@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 
 import '../../core/theme/app_theme.dart';
+import '../../widgets/figma_icon.dart';
 import '../../models/app_models.dart';
 import '../../widgets/common.dart';
 
@@ -16,7 +17,10 @@ class _AiSuggestionsScreenState extends State<AiSuggestionsScreen> {
   @override
   Widget build(BuildContext context) => Scaffold(
     backgroundColor: const Color(0xFF2E1442),
-    appBar: AppBar(foregroundColor: Colors.white),
+    appBar: AppBar(
+      leading: const FigmaBackButton(color: Colors.white),
+      foregroundColor: Colors.white,
+    ),
     body: ListView(
       padding: const EdgeInsets.fromLTRB(16, 0, 16, 24),
       children: [
@@ -172,7 +176,7 @@ class _Reason extends StatelessWidget {
     padding: const EdgeInsets.only(top: 12),
     child: Row(
       children: [
-        const Icon(Icons.check_circle, color: AppColors.success, size: 17),
+        const FigmaAnalysisStatus(done: true, inProgress: false, size: 17),
         const SizedBox(width: 12),
         Expanded(child: Text(text)),
       ],

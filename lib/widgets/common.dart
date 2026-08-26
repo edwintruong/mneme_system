@@ -3,6 +3,7 @@ import 'package:flutter/material.dart';
 import '../core/theme/app_theme.dart';
 import '../models/app_models.dart';
 import '../screens/link/link_detail_screen.dart';
+import 'figma_icon.dart';
 
 class SearchCard extends StatelessWidget {
   const SearchCard({super.key, this.onTap});
@@ -28,7 +29,7 @@ class SearchCard extends StatelessWidget {
                 ),
                 child: const Row(
                   children: [
-                    Icon(Icons.search, size: 18),
+                    FigmaIcon(FigmaAssets.search, size: 16),
                     SizedBox(width: 10),
                     Text(
                       'Enter search terms...',
@@ -46,7 +47,7 @@ class SearchCard extends StatelessWidget {
                 color: AppColors.surfaceMuted,
                 shape: BoxShape.circle,
               ),
-              child: const Icon(Icons.filter_list_rounded),
+              child: const FigmaIcon(FigmaAssets.filter, size: 36),
             ),
           ],
         ),
@@ -166,7 +167,7 @@ class LinkTile extends StatelessWidget {
               ],
             ),
           ),
-          const Icon(Icons.more_vert, size: 18),
+          const FigmaIcon(FigmaAssets.moreVertical, size: 18),
         ],
       ),
     ),

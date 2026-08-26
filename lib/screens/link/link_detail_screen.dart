@@ -4,6 +4,7 @@ import '../../core/theme/app_theme.dart';
 import '../../models/app_models.dart';
 import '../../state/store_scope.dart';
 import '../../widgets/common.dart';
+import '../../widgets/figma_icon.dart';
 import 'edit_link_screen.dart';
 
 class LinkDetailScreen extends StatelessWidget {
@@ -14,6 +15,7 @@ class LinkDetailScreen extends StatelessWidget {
     final store = StoreScope.of(context);
     return Scaffold(
       appBar: AppBar(
+        leading: const FigmaBackButton(),
         actions: [
           IconButton(
             onPressed: () => showModalBottomSheet<void>(
@@ -24,11 +26,7 @@ class LinkDetailScreen extends StatelessWidget {
                   child: Column(
                     mainAxisSize: MainAxisSize.min,
                     children: [
-                      Icon(
-                        Icons.share_outlined,
-                        size: 34,
-                        color: AppColors.primary,
-                      ),
+                      FigmaIcon(FigmaAssets.share, size: 34),
                       SizedBox(height: 14),
                       Text(
                         'Chia sẻ liên kết',
@@ -47,7 +45,7 @@ class LinkDetailScreen extends StatelessWidget {
                 ),
               ),
             ),
-            icon: const Icon(Icons.share_outlined),
+            icon: const FigmaIcon(FigmaAssets.share),
           ),
         ],
       ),
@@ -72,7 +70,7 @@ class LinkDetailScreen extends StatelessWidget {
                 shape: BoxShape.circle,
               ),
               child: PopupMenuButton<String>(
-                icon: const Icon(Icons.more_horiz, color: AppColors.primary),
+                icon: const FigmaIcon(FigmaAssets.moreHorizontal),
                 onSelected: (value) async {
                   if (value == 'edit') {
                     final changed = await Navigator.push<bool>(
@@ -157,9 +155,9 @@ class LinkDetailScreen extends StatelessWidget {
                         style: Theme.of(context).textTheme.titleMedium,
                       ),
                     ),
-                    Icon(
-                      link.favorite ? Icons.star : Icons.star_border,
-                      color: Colors.amber,
+                    FigmaIcon(
+                      FigmaAssets.star,
+                      color: link.favorite ? Colors.amber : AppColors.muted,
                     ),
                   ],
                 ),
@@ -180,7 +178,7 @@ class LinkDetailScreen extends StatelessWidget {
                           overflow: TextOverflow.ellipsis,
                         ),
                       ),
-                      const Icon(Icons.copy_outlined),
+                      const FigmaIcon(FigmaAssets.copy),
                     ],
                   ),
                 ),
@@ -194,20 +192,16 @@ class LinkDetailScreen extends StatelessWidget {
                     const Tag('Design', primary: true),
                     Tag(link.folder),
                     const Tag('Figma', primary: true),
-                    const CircleAvatar(
-                      radius: 16,
-                      backgroundColor: AppColors.primary,
-                      child: Icon(Icons.add, color: Colors.white, size: 18),
-                    ),
+                    const FigmaIcon(FigmaAssets.plusCircle, size: 32),
                   ],
                 ),
                 const SizedBox(height: 24),
                 Row(
                   children: [
-                    const Icon(Icons.layers_outlined),
+                    const FigmaIcon(FigmaAssets.layers),
                     const SizedBox(width: 10),
                     const Expanded(child: Text('Nguồn')),
-                    const Icon(Icons.play_circle, color: Colors.red),
+                    const FigmaIcon(FigmaAssets.youtube),
                     const SizedBox(width: 8),
                     Text(link.source),
                   ],
@@ -215,7 +209,7 @@ class LinkDetailScreen extends StatelessWidget {
                 const SizedBox(height: 14),
                 const Row(
                   children: [
-                    Icon(Icons.schedule),
+                    FigmaIcon(FigmaAssets.clock, size: 20),
                     SizedBox(width: 10),
                     Expanded(child: Text('Đã lưu')),
                     Text('2 giờ trước'),

@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 
 import '../../models/app_models.dart';
 import '../../widgets/common.dart';
+import '../../widgets/figma_icon.dart';
 import 'ai_suggestions_screen.dart';
 
 class NotebookDetailScreen extends StatelessWidget {
@@ -10,6 +11,7 @@ class NotebookDetailScreen extends StatelessWidget {
   @override
   Widget build(BuildContext context) => Scaffold(
     appBar: AppBar(
+      leading: const FigmaBackButton(),
       actions: [
         IconButton(
           onPressed: () => Navigator.push(
@@ -18,7 +20,7 @@ class NotebookDetailScreen extends StatelessWidget {
               builder: (_) => AiSuggestionsScreen(notebook: notebook),
             ),
           ),
-          icon: const Icon(Icons.more_horiz),
+          icon: const FigmaIcon(FigmaAssets.moreHorizontal),
         ),
       ],
     ),
@@ -29,7 +31,7 @@ class NotebookDetailScreen extends StatelessWidget {
           Expanded(
             child: OutlinedButton.icon(
               onPressed: () {},
-              icon: const Icon(Icons.share_outlined),
+              icon: const FigmaIcon(FigmaAssets.share),
               label: const Text('Chia sẻ'),
             ),
           ),
@@ -37,7 +39,7 @@ class NotebookDetailScreen extends StatelessWidget {
           Expanded(
             child: FilledButton.icon(
               onPressed: () {},
-              icon: const Icon(Icons.menu_book_outlined),
+              icon: const FigmaIcon(FigmaAssets.openBook),
               label: const Text('Xem sổ tay'),
             ),
           ),
@@ -69,7 +71,10 @@ class NotebookDetailScreen extends StatelessWidget {
                       color: Colors.white.withValues(alpha: .16),
                       shape: BoxShape.circle,
                     ),
-                    child: const Icon(Icons.star, color: Colors.amber),
+                    child: const FigmaIcon(
+                      FigmaAssets.star,
+                      color: Colors.amber,
+                    ),
                   ),
                 ],
               ),
@@ -95,7 +100,7 @@ class NotebookDetailScreen extends StatelessWidget {
               const SizedBox(height: 10),
               const Row(
                 children: [
-                  Icon(Icons.auto_awesome, color: Colors.white, size: 18),
+                  FigmaIcon(FigmaAssets.ai, size: 18, color: Colors.white),
                   SizedBox(width: 8),
                   Text(
                     'Tạo bởi AI 2/2/2022',

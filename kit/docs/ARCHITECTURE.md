@@ -19,5 +19,6 @@ Android external shares enter through `MainActivity` (`ACTION_SEND` / `text/plai
 
 - No login or remote backend in showcase mode.
 - Demo content must survive app restart.
-- Any Figma-exported raster used in committed code must be stored under `assets/images`; never leave an expiring Figma URL in Dart.
-- Common Material icons are allowed only where their glyph clearly matches the Figma icon.
+- Figma-exported raster assets belong under `assets/images`; exact vector exports belong under `assets/icons/figma`. Never leave an expiring Figma URL in Dart.
+- Do not use `Icons.*`, `Icon`, or a hand-authored SVG as a visual substitute. Use `FigmaIcon`/`FigmaVector` with the committed bytes exported from the exact node.
+- `figma_tokens.dart` is the Flutter equivalent of the Figma/CSS variable layer. Reuse its color, typography, spacing, radius, and shadow values before adding literals.

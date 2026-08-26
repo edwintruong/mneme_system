@@ -4,6 +4,7 @@ import '../../core/theme/app_theme.dart';
 import '../../models/app_models.dart';
 import '../../state/store_scope.dart';
 import '../../widgets/common.dart';
+import '../../widgets/figma_icon.dart';
 
 class EditLinkScreen extends StatefulWidget {
   const EditLinkScreen({super.key, required this.link});
@@ -23,6 +24,7 @@ class _EditLinkScreenState extends State<EditLinkScreen> {
     final store = StoreScope.of(context);
     return Scaffold(
       appBar: AppBar(
+        leading: const FigmaBackButton(),
         title: const Text('Chỉnh sửa liên kết'),
         centerTitle: true,
       ),
@@ -67,6 +69,7 @@ class _EditLinkScreenState extends State<EditLinkScreen> {
           const Text('Folder', style: TextStyle(fontWeight: FontWeight.w600)),
           const SizedBox(height: 8),
           DropdownButtonFormField<String>(
+            icon: const FigmaIcon(FigmaAssets.dropdown),
             initialValue: folder,
             items: store.folders
                 .map((f) => DropdownMenuItem(value: f, child: Text(f)))
@@ -86,7 +89,7 @@ class _EditLinkScreenState extends State<EditLinkScreen> {
               CircleAvatar(
                 radius: 16,
                 backgroundColor: AppColors.primarySoft,
-                child: Icon(Icons.add, color: AppColors.primary, size: 18),
+                child: FigmaIcon(FigmaAssets.plusSmall, size: 18),
               ),
             ],
           ),

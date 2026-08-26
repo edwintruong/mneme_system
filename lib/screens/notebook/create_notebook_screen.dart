@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 
 import '../../core/theme/app_theme.dart';
+import '../../widgets/figma_icon.dart';
 import 'select_sources_screen.dart';
 
 class CreateNotebookScreen extends StatelessWidget {
@@ -10,6 +11,7 @@ class CreateNotebookScreen extends StatelessWidget {
     return Scaffold(
       backgroundColor: AppColors.primary,
       appBar: AppBar(
+        leading: const FigmaBackButton(),
         foregroundColor: Colors.white,
         title: const Text('Tạo sổ tay mới'),
         centerTitle: true,
@@ -107,7 +109,7 @@ class _SourceCard extends StatelessWidget {
                 ],
               ),
             ),
-            const Icon(Icons.chevron_right),
+            const FigmaIcon(FigmaAssets.chevronRight, size: 30),
           ],
         ),
       ),

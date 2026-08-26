@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 
 import '../../state/store_scope.dart';
 import '../../widgets/common.dart';
+import '../../widgets/figma_icon.dart';
 import '../../models/app_models.dart';
 
 class SearchScreen extends StatefulWidget {
@@ -19,7 +20,10 @@ class _SearchScreenState extends State<SearchScreen> {
         .where((link) => _semanticMatch(link, query))
         .toList();
     return Scaffold(
-      appBar: AppBar(title: const Text('Tìm kiếm')),
+      appBar: AppBar(
+        leading: const FigmaBackButton(),
+        title: const Text('Tìm kiếm'),
+      ),
       body: ListView(
         padding: const EdgeInsets.all(20),
         children: [
@@ -27,7 +31,10 @@ class _SearchScreenState extends State<SearchScreen> {
             autofocus: true,
             onChanged: (v) => setState(() => query = v),
             decoration: const InputDecoration(
-              prefixIcon: Icon(Icons.search),
+              prefixIcon: Center(
+                widthFactor: 1,
+                child: FigmaIcon(FigmaAssets.search, size: 16),
+              ),
               hintText: 'Tìm link, folder hoặc category...',
             ),
           ),

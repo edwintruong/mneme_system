@@ -3,6 +3,7 @@ import 'package:flutter/material.dart';
 import '../../core/theme/app_theme.dart';
 import '../../state/store_scope.dart';
 import '../../widgets/common.dart';
+import '../../widgets/figma_icon.dart';
 import 'create_notebook_screen.dart';
 import 'notebook_detail_screen.dart';
 
@@ -31,7 +32,7 @@ class NotebookScreen extends StatelessWidget {
                     builder: (_) => const CreateNotebookScreen(),
                   ),
                 ),
-                icon: const Icon(Icons.add_circle_outline),
+                icon: const FigmaIcon(FigmaAssets.addCircle),
                 label: const Text('Tạo sổ tay'),
               ),
             ],

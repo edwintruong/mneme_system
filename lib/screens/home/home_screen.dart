@@ -1,8 +1,10 @@
 import 'package:flutter/material.dart';
 
 import '../../core/theme/app_theme.dart';
+import '../../core/theme/figma_tokens.dart';
 import '../../state/store_scope.dart';
 import '../../widgets/common.dart';
+import '../../widgets/figma_icon.dart';
 import '../folder/category_screen.dart';
 import '../search/search_screen.dart';
 import '../notebook/create_notebook_screen.dart';
@@ -55,7 +57,7 @@ class HomeScreen extends StatelessWidget {
                     CircleAvatar(
                       backgroundColor: AppColors.primary,
                       foregroundColor: Colors.white,
-                      child: Icon(Icons.auto_awesome),
+                      child: FigmaIcon(FigmaAssets.ai, color: Colors.white),
                     ),
                     SizedBox(width: 12),
                     Expanded(
@@ -77,7 +79,7 @@ class HomeScreen extends StatelessWidget {
                         ],
                       ),
                     ),
-                    Icon(Icons.chevron_right, color: AppColors.primary),
+                    FigmaIcon(FigmaAssets.chevronRight, size: 30),
                   ],
                 ),
               ),
@@ -88,14 +90,8 @@ class HomeScreen extends StatelessWidget {
             padding: const EdgeInsets.all(16),
             decoration: BoxDecoration(
               color: Colors.white,
-              borderRadius: BorderRadius.circular(20),
-              boxShadow: const [
-                BoxShadow(
-                  color: Color(0x0F000000),
-                  blurRadius: 8,
-                  offset: Offset(0, 4),
-                ),
-              ],
+              borderRadius: BorderRadius.circular(FigmaRadii.card),
+              boxShadow: FigmaShadows.card,
             ),
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.start,
@@ -170,10 +166,7 @@ class HomeScreen extends StatelessWidget {
                               ],
                             ),
                           ),
-                          const Icon(
-                            Icons.chevron_right,
-                            color: AppColors.muted,
-                          ),
+                          const FigmaIcon(FigmaAssets.chevronRight, size: 30),
                         ],
                       ),
                     ),

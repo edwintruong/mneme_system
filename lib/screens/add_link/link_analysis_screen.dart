@@ -3,6 +3,7 @@ import 'package:flutter/material.dart';
 import '../../core/theme/app_theme.dart';
 import '../../state/mneme_store.dart';
 import '../../state/store_scope.dart';
+import '../../widgets/figma_icon.dart';
 
 class LinkAnalysisScreen extends StatefulWidget {
   const LinkAnalysisScreen({
@@ -60,7 +61,11 @@ class _LinkAnalysisScreenState extends State<LinkAnalysisScreen> {
 
   @override
   Widget build(BuildContext context) => Scaffold(
-    appBar: AppBar(title: const Text('AI đang phân tích'), centerTitle: true),
+    appBar: AppBar(
+      leading: const FigmaBackButton(),
+      title: const Text('AI đang phân tích'),
+      centerTitle: true,
+    ),
     body: Padding(
       padding: const EdgeInsets.all(20),
       child: Column(
@@ -90,15 +95,9 @@ class _LinkAnalysisScreenState extends State<LinkAnalysisScreen> {
               padding: const EdgeInsets.symmetric(vertical: 6),
               child: Row(
                 children: [
-                  Icon(
-                    i < completed
-                        ? Icons.check_circle
-                        : i == completed
-                        ? Icons.sync
-                        : Icons.circle_outlined,
-                    color: i < completed
-                        ? AppColors.success
-                        : AppColors.primary,
+                  FigmaAnalysisStatus(
+                    done: i < completed,
+                    inProgress: i == completed,
                   ),
                   const SizedBox(width: 12),
                   Text(steps[i]),

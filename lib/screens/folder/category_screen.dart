@@ -4,6 +4,7 @@ import '../../core/theme/app_theme.dart';
 import '../../models/app_models.dart';
 import '../../state/store_scope.dart';
 import '../../widgets/common.dart';
+import '../../widgets/figma_icon.dart';
 import 'folder_detail_screen.dart';
 
 class CategoryScreen extends StatelessWidget {
@@ -14,10 +15,14 @@ class CategoryScreen extends StatelessWidget {
     final store = StoreScope.of(context);
     return Scaffold(
       appBar: AppBar(
+        leading: const FigmaBackButton(),
         title: const Text('Design'),
         centerTitle: true,
         actions: [
-          IconButton(onPressed: () {}, icon: const Icon(Icons.more_horiz)),
+          IconButton(
+            onPressed: () {},
+            icon: const FigmaIcon(FigmaAssets.moreHorizontal),
+          ),
         ],
       ),
       body: ListView(
@@ -40,7 +45,7 @@ class CategoryScreen extends StatelessWidget {
                   'Folders (${store.folders.length})',
                   trailing: TextButton.icon(
                     onPressed: () => _createFolder(context, store),
-                    icon: const Icon(Icons.add, size: 18),
+                    icon: const FigmaIcon(FigmaAssets.plusSmall, size: 18),
                     label: const Text('Tạo folder'),
                   ),
                 ),
@@ -72,10 +77,10 @@ class CategoryScreen extends StatelessWidget {
                       ),
                       child: Row(
                         children: [
-                          const Icon(
-                            Icons.folder_rounded,
-                            color: Color(0xFFB67BFF),
+                          const MnemeImage(
+                            'assets/images/folder_design.png',
                             size: 38,
+                            radius: 9,
                           ),
                           const SizedBox(width: 8),
                           Expanded(

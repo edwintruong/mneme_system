@@ -1,14 +1,16 @@
 import 'package:flutter/material.dart';
 
+import 'figma_tokens.dart';
+
 abstract final class AppColors {
-  static const background = Color(0xFFF8F6FD);
-  static const primary = Color(0xFF7758E2);
-  static const primaryDark = Color(0xFF613EEA);
-  static const primarySoft = Color(0xFFF1EEFC);
-  static const ink = Color(0xFF0E0727);
-  static const muted = Color(0xFF9490A2);
-  static const surfaceMuted = Color(0xFFF5F5F7);
-  static const success = Color(0xFF31CF37);
+  static const background = FigmaColors.background;
+  static const primary = FigmaColors.primary;
+  static const primaryDark = FigmaColors.primaryDark;
+  static const primarySoft = FigmaColors.primarySoft;
+  static const ink = FigmaColors.ink;
+  static const muted = FigmaColors.muted;
+  static const surfaceMuted = FigmaColors.neutral500;
+  static const success = FigmaColors.success;
 }
 
 ThemeData buildAppTheme() => ThemeData(
@@ -20,12 +22,7 @@ ThemeData buildAppTheme() => ThemeData(
   scaffoldBackgroundColor: AppColors.background,
   fontFamily: 'Roboto',
   textTheme: const TextTheme(
-    headlineSmall: TextStyle(
-      fontSize: 24,
-      height: 1.25,
-      fontWeight: FontWeight.w500,
-      color: AppColors.ink,
-    ),
+    headlineSmall: FigmaType.headingH3Medium,
     titleLarge: TextStyle(
       fontSize: 20,
       height: 1.25,
@@ -38,7 +35,7 @@ ThemeData buildAppTheme() => ThemeData(
       fontWeight: FontWeight.w600,
       color: AppColors.ink,
     ),
-    bodyLarge: TextStyle(fontSize: 16, height: 1.5, color: AppColors.ink),
+    bodyLarge: FigmaType.body16Medium,
     bodyMedium: TextStyle(fontSize: 14, height: 1.45, color: AppColors.ink),
     labelLarge: TextStyle(fontSize: 16, fontWeight: FontWeight.w600),
   ),
@@ -51,15 +48,15 @@ ThemeData buildAppTheme() => ThemeData(
     filled: true,
     fillColor: AppColors.surfaceMuted,
     border: OutlineInputBorder(
-      borderRadius: BorderRadius.circular(14),
+      borderRadius: BorderRadius.circular(FigmaRadii.control),
       borderSide: BorderSide.none,
     ),
     enabledBorder: OutlineInputBorder(
-      borderRadius: BorderRadius.circular(14),
+      borderRadius: BorderRadius.circular(FigmaRadii.control),
       borderSide: BorderSide.none,
     ),
     focusedBorder: OutlineInputBorder(
-      borderRadius: BorderRadius.circular(14),
+      borderRadius: BorderRadius.circular(FigmaRadii.control),
       borderSide: const BorderSide(color: AppColors.primary),
     ),
     contentPadding: const EdgeInsets.symmetric(horizontal: 14, vertical: 14),
@@ -69,7 +66,9 @@ ThemeData buildAppTheme() => ThemeData(
       backgroundColor: AppColors.primary,
       foregroundColor: Colors.white,
       minimumSize: const Size(0, 48),
-      shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(14)),
+      shape: RoundedRectangleBorder(
+        borderRadius: BorderRadius.circular(FigmaRadii.control),
+      ),
     ),
   ),
 );

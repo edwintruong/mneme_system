@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 
 import '../../core/theme/app_theme.dart';
+import '../../widgets/figma_icon.dart';
 import '../../state/store_scope.dart';
 import '../../widgets/common.dart';
 import '../notebook/ai_suggestions_screen.dart';
@@ -27,7 +28,7 @@ class ActivityScreen extends StatelessWidget {
                 const CircleAvatar(
                   radius: 28,
                   backgroundColor: AppColors.primarySoft,
-                  child: Icon(Icons.auto_awesome, color: AppColors.primary),
+                  child: FigmaIcon(FigmaAssets.ai, color: AppColors.primary),
                 ),
                 const SizedBox(height: 12),
                 const Text(

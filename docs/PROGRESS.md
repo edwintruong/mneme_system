@@ -21,6 +21,9 @@ The first runnable Flutter showcase milestone is complete. The app is local-firs
 - Added the post-share AI analysis state, semantic natural-language retrieval for the script's air-fryer cake example, and a proactive Home notebook CTA.
 - Added a real Android `ACTION_SEND` text share target; cold and warm share intents open the pre-filled Flutter intake flow.
 - Added durable agent handoff instructions and Figma node mapping under `kit/`.
+- Re-read 11 exact Figma screen/component nodes with the design-to-code workflow and downloaded 130 SVG vector exports into the repository.
+- Removed all Material `Icons.*` usage, added fixed-size `FigmaIcon`/`FigmaVector` renderers, and rebuilt the notched bottom navigation with its exported Figma vectors.
+- Added CSS-equivalent Figma color, type, spacing, radius, and shadow tokens plus an enforceable asset contract for future agents.
 - `flutter analyze`: clean.
 - `flutter test`: passing.
 
@@ -38,7 +41,7 @@ The first runnable Flutter showcase milestone is complete. The app is local-firs
 ## Next work
 
 1. Run the app on a 390x844 emulator and compare every happy-path screen against its Figma screenshot (no Android emulator is installed in the current environment).
-2. Refine spacing/typography and test smaller Android device overflow.
+2. Capture pixel-diff screenshots on that emulator and refine any remaining per-screen spacing.
 3. Add the secondary Figma states: multi-select edit, rename/tag sheets, empty search/filter, and share states.
 4. Add an iOS Share Extension if the final recording must use an iPhone rather than the current Android showcase path.
 

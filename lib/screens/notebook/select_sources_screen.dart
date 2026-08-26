@@ -3,6 +3,7 @@ import 'package:flutter/material.dart';
 import '../../core/theme/app_theme.dart';
 import '../../state/store_scope.dart';
 import '../../widgets/common.dart';
+import '../../widgets/figma_icon.dart';
 import 'notebook_analysis_screen.dart';
 
 class SelectSourcesScreen extends StatefulWidget {
@@ -18,7 +19,11 @@ class _SelectSourcesScreenState extends State<SelectSourcesScreen> {
   Widget build(BuildContext context) {
     final store = StoreScope.of(context);
     return Scaffold(
-      appBar: AppBar(title: const Text('Tạo sổ tay mới'), centerTitle: true),
+      appBar: AppBar(
+        leading: const FigmaBackButton(),
+        title: const Text('Tạo sổ tay mới'),
+        centerTitle: true,
+      ),
       bottomNavigationBar: SafeArea(
         minimum: const EdgeInsets.all(20),
         child: FilledButton(
@@ -58,17 +63,40 @@ class _SelectSourcesScreenState extends State<SelectSourcesScreen> {
                     ? Border.all(color: AppColors.primary, width: 2)
                     : null,
               ),
-              child: CheckboxListTile(
-                value: selected.contains(link.id),
-                activeColor: AppColors.primary,
-                controlAffinity: ListTileControlAffinity.leading,
-                secondary: MnemeImage(link.image, size: 68, radius: 13),
-                title: Text(link.title, maxLines: 2),
-                subtitle: Text('${link.source} · ${link.folder}'),
-                onChanged: (_) => setState(
+              child: InkWell(
+                onTap: () => setState(
                   () => selected.contains(link.id)
                       ? selected.remove(link.id)
                       : selected.add(link.id),
+                ),
+                borderRadius: BorderRadius.circular(16),
+                child: Padding(
+                  padding: const EdgeInsets.all(12),
+                  child: Row(
+                    children: [
+                      FigmaIcon(
+                        selected.contains(link.id)
+                            ? FigmaAssets.radioSelected
+                            : FigmaAssets.radio,
+                      ),
+                      const SizedBox(width: 10),
+                      MnemeImage(link.image, size: 68, radius: 13),
+                      const SizedBox(width: 10),
+                      Expanded(
+                        child: Column(
+                          crossAxisAlignment: CrossAxisAlignment.start,
+                          children: [
+                            Text(link.title, maxLines: 2),
+                            const SizedBox(height: 6),
+                            Text(
+                              '${link.source} · ${link.folder}',
+                              style: const TextStyle(color: AppColors.muted),
+                            ),
+                          ],
+                        ),
+                      ),
+                    ],
+                  ),
                 ),
               ),
             ),

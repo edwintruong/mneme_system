@@ -5,6 +5,7 @@ import '../../models/app_models.dart';
 import '../../state/store_scope.dart';
 import '../../state/mneme_store.dart';
 import '../../widgets/common.dart';
+import '../../widgets/figma_icon.dart';
 
 class FolderDetailScreen extends StatefulWidget {
   const FolderDetailScreen({super.key, required this.folder});
@@ -26,9 +27,9 @@ class _FolderDetailScreenState extends State<FolderDetailScreen> {
         leading: selecting
             ? IconButton(
                 onPressed: () => setState(selected.clear),
-                icon: const Icon(Icons.close),
+                icon: const FigmaIcon(FigmaAssets.close),
               )
-            : null,
+            : const FigmaBackButton(),
         title: Text(selecting ? '${selected.length} đã chọn' : widget.folder),
         centerTitle: true,
         actions: selecting
@@ -41,11 +42,12 @@ class _FolderDetailScreenState extends State<FolderDetailScreen> {
                       selected.addAll(links.map((e) => e.id));
                     }
                   }),
-                  icon: const Icon(Icons.select_all),
+                  icon: const FigmaIcon(FigmaAssets.radioSelected),
                 ),
               ]
             : [
                 PopupMenuButton(
+                  icon: const FigmaIcon(FigmaAssets.folderMore),
                   itemBuilder: (_) => const [
                     PopupMenuItem(child: Text('Đổi tên')),
                     PopupMenuItem(child: Text('Chỉnh sửa tag')),
@@ -60,7 +62,7 @@ class _FolderDetailScreenState extends State<FolderDetailScreen> {
               onPressed: () {},
               backgroundColor: AppColors.primary,
               foregroundColor: Colors.white,
-              child: const Icon(Icons.add),
+              child: const FigmaIcon(FigmaAssets.plus, color: Colors.white),
             ),
       bottomNavigationBar: selecting
           ? SafeArea(
@@ -70,7 +72,7 @@ class _FolderDetailScreenState extends State<FolderDetailScreen> {
                   Expanded(
                     child: OutlinedButton.icon(
                       onPressed: () => _move(context, store),
-                      icon: const Icon(Icons.drive_file_move_outline),
+                      icon: const FigmaIcon(FigmaAssets.moveFolder),
                       label: const Text('Thêm vào folder'),
                     ),
                   ),
@@ -78,7 +80,7 @@ class _FolderDetailScreenState extends State<FolderDetailScreen> {
                   Expanded(
                     child: FilledButton.icon(
                       onPressed: () => _delete(context, store),
-                      icon: const Icon(Icons.delete_outline),
+                      icon: const FigmaIcon(FigmaAssets.delete),
                       label: const Text('Xóa'),
                     ),
                   ),
@@ -93,10 +95,10 @@ class _FolderDetailScreenState extends State<FolderDetailScreen> {
           const SizedBox(height: 18),
           Row(
             children: [
-              const Icon(
-                Icons.folder_rounded,
-                color: Color(0xFFB67BFF),
+              const MnemeImage(
+                'assets/images/folder_design.png',
                 size: 50,
+                radius: 12,
               ),
               const SizedBox(width: 12),
               Column(
@@ -120,7 +122,7 @@ class _FolderDetailScreenState extends State<FolderDetailScreen> {
               padding: EdgeInsets.only(top: 100),
               child: Column(
                 children: [
-                  Icon(Icons.inbox_outlined, size: 64, color: AppColors.muted),
+                  FigmaIcon(FigmaAssets.openBook, size: 64),
                   SizedBox(height: 16),
                   Text('Chưa có liên kết nào trong thư mục này'),
                 ],
@@ -158,9 +160,10 @@ class _FolderDetailScreenState extends State<FolderDetailScreen> {
             const SizedBox(height: 10),
             ...store.folders.map<Widget>(
               (f) => ListTile(
-                leading: const Icon(
-                  Icons.folder_outlined,
-                  color: AppColors.primary,
+                leading: const MnemeImage(
+                  'assets/images/folder_design.png',
+                  size: 36,
+                  radius: 9,
                 ),
                 title: Text(f),
                 onTap: () => Navigator.pop(context, f),
@@ -229,7 +232,7 @@ class _SelectableLink extends StatelessWidget {
           if (selected)
             const Padding(
               padding: EdgeInsets.only(right: 6),
-              child: Icon(Icons.check_circle, color: AppColors.primary),
+              child: FigmaIcon(FigmaAssets.radioSelected),
             ),
           Expanded(
             child: IgnorePointer(

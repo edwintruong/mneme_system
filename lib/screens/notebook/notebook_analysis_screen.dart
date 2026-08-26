@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 
 import '../../core/theme/app_theme.dart';
 import '../../state/store_scope.dart';
+import '../../widgets/figma_icon.dart';
 import 'notebook_detail_screen.dart';
 
 class NotebookAnalysisScreen extends StatefulWidget {
@@ -47,7 +48,11 @@ class _NotebookAnalysisScreenState extends State<NotebookAnalysisScreen> {
 
   @override
   Widget build(BuildContext context) => Scaffold(
-    appBar: AppBar(title: const Text('Tạo sổ tay mới'), centerTitle: true),
+    appBar: AppBar(
+      leading: const FigmaBackButton(),
+      title: const Text('Tạo sổ tay mới'),
+      centerTitle: true,
+    ),
     body: Padding(
       padding: const EdgeInsets.all(20),
       child: Column(
@@ -77,16 +82,10 @@ class _NotebookAnalysisScreenState extends State<NotebookAnalysisScreen> {
                 children: [
                   AnimatedSwitcher(
                     duration: const Duration(milliseconds: 200),
-                    child: Icon(
-                      i < completed
-                          ? Icons.check_circle
-                          : i == completed
-                          ? Icons.sync
-                          : Icons.circle_outlined,
+                    child: FigmaAnalysisStatus(
                       key: ValueKey(i < completed),
-                      color: i < completed
-                          ? AppColors.success
-                          : AppColors.primary,
+                      done: i < completed,
+                      inProgress: i == completed,
                       size: 22,
                     ),
                   ),

@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 
 import '../../core/theme/app_theme.dart';
 import '../../widgets/common.dart';
+import '../../widgets/figma_icon.dart';
 
 class ProfileScreen extends StatelessWidget {
   const ProfileScreen({super.key});
@@ -37,20 +38,20 @@ class ProfileScreen extends StatelessWidget {
           child: const Column(
             children: [
               ListTile(
-                leading: Icon(Icons.palette_outlined),
+                leading: FigmaIcon(FigmaAssets.edit),
                 title: Text('Giao diện'),
-                trailing: Icon(Icons.chevron_right),
+                trailing: FigmaIcon(FigmaAssets.chevronRight, size: 24),
               ),
               Divider(height: 1),
               ListTile(
-                leading: Icon(Icons.storage_outlined),
+                leading: FigmaIcon(FigmaAssets.layers),
                 title: Text('Dữ liệu local'),
                 subtitle: Text('SQLite trên thiết bị'),
-                trailing: Icon(Icons.check_circle, color: AppColors.success),
+                trailing: FigmaAnalysisStatus(done: true, inProgress: false),
               ),
               Divider(height: 1),
               ListTile(
-                leading: Icon(Icons.info_outline),
+                leading: FigmaIcon(FigmaAssets.openBook),
                 title: Text('Mneme Showcase'),
                 subtitle: Text('Version 1.0.0'),
               ),

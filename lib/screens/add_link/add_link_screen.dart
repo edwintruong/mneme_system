@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 
 import '../../core/theme/app_theme.dart';
+import '../../widgets/figma_icon.dart';
 import '../../state/store_scope.dart';
 import '../../widgets/common.dart';
 import 'link_analysis_screen.dart';
@@ -35,7 +36,11 @@ class _AddLinkScreenState extends State<AddLinkScreen> {
   Widget build(BuildContext context) {
     final store = StoreScope.of(context);
     return Scaffold(
-      appBar: AppBar(title: const Text('Thêm liên kết'), centerTitle: true),
+      appBar: AppBar(
+        leading: const FigmaBackButton(),
+        title: const Text('Thêm liên kết'),
+        centerTitle: true,
+      ),
       bottomNavigationBar: SafeArea(
         minimum: const EdgeInsets.all(16),
         child: FilledButton(
@@ -65,8 +70,14 @@ class _AddLinkScreenState extends State<AddLinkScreen> {
           TextField(
             controller: controller,
             decoration: const InputDecoration(
-              prefixIcon: Icon(Icons.link),
-              suffixIcon: Icon(Icons.close),
+              prefixIcon: Center(
+                widthFactor: 1,
+                child: FigmaIcon(FigmaAssets.link),
+              ),
+              suffixIcon: Center(
+                widthFactor: 1,
+                child: FigmaIcon(FigmaAssets.close),
+              ),
             ),
           ),
           const SizedBox(height: 16),
@@ -136,7 +147,7 @@ class _AddLinkScreenState extends State<AddLinkScreen> {
                     ],
                   ),
                 ),
-                Icon(Icons.keyboard_arrow_down),
+                FigmaIcon(FigmaAssets.dropdown),
               ],
             ),
           ),
@@ -144,6 +155,7 @@ class _AddLinkScreenState extends State<AddLinkScreen> {
           const Text('Folder', style: TextStyle(fontWeight: FontWeight.w600)),
           const SizedBox(height: 8),
           DropdownButtonFormField<String>(
+            icon: const FigmaIcon(FigmaAssets.dropdown),
             initialValue: folder,
             items: store.folders
                 .map((f) => DropdownMenuItem(value: f, child: Text(f)))
