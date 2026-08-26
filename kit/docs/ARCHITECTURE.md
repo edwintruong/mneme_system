@@ -13,6 +13,8 @@
 
 Screen action → `MnemeStore` mutation → SQLite write → `load()` → `notifyListeners()` → subscribed screens rebuild through `StoreScope`.
 
+Android external shares enter through `MainActivity` (`ACTION_SEND` / `text/plain`), cross the `mneme/share` method channel in `ShareIntentBridge`, and open `AddLinkScreen` from `AppShell` for both cold and warm app states.
+
 ## Product constraints
 
 - No login or remote backend in showcase mode.

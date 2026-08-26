@@ -6,9 +6,11 @@ import '../add_link/add_link_screen.dart';
 import '../home/home_screen.dart';
 import '../notebook/notebook_screen.dart';
 import '../profile/profile_screen.dart';
+import '../../platform/share_intent_bridge.dart';
 
 class AppShell extends StatefulWidget {
-  const AppShell({super.key});
+  const AppShell({super.key, this.initialSharedText});
+  final String? initialSharedText;
   @override
   State<AppShell> createState() => _AppShellState();
 }
@@ -21,6 +23,31 @@ class _AppShellState extends State<AppShell> {
     ActivityScreen(),
     ProfileScreen(),
   ];
+  @override
+  void initState() {
+    super.initState();
+    ShareIntentBridge.listen(_openSharedText);
+    if (widget.initialSharedText != null) {
+      WidgetsBinding.instance.addPostFrameCallback(
+        (_) => _openSharedText(widget.initialSharedText!),
+      );
+    }
+  }
+
+  @override
+  void dispose() {
+    ShareIntentBridge.stopListening();
+    super.dispose();
+  }
+
+  void _openSharedText(String text) {
+    if (!mounted) return;
+    Navigator.push(
+      context,
+      MaterialPageRoute(builder: (_) => AddLinkScreen(initialUrl: text)),
+    );
+  }
+
   @override
   Widget build(BuildContext context) => Scaffold(
     body: IndexedStack(index: index, children: screens),

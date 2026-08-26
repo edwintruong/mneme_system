@@ -6,8 +6,9 @@ import 'state/mneme_store.dart';
 import 'state/store_scope.dart';
 
 class MnemeApp extends StatelessWidget {
-  const MnemeApp({super.key, required this.store});
+  const MnemeApp({super.key, required this.store, this.initialSharedText});
   final MnemeStore store;
+  final String? initialSharedText;
 
   @override
   Widget build(BuildContext context) => StoreScope(
@@ -16,7 +17,7 @@ class MnemeApp extends StatelessWidget {
       title: 'Mneme',
       debugShowCheckedModeBanner: false,
       theme: buildAppTheme(),
-      home: const AppShell(),
+      home: AppShell(initialSharedText: initialSharedText),
     ),
   );
 }

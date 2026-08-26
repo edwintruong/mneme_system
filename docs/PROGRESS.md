@@ -19,6 +19,7 @@ The first runnable Flutter showcase milestone is complete. The app is local-firs
 - Added an inferred five-part showcase script in `docs/DEMO_SCRIPT.md`.
 - Re-read the original attached 0:00–1:05 video script and replaced the inferred version with an exact screen/action mapping.
 - Added the post-share AI analysis state, semantic natural-language retrieval for the script's air-fryer cake example, and a proactive Home notebook CTA.
+- Added a real Android `ACTION_SEND` text share target; cold and warm share intents open the pre-filled Flutter intake flow.
 - Added durable agent handoff instructions and Figma node mapping under `kit/`.
 - `flutter analyze`: clean.
 - `flutter test`: passing.
@@ -39,7 +40,7 @@ The first runnable Flutter showcase milestone is complete. The app is local-firs
 1. Run the app on a 390x844 emulator and compare every happy-path screen against its Figma screenshot (no Android emulator is installed in the current environment).
 2. Refine spacing/typography and test smaller Android device overflow.
 3. Add the secondary Figma states: multi-select edit, rename/tag sheets, empty search/filter, and share states.
-4. Add a real Android share-target integration if the showcase must launch directly from TikTok instead of staging the external share shot and opening Mneme.
+4. Add an iOS Share Extension if the final recording must use an iPhone rather than the current Android showcase path.
 
 ## Important context
 

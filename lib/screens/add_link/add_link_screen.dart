@@ -6,17 +6,31 @@ import '../../widgets/common.dart';
 import 'link_analysis_screen.dart';
 
 class AddLinkScreen extends StatefulWidget {
-  const AddLinkScreen({super.key});
+  const AddLinkScreen({super.key, this.initialUrl});
+  final String? initialUrl;
   @override
   State<AddLinkScreen> createState() => _AddLinkScreenState();
 }
 
 class _AddLinkScreenState extends State<AddLinkScreen> {
-  final controller = TextEditingController(
-    text: 'https://www.youtube.com/watch?v=design-system',
-  );
+  late final TextEditingController controller;
   String folder = 'UI/UX';
   bool saving = false;
+  @override
+  void initState() {
+    super.initState();
+    controller = TextEditingController(
+      text:
+          widget.initialUrl ?? 'https://www.youtube.com/watch?v=design-system',
+    );
+  }
+
+  @override
+  void dispose() {
+    controller.dispose();
+    super.dispose();
+  }
+
   @override
   Widget build(BuildContext context) {
     final store = StoreScope.of(context);
