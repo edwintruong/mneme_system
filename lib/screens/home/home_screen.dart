@@ -7,7 +7,46 @@ import '../../widgets/common.dart';
 import '../../widgets/figma_icon.dart';
 import '../folder/category_screen.dart';
 import '../search/search_screen.dart';
-import '../notebook/create_notebook_screen.dart';
+
+const _home2159ImageRoot = 'assets/images/figma_2159';
+
+const _home2159Recents = [
+  (
+    image: '$_home2159ImageRoot/2159_12771_recent_crepe.png',
+    title: 'Công thức bánh crepe',
+  ),
+  (
+    image: '$_home2159ImageRoot/2159_12771_recent_prompt.png',
+    title: 'Tối ưu prompt AI',
+  ),
+  (
+    image: '$_home2159ImageRoot/2159_12771_recent_movie.png',
+    title: 'Phim hay mùa hè 2026',
+  ),
+];
+
+const _home2159Categories = [
+  (
+    image: '$_home2159ImageRoot/2159_12771_category_study.png',
+    title: 'Học tập & Công việc',
+    count: 24,
+  ),
+  (
+    image: '$_home2159ImageRoot/2159_12771_category_travel.png',
+    title: 'Du lịch',
+    count: 10,
+  ),
+  (
+    image: '$_home2159ImageRoot/2159_12771_category_movie.png',
+    title: 'Phim ảnh',
+    count: 10,
+  ),
+  (
+    image: '$_home2159ImageRoot/2159_12771_category_cake.png',
+    title: 'Công thức bánh',
+    count: 10,
+  ),
+];
 
 class HomeScreen extends StatelessWidget {
   const HomeScreen({super.key});
@@ -26,14 +65,23 @@ class HomeScreen extends StatelessWidget {
                   style: Theme.of(context).textTheme.headlineSmall,
                 ),
               ),
-              const MnemeImage(
-                'assets/images/avatar.png',
-                size: 36,
-                radius: 18,
+              Container(
+                width: 36,
+                height: 36,
+                padding: const EdgeInsets.all(1.385),
+                decoration: BoxDecoration(
+                  color: const Color(0xFFE5E5EA),
+                  borderRadius: BorderRadius.circular(18),
+                ),
+                child: const MnemeImage(
+                  '$_home2159ImageRoot/2159_12771_avatar.png',
+                  size: 33.23,
+                  radius: 16.615,
+                ),
               ),
             ],
           ),
-          const SizedBox(height: 16),
+          const SizedBox(height: 12),
           SearchCard(
             onTap: () => Navigator.push(
               context,
@@ -41,53 +89,8 @@ class HomeScreen extends StatelessWidget {
             ),
           ),
           const SizedBox(height: 12),
-          Material(
-            color: AppColors.primarySoft,
-            borderRadius: BorderRadius.circular(18),
-            child: InkWell(
-              onTap: () => Navigator.push(
-                context,
-                MaterialPageRoute(builder: (_) => const CreateNotebookScreen()),
-              ),
-              borderRadius: BorderRadius.circular(18),
-              child: const Padding(
-                padding: EdgeInsets.all(16),
-                child: Row(
-                  children: [
-                    CircleAvatar(
-                      backgroundColor: AppColors.primary,
-                      foregroundColor: Colors.white,
-                      child: FigmaIcon(FigmaAssets.ai, color: Colors.white),
-                    ),
-                    SizedBox(width: 12),
-                    Expanded(
-                      child: Column(
-                        crossAxisAlignment: CrossAxisAlignment.start,
-                        children: [
-                          Text(
-                            'Bạn đã lưu đủ nội dung về UI/UX',
-                            style: TextStyle(fontWeight: FontWeight.w600),
-                          ),
-                          SizedBox(height: 3),
-                          Text(
-                            'Tạo sổ tay để biến link rời rạc thành tri thức',
-                            style: TextStyle(
-                              color: AppColors.muted,
-                              fontSize: 12,
-                            ),
-                          ),
-                        ],
-                      ),
-                    ),
-                    FigmaIcon(FigmaAssets.chevronRight, size: 30),
-                  ],
-                ),
-              ),
-            ),
-          ),
-          const SizedBox(height: 12),
           Container(
-            padding: const EdgeInsets.all(16),
+            padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 20),
             decoration: BoxDecoration(
               color: Colors.white,
               borderRadius: BorderRadius.circular(FigmaRadii.card),
@@ -100,78 +103,36 @@ class HomeScreen extends StatelessWidget {
                 const SizedBox(height: 20),
                 const SectionTitle('Đã lưu gần đây'),
                 const SizedBox(height: 10),
-                SizedBox(
-                  height: 132,
-                  child: ListView.separated(
-                    scrollDirection: Axis.horizontal,
-                    itemCount: store.categories.take(3).length,
-                    separatorBuilder: (_, _) => const SizedBox(width: 10),
-                    itemBuilder: (_, i) => SizedBox(
-                      width: 100,
-                      child: Column(
-                        crossAxisAlignment: CrossAxisAlignment.start,
-                        children: [
-                          MnemeImage(
-                            i == 0
-                                ? 'assets/images/recent.png'
-                                : store.categories[i].image,
-                            size: 100,
-                            radius: 18,
-                          ),
-                          const SizedBox(height: 6),
-                          const Text(
-                            'Design',
-                            style: TextStyle(fontWeight: FontWeight.w600),
-                          ),
-                        ],
-                      ),
-                    ),
-                  ),
+                Row(
+                  children: [
+                    for (var i = 0; i < _home2159Recents.length; i++) ...[
+                      Expanded(child: _Recent2159(item: _home2159Recents[i])),
+                      if (i != _home2159Recents.length - 1)
+                        const SizedBox(width: 12),
+                    ],
+                  ],
                 ),
-                const SizedBox(height: 18),
+                const SizedBox(height: 20),
                 const SectionTitle('Categories'),
-                const SizedBox(height: 4),
-                ...store.categories.map(
-                  (category) => InkWell(
+                const SizedBox(height: 10),
+                for (var i = 0; i < _home2159Categories.length; i++) ...[
+                  InkWell(
                     onTap: () => Navigator.push(
                       context,
                       MaterialPageRoute(
-                        builder: (_) => CategoryScreen(category: category),
+                        builder: (_) =>
+                            CategoryScreen(category: store.categories[i]),
                       ),
                     ),
-                    borderRadius: BorderRadius.circular(16),
-                    child: Padding(
-                      padding: const EdgeInsets.symmetric(vertical: 5),
-                      child: Row(
-                        children: [
-                          MnemeImage(category.image),
-                          const SizedBox(width: 10),
-                          Expanded(
-                            child: Column(
-                              crossAxisAlignment: CrossAxisAlignment.start,
-                              children: [
-                                Text(
-                                  category.name,
-                                  style: const TextStyle(
-                                    fontWeight: FontWeight.w600,
-                                    fontSize: 16,
-                                  ),
-                                ),
-                                Text(
-                                  '${category.itemCount} mục',
-                                  style: const TextStyle(
-                                    color: AppColors.muted,
-                                  ),
-                                ),
-                              ],
-                            ),
-                          ),
-                          const FigmaIcon(FigmaAssets.chevronRight, size: 30),
-                        ],
-                      ),
+                    borderRadius: BorderRadius.circular(15),
+                    child: _Category2159(
+                      item: _home2159Categories[i],
+                      showMore: i == _home2159Categories.length - 1,
                     ),
                   ),
-                ),
+                  if (i != _home2159Categories.length - 1)
+                    const SizedBox(height: 10),
+                ],
               ],
             ),
           ),
@@ -179,4 +140,84 @@ class HomeScreen extends StatelessWidget {
       ),
     );
   }
+}
+
+class _Recent2159 extends StatelessWidget {
+  const _Recent2159({required this.item});
+
+  final ({String image, String title}) item;
+
+  @override
+  Widget build(BuildContext context) => Column(
+    children: [
+      MnemeImage(item.image, size: 80, radius: 15),
+      const SizedBox(height: 9),
+      SizedBox(
+        width: double.infinity,
+        child: Text(
+          item.title,
+          maxLines: 1,
+          overflow: TextOverflow.ellipsis,
+          style: const TextStyle(
+            color: AppColors.ink,
+            fontSize: 12,
+            height: 16 / 12,
+            fontWeight: FontWeight.w500,
+          ),
+        ),
+      ),
+    ],
+  );
+}
+
+class _Category2159 extends StatelessWidget {
+  const _Category2159({required this.item, required this.showMore});
+
+  final ({String image, String title, int count}) item;
+  final bool showMore;
+
+  @override
+  Widget build(BuildContext context) => SizedBox(
+    height: 80,
+    child: Row(
+      children: [
+        MnemeImage(item.image, size: 80, radius: 15),
+        const SizedBox(width: 10),
+        Expanded(
+          child: Column(
+            mainAxisAlignment: MainAxisAlignment.center,
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              Text(item.title, style: FigmaType.body16Medium),
+              const SizedBox(height: 8),
+              Text(
+                '${item.count} mục',
+                style: const TextStyle(
+                  color: AppColors.muted,
+                  fontSize: 14,
+                  height: 20 / 14,
+                  letterSpacing: .4,
+                  fontWeight: FontWeight.w400,
+                ),
+              ),
+            ],
+          ),
+        ),
+        if (showMore)
+          const SizedBox.square(
+            dimension: 24,
+            child: Center(
+              child: RotatedBox(
+                quarterTurns: 1,
+                child: FigmaVector(
+                  FigmaAssets.homeMoreVertical,
+                  width: 2.5,
+                  height: 12.5,
+                ),
+              ),
+            ),
+          ),
+      ],
+    ),
+  );
 }

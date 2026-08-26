@@ -1,10 +1,10 @@
 # Mneme implementation progress
 
-Last updated: 2026-08-26
+Last updated: 2026-08-27
 
 ## Current milestone
 
-The first runnable Flutter showcase milestone is complete. The app is local-first, requires no login, and follows the legacy Figma node `2143:4235` visual system. A takeover audit has now started for the requested source-of-truth section `2159:12770`; the exact child-frame map and references are recorded in `kit/prompts/CONTINUE.md`.
+The first runnable Flutter showcase milestone is complete. The app is local-first and requires no login. Migration from legacy Figma section `2143:4235` to the source-of-truth section `2159:12770` is underway; the base Home frame `2159:12771` is now implemented and emulator-compared.
 
 ## Completed
 
@@ -25,12 +25,15 @@ The first runnable Flutter showcase milestone is complete. The app is local-firs
 - Removed all Material `Icons.*` usage, added fixed-size `FigmaIcon`/`FigmaVector` renderers, and rebuilt the notched bottom navigation with its exported Figma vectors.
 - Added CSS-equivalent Figma color, type, spacing, radius, and shadow tokens plus an enforceable asset contract for future agents.
 - Added Gemini REST integration with build-time API-key injection, URL Context/Google Search link classification, structured notebook writing, SQLite schema v3 persistence, and local fallback behavior.
+- Rebuilt the base Home screen against exact node `2159:12771`, removed the non-Figma notebook CTA, and matched the fixed 390 px layout, content, spacing, image crops, chips, category rows, and bottom navigation.
+- Downloaded and namespaced the 18 exact Home assets under `assets/icons/figma_2159/` and `assets/images/figma_2159/`; the active screen no longer consumes legacy Home/search/navigation assets.
+- Rendered Home on the Android emulator at physical 1170x2568 / logical 390x856 and compared it with the 390x856 Figma export. After accounting for the native Android 24 px status bar versus the Figma iOS 44 px status bar, the aligned content-region mean absolute RGB difference is approximately 3.68/3.84/3.05 out of 255. Remaining platform-only differences are the status-bar glyphs/time, device corners, and Android navigation gesture bar.
 - `flutter analyze`: clean.
 - `flutter test`: passing.
 
 ## Screen map
 
-- `lib/screens/home/home_screen.dart`: Figma `2143:5988`
+- `lib/screens/home/home_screen.dart`: active Figma `2159:12771` (base Home); legacy `2143:5988` retired for this state
 - `lib/screens/add_link/add_link_screen.dart`: Figma `2143:7101`
 - `lib/screens/folder/category_screen.dart`: Figma `2143:6203`
 - `lib/screens/link/link_detail_screen.dart`: Figma `2143:6066`
@@ -41,9 +44,9 @@ The first runnable Flutter showcase milestone is complete. The app is local-firs
 
 ## Next work
 
-1. Rebuild the Flutter screens against the active section `2159:12770`, using the exact child nodes listed in `kit/prompts/CONTINUE.md`; the current implementation is still primarily mapped to legacy `2143` nodes.
-2. Download and namespace all assets from the active child-node contexts, then update the screen/asset map. Do not mix legacy assets without byte verification.
-3. Run the app on a 390x844/856 emulator and capture frame-by-frame screenshot comparisons. No Android emulator is installed in the current environment, so pixel-perfect completion is not yet verified.
+1. Implement the remaining Home states from exact nodes `2159:13227`, `2159:13303`, and `2159:13676`; fetch each node context and its namespaced assets before editing.
+2. Rebuild the remaining screens against section `2159:12770`, starting with Link detail `2159:12980` or Add link `2159:13180`, while preserving the current local-first interactions.
+3. Continue frame-by-frame 390x844/856 emulator captures. Do not compensate in Flutter layout for native Android/iOS status-bar, device-corner, or home-indicator differences.
 4. Preserve and re-test SQLite, Gemini offline fallback, sharing, and the existing demo script while replacing only the visual/content contract.
 
 ## Important context
@@ -51,4 +54,5 @@ The first runnable Flutter showcase milestone is complete. The app is local-firs
 - Brand tokens live in `lib/core/theme/app_theme.dart`.
 - App state is exposed with `StoreScope`; persisted mutations live in `MnemeStore` and `LocalDatabase`.
 - Figma asset URLs expire, so referenced raster assets are committed locally.
+- Home comparison artifacts were kept in `/tmp` rather than committed; regenerate them from node `2159:12771` when revisiting the screen.
 - Do not add authentication for this showcase build.

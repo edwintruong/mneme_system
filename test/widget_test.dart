@@ -19,5 +19,34 @@ void main() {
       ),
       findsOneWidget,
     );
+    expect(tester.getSize(find.byType(SearchCard)).height, 70);
+    expect(
+      tester.getSize(
+        find.byWidgetPredicate(
+          (widget) => widget is FigmaIcon && widget.asset == FigmaAssets.filter,
+        ),
+      ),
+      const Size.square(36),
+    );
+  });
+
+  testWidgets('home filter chips keep the 2159 fixed-size contract', (
+    tester,
+  ) async {
+    await tester.pumpWidget(
+      MaterialApp(
+        theme: buildAppTheme(),
+        home: const Scaffold(body: Center(child: FilterChips())),
+      ),
+    );
+
+    final chipTaps = find.descendant(
+      of: find.byType(FilterChips),
+      matching: find.byType(InkWell),
+    );
+    expect(chipTaps, findsNWidgets(4));
+    for (var i = 0; i < 4; i++) {
+      expect(tester.getSize(chipTaps.at(i)), const Size(70, 28));
+    }
   });
 }

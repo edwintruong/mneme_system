@@ -63,7 +63,9 @@ flutter:
 
   assets:
     - assets/images/
+    - assets/images/figma_2159/
     - assets/icons/figma/
+    - assets/icons/figma_2159/
 
   # To add assets to your application, add an assets section, like this:
   # assets:

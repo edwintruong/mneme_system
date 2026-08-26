@@ -22,7 +22,7 @@ class SearchCard extends StatelessWidget {
             Expanded(
               child: Container(
                 height: 46,
-                padding: const EdgeInsets.symmetric(horizontal: 10),
+                padding: const EdgeInsets.symmetric(horizontal: 8),
                 decoration: BoxDecoration(
                   color: AppColors.surfaceMuted,
                   borderRadius: BorderRadius.circular(11),
@@ -33,22 +33,20 @@ class SearchCard extends StatelessWidget {
                     SizedBox(width: 10),
                     Text(
                       'Enter search terms...',
-                      style: TextStyle(color: AppColors.muted, fontSize: 16),
+                      style: TextStyle(
+                        color: AppColors.muted,
+                        fontSize: 16,
+                        height: 22 / 16,
+                        letterSpacing: -.18,
+                        fontWeight: FontWeight.w400,
+                      ),
                     ),
                   ],
                 ),
               ),
             ),
-            const SizedBox(width: 12),
-            Container(
-              width: 46,
-              height: 46,
-              decoration: const BoxDecoration(
-                color: AppColors.surfaceMuted,
-                shape: BoxShape.circle,
-              ),
-              child: const FigmaIcon(FigmaAssets.filter, size: 36),
-            ),
+            const SizedBox(width: 18),
+            const FigmaIcon(FigmaAssets.filter, size: 36),
           ],
         ),
       ),
@@ -65,30 +63,46 @@ class FilterChips extends StatefulWidget {
 class _FilterChipsState extends State<FilterChips> {
   int selected = 0;
   @override
-  Widget build(BuildContext context) => Row(
-    children: List.generate(4, (i) {
-      final labels = ['Tất cả', 'Bài viết', 'Video', 'Ảnh'];
-      return Padding(
-        padding: const EdgeInsets.only(right: 10),
-        child: ChoiceChip(
-          showCheckmark: false,
-          selectedColor: AppColors.primarySoft,
-          backgroundColor: AppColors.surfaceMuted,
-          side: BorderSide.none,
-          label: Text(
-            labels[i],
-            style: TextStyle(
-              color: selected == i ? AppColors.primary : AppColors.muted,
-              fontSize: 12,
-              fontWeight: FontWeight.w700,
+  Widget build(BuildContext context) {
+    const labels = ['Tất cả', 'Bài viết', 'Video', 'Ảnh'];
+    return Row(
+      children: List.generate(labels.length, (i) {
+        final isSelected = selected == i;
+        return Padding(
+          padding: EdgeInsets.only(right: i == labels.length - 1 ? 0 : 10),
+          child: Semantics(
+            button: true,
+            selected: isSelected,
+            child: InkWell(
+              onTap: () => setState(() => selected = i),
+              borderRadius: BorderRadius.circular(24),
+              child: Container(
+                width: 70,
+                height: 28,
+                alignment: Alignment.center,
+                decoration: BoxDecoration(
+                  color: isSelected
+                      ? AppColors.primarySoft
+                      : AppColors.surfaceMuted,
+                  borderRadius: BorderRadius.circular(24),
+                ),
+                child: Text(
+                  labels[i],
+                  style: TextStyle(
+                    color: isSelected ? AppColors.primary : AppColors.muted,
+                    fontSize: 12,
+                    height: 16 / 12,
+                    letterSpacing: .4,
+                    fontWeight: FontWeight.w800,
+                  ),
+                ),
+              ),
             ),
           ),
-          selected: selected == i,
-          onSelected: (_) => setState(() => selected = i),
-        ),
-      );
-    }),
-  );
+        );
+      }),
+    );
+  }
 }
 
 class MnemeImage extends StatelessWidget {
@@ -208,7 +222,13 @@ class SectionTitle extends StatelessWidget {
       Expanded(
         child: Text(
           title,
-          style: const TextStyle(fontSize: 14, fontWeight: FontWeight.w600),
+          style: const TextStyle(
+            color: AppColors.ink,
+            fontSize: 14,
+            height: 20 / 14,
+            letterSpacing: .4,
+            fontWeight: FontWeight.w500,
+          ),
         ),
       ),
       trailing ?? const SizedBox.shrink(),

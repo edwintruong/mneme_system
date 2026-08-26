@@ -97,9 +97,11 @@ class _FigmaBottomNavigation extends StatelessWidget {
           right: 16,
           height: 75,
           child: Row(
+            crossAxisAlignment: CrossAxisAlignment.start,
             mainAxisAlignment: MainAxisAlignment.spaceBetween,
             children: [
               Row(
+                crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
                   _item(
                     0,
@@ -107,6 +109,7 @@ class _FigmaBottomNavigation extends StatelessWidget {
                     FigmaAssets.homeActive,
                     FigmaAssets.homeIdle,
                   ),
+                  const SizedBox(width: 10),
                   _item(
                     1,
                     'Sổ tay',
@@ -116,6 +119,7 @@ class _FigmaBottomNavigation extends StatelessWidget {
                 ],
               ),
               Row(
+                crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
                   _item(
                     2,
@@ -123,6 +127,7 @@ class _FigmaBottomNavigation extends StatelessWidget {
                     FigmaAssets.activityIdle,
                     FigmaAssets.activityIdle,
                   ),
+                  const SizedBox(width: 10),
                   _item(
                     3,
                     'Cá nhân',
@@ -174,28 +179,30 @@ class _FigmaBottomNavigation extends StatelessWidget {
       onTap: () => onSelected(itemIndex),
       child: SizedBox(
         width: 74,
-        height: 75,
-        child: Column(
-          mainAxisAlignment: MainAxisAlignment.center,
-          children: [
-            FigmaIcon(
-              selected ? selectedAsset : idleAsset,
-              size: 24,
-              color: itemIndex > 1 && selected ? AppColors.primary : null,
-            ),
-            const SizedBox(height: 5),
-            Text(
-              label,
-              textAlign: TextAlign.center,
-              style: TextStyle(
-                color: selected ? AppColors.primary : AppColors.muted,
-                fontSize: 12,
-                height: 16 / 12,
-                letterSpacing: .4,
-                fontWeight: selected ? FontWeight.w500 : FontWeight.w400,
+        child: Padding(
+          padding: const EdgeInsets.symmetric(vertical: 12.5),
+          child: Column(
+            mainAxisSize: MainAxisSize.min,
+            children: [
+              FigmaIcon(
+                selected ? selectedAsset : idleAsset,
+                size: 24,
+                color: itemIndex > 1 && selected ? AppColors.primary : null,
               ),
-            ),
-          ],
+              const SizedBox(height: 5),
+              Text(
+                label,
+                textAlign: TextAlign.center,
+                style: TextStyle(
+                  color: selected ? AppColors.primary : AppColors.muted,
+                  fontSize: 12,
+                  height: 16 / 12,
+                  letterSpacing: .4,
+                  fontWeight: selected ? FontWeight.w500 : FontWeight.w400,
+                ),
+              ),
+            ],
+          ),
         ),
       ),
     );

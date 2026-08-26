@@ -7,11 +7,13 @@ import 'package:flutter_svg/flutter_svg.dart';
 /// download URLs expire and because using Material glyphs changes the design.
 abstract final class FigmaAssets {
   static const _root = 'assets/icons/figma';
+  static const _root2159 = 'assets/icons/figma_2159';
 
-  static const plus = '$_root/home_plus.svg';
-  static const search = '$_root/home_search.svg';
-  static const filter = '$_root/home_filter.svg';
+  static const plus = '$_root2159/2159_12771_plus.svg';
+  static const search = '$_root2159/2159_12771_search.svg';
+  static const filter = '$_root2159/2159_12771_filter.svg';
   static const moreVertical = '$_root/home_more_vertical.svg';
+  static const homeMoreVertical = '$_root2159/2159_12771_more_vertical.svg';
   static const moreHorizontal = '$_root/add_link_more.svg';
   static const back = '$_root/add_link_back.svg';
   static const link = '$_root/add_link_link.svg';
@@ -20,13 +22,13 @@ abstract final class FigmaAssets {
   static const chevronRight = '$_root/category_icon_3.svg';
   static const plusSmall = '$_root/category_icon_5.svg';
 
-  static const navBackground = '$_root/home_nav_bg.svg';
-  static const homeActive = '$_root/home_nav_home.svg';
+  static const navBackground = '$_root2159/2159_12771_nav_bg.svg';
+  static const homeActive = '$_root2159/2159_12771_nav_home.svg';
   static const homeIdle = '$_root/notebook_nav_home.svg';
   static const notebookActive = '$_root/notebook_nav_notebook.svg';
-  static const notebookIdle = '$_root/home_nav_notebook.svg';
-  static const activityIdle = '$_root/home_nav_activity.svg';
-  static const profileIdle = '$_root/home_nav_profile.svg';
+  static const notebookIdle = '$_root2159/2159_12771_nav_notebook.svg';
+  static const activityIdle = '$_root2159/2159_12771_nav_activity.svg';
+  static const profileIdle = '$_root2159/2159_12771_nav_profile.svg';
 
   static const addCircle = '$_root/notebook_add_circle.svg';
   static const star = '$_root/link_detail_star.svg';
