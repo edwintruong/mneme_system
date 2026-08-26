@@ -88,6 +88,43 @@ class MnemeStore extends ChangeNotifier {
     await load();
   }
 
+  Future<void> updateLink({
+    required int id,
+    required String title,
+    required String folder,
+  }) async {
+    await database.db.update(
+      'links',
+      {'title': title, 'folder': folder},
+      where: 'id = ?',
+      whereArgs: [id],
+    );
+    await load();
+  }
+
+  Future<void> moveLinks(Iterable<int> ids, String folder) async {
+    final batch = database.db.batch();
+    for (final id in ids) {
+      batch.update(
+        'links',
+        {'folder': folder},
+        where: 'id = ?',
+        whereArgs: [id],
+      );
+    }
+    await batch.commit(noResult: true);
+    await load();
+  }
+
+  Future<void> deleteLinks(Iterable<int> ids) async {
+    final batch = database.db.batch();
+    for (final id in ids) {
+      batch.delete('links', where: 'id = ?', whereArgs: [id]);
+    }
+    await batch.commit(noResult: true);
+    await load();
+  }
+
   Future<void> addFolder(String name) async {
     await database.db.insert('folders', {'name': name, 'category': 'Design'});
     await load();

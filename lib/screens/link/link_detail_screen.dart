@@ -4,6 +4,7 @@ import '../../core/theme/app_theme.dart';
 import '../../models/app_models.dart';
 import '../../state/store_scope.dart';
 import '../../widgets/common.dart';
+import 'edit_link_screen.dart';
 
 class LinkDetailScreen extends StatelessWidget {
   const LinkDetailScreen({super.key, required this.link});
@@ -14,7 +15,40 @@ class LinkDetailScreen extends StatelessWidget {
     return Scaffold(
       appBar: AppBar(
         actions: [
-          IconButton(onPressed: () {}, icon: const Icon(Icons.share_outlined)),
+          IconButton(
+            onPressed: () => showModalBottomSheet<void>(
+              context: context,
+              builder: (_) => const SafeArea(
+                child: Padding(
+                  padding: EdgeInsets.all(24),
+                  child: Column(
+                    mainAxisSize: MainAxisSize.min,
+                    children: [
+                      Icon(
+                        Icons.share_outlined,
+                        size: 34,
+                        color: AppColors.primary,
+                      ),
+                      SizedBox(height: 14),
+                      Text(
+                        'Chia sẻ liên kết',
+                        style: TextStyle(
+                          fontSize: 18,
+                          fontWeight: FontWeight.w600,
+                        ),
+                      ),
+                      SizedBox(height: 8),
+                      Text(
+                        'Đã tạo bản xem trước để showcase luồng chia sẻ.',
+                        textAlign: TextAlign.center,
+                      ),
+                    ],
+                  ),
+                ),
+              ),
+            ),
+            icon: const Icon(Icons.share_outlined),
+          ),
         ],
       ),
       bottomNavigationBar: SafeArea(
@@ -37,20 +71,57 @@ class LinkDetailScreen extends StatelessWidget {
                 color: AppColors.primarySoft,
                 shape: BoxShape.circle,
               ),
-              child: PopupMenuButton(
+              child: PopupMenuButton<String>(
                 icon: const Icon(Icons.more_horiz, color: AppColors.primary),
-                itemBuilder: (_) => [
-                  PopupMenuItem(
-                    onTap: () => store.toggleFavorite(link),
-                    child: Text(link.favorite ? 'Bỏ yêu thích' : 'Yêu thích'),
-                  ),
-                  PopupMenuItem(
-                    onTap: () async {
+                onSelected: (value) async {
+                  if (value == 'edit') {
+                    final changed = await Navigator.push<bool>(
+                      context,
+                      MaterialPageRoute(
+                        builder: (_) => EditLinkScreen(link: link),
+                      ),
+                    );
+                    if (changed == true && context.mounted) {
+                      Navigator.pop(context);
+                    }
+                  } else if (value == 'favorite') {
+                    await store.toggleFavorite(link);
+                    if (context.mounted) Navigator.pop(context);
+                  } else if (value == 'delete') {
+                    final confirmed =
+                        await showDialog<bool>(
+                          context: context,
+                          builder: (context) => AlertDialog(
+                            title: const Text('Delete'),
+                            content: const Text(
+                              "This link will be permanently deleted. This action can't be undone.",
+                            ),
+                            actions: [
+                              TextButton(
+                                onPressed: () => Navigator.pop(context, false),
+                                child: const Text('Cancel'),
+                              ),
+                              FilledButton(
+                                onPressed: () => Navigator.pop(context, true),
+                                child: const Text('Delete Link'),
+                              ),
+                            ],
+                          ),
+                        ) ??
+                        false;
+                    if (confirmed) {
                       await store.deleteLink(link.id);
                       if (context.mounted) Navigator.pop(context);
-                    },
-                    child: const Text('Xóa'),
+                    }
+                  }
+                },
+                itemBuilder: (_) => [
+                  const PopupMenuItem(value: 'edit', child: Text('Chỉnh sửa')),
+                  PopupMenuItem(
+                    value: 'favorite',
+                    child: Text(link.favorite ? 'Bỏ yêu thích' : 'Yêu thích'),
                   ),
+                  const PopupMenuItem(value: 'delete', child: Text('Xóa')),
                 ],
               ),
             ),

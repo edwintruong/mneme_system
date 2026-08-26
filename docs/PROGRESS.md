@@ -15,6 +15,8 @@ The first runnable Flutter showcase milestone is complete. The app is local-firs
 - Added exact raster assets exported from Figma under `assets/images/`.
 - Implemented working demo actions: search, add/classify a link, create a folder, open/delete/favorite a link, create a notebook, and accept an AI suggestion.
 - Completed the notebook showcase sequence: choose creation mode → select sources → animated AI analysis → notebook detail.
+- Added link editing, favorite/delete confirmation, share preview, and folder multi-select move/delete actions.
+- Added an inferred five-part showcase script in `docs/DEMO_SCRIPT.md`.
 - Added durable agent handoff instructions and Figma node mapping under `kit/`.
 - `flutter analyze`: clean.
 - `flutter test`: passing.
