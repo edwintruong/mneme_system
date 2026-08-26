@@ -17,6 +17,7 @@ import { AiSuggestionsScreen } from './screens/AiSuggestionsScreen';
 import { SearchScreen } from './screens/SearchScreen';
 import { ActivityScreen } from './screens/ActivityScreen';
 import { ProfileScreen } from './screens/ProfileScreen';
+import { FigmaIcon } from './components/common/FigmaIcon';
 import { MnemeCategory, SavedLink, Notebook } from './types';
 
 type ScreenView =
@@ -217,29 +218,19 @@ const MnemeApp: React.FC = () => {
   };
 
   return (
-    <div className="min-h-screen bg-slate-900 flex items-center justify-center p-0 sm:p-4 selection:bg-[#7758E2]/30">
-      {/* Device Frame with Realistic Mobile Proportions and Notch/Punch-hole */}
-      <div className="w-full sm:max-w-[412px] h-screen sm:h-[860px] bg-[#F8F6FD] sm:rounded-[44px] shadow-[0_25px_60px_-15px_rgba(0,0,0,0.5)] sm:border-[8px] sm:border-slate-800 overflow-hidden relative flex flex-col">
-        {/* Android / Mobile Status Bar & Camera Punch-hole */}
-        <div className="pt-3 px-6 pb-1 flex items-center justify-between text-xs text-[#0E0727]/80 font-semibold select-none z-30 bg-[#F8F6FD]/80 backdrop-blur-xs">
-          <span className="font-medium tracking-tight">9:41</span>
-          
-          {/* Subtle Punch-hole camera simulator on desktop */}
-          <div className="hidden sm:block w-3.5 h-3.5 rounded-full bg-slate-900 ring-2 ring-slate-800/60 shadow-inner -mt-1"></div>
-
-          <div className="flex items-center gap-1.5 text-[11px]">
-            <span className="font-bold">5G</span>
-            <span>📶</span>
-            <span>100% 🔋</span>
-          </div>
+    <div className="flex min-h-screen items-center justify-center bg-[#1B1533] p-0 sm:p-6">
+      {/* Figma frames in section 2159:12770 are 390 wide; keep the app at that width. */}
+      <div className="relative flex h-screen w-full flex-col overflow-hidden bg-[#F8F6FD] sm:h-[844px] sm:w-[390px] sm:rounded-[40px] sm:shadow-[0_30px_70px_-20px_rgba(0,0,0,0.55)]">
+        {/* iOS status bar, 44 tall in the Figma frames. */}
+        <div className="flex h-11 shrink-0 select-none items-center justify-between px-[26px] pt-2 text-[#0E0727]">
+          <span className="text-[15px] font-semibold tracking-tight">9:41</span>
+          <FigmaIcon name="status-right" size={67} />
         </div>
 
-        {/* Dynamic Screen View Content */}
-        <main className="flex-1 overflow-y-auto overflow-x-hidden relative">
+        <main className="relative flex-1 overflow-y-auto overflow-x-hidden">
           {renderActiveScreen()}
         </main>
 
-        {/* Global Bottom Navigation Bar when on Tabs view */}
         {currentView.type === 'tabs' && (
           <BottomNavigation
             currentTab={currentTab}
@@ -247,11 +238,6 @@ const MnemeApp: React.FC = () => {
             onAddClick={() => pushView({ type: 'add_link' })}
           />
         )}
-
-        {/* Android Navigation Bar / Home Indicator */}
-        <div className="py-1.5 flex justify-center items-center bg-[#F8F6FD] pointer-events-none select-none">
-          <div className="w-32 h-1 bg-black/20 rounded-full"></div>
-        </div>
       </div>
     </div>
   );

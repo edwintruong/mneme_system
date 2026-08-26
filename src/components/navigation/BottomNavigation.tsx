@@ -9,76 +9,89 @@ interface BottomNavigationProps {
   onAddClick: () => void;
 }
 
+/** Figma exports the bar as a single 390x75 vector whose top edge is notched. */
+const BAR_WIDTH = 390;
+const BAR_HEIGHT = 75;
+/** The notch arc is centred on this x in the exported path. */
+const NOTCH_CENTER_X = 195;
+
+const ACTIVE = '#7758E2';
+const INACTIVE = '#9490A2';
+
+interface TabSpec {
+  tab: TabType;
+  label: string;
+  icon: string;
+  activeIcon?: string;
+}
+
+/** Two tabs sit left of the notch, two right of it. */
+const LEFT_TABS: TabSpec[] = [
+  { tab: 'home', label: 'Trang chủ', icon: 'home', activeIcon: 'nav-home-active' },
+  { tab: 'notebook', label: 'Sổ tay', icon: 'notebook', activeIcon: 'nav-notebook-active' },
+];
+
+const RIGHT_TABS: TabSpec[] = [
+  { tab: 'activity', label: 'Hoạt động', icon: 'activity' },
+  { tab: 'profile', label: 'Cá nhân', icon: 'profile' },
+];
+
 export const BottomNavigation: React.FC<BottomNavigationProps> = ({
   currentTab,
   onTabChange,
   onAddClick,
 }) => {
+  const renderTab = ({ tab, label, icon, activeIcon }: TabSpec) => {
+    const isActive = currentTab === tab;
+    return (
+      <button
+        key={tab}
+        type="button"
+        onClick={() => onTabChange(tab)}
+        aria-current={isActive ? 'page' : undefined}
+        className="flex w-[70px] flex-col items-center justify-center gap-1 pt-1"
+      >
+        <FigmaIcon
+          name={isActive && activeIcon ? activeIcon : icon}
+          size={24}
+          color={isActive ? ACTIVE : INACTIVE}
+        />
+        <span
+          className="text-[10px] font-semibold leading-none"
+          style={{ color: isActive ? ACTIVE : INACTIVE }}
+        >
+          {label}
+        </span>
+      </button>
+    );
+  };
+
   return (
-    <div className="fixed bottom-0 left-0 right-0 max-w-md mx-auto z-40 px-4 pb-4 pointer-events-none">
-      <div className="bg-white/95 backdrop-blur-md rounded-[32px] shadow-lg border border-black/5 px-6 py-2.5 flex items-center justify-between pointer-events-auto relative">
-        {/* Home */}
-        <button
-          type="button"
-          onClick={() => onTabChange('home')}
-          className={`flex flex-col items-center justify-center p-2 rounded-2xl transition-all ${
-            currentTab === 'home' ? 'text-[#7758E2] scale-105' : 'text-[#9490A2] hover:text-[#0E0727]'
-          }`}
-        >
-          <FigmaIcon name="home" size={22} color={currentTab === 'home' ? '#7758E2' : '#9490A2'} />
-          <span className="text-[10px] font-semibold mt-1">Trang chủ</span>
-        </button>
+    <div
+      className="pointer-events-none absolute inset-x-0 bottom-0 z-40 mx-auto"
+      style={{ width: BAR_WIDTH, height: BAR_HEIGHT }}
+    >
+      {/* The notched white bar, straight from Figma. */}
+      <FigmaIcon
+        name="nav-bg"
+        className="absolute inset-0 h-full w-full drop-shadow-[0_-2px_12px_rgba(14,7,39,0.06)]"
+      />
 
-        {/* Notebook */}
-        <button
-          type="button"
-          onClick={() => onTabChange('notebook')}
-          className={`flex flex-col items-center justify-center p-2 rounded-2xl transition-all ${
-            currentTab === 'notebook' ? 'text-[#7758E2] scale-105' : 'text-[#9490A2] hover:text-[#0E0727]'
-          }`}
-        >
-          <FigmaIcon name="open-book" size={22} color={currentTab === 'notebook' ? '#7758E2' : '#9490A2'} />
-          <span className="text-[10px] font-semibold mt-1">Sổ tay</span>
-        </button>
-
-        {/* Floating Center Plus */}
-        <div className="relative -top-5">
-          <button
-            type="button"
-            onClick={onAddClick}
-            aria-label="Thêm liên kết mới"
-            className="w-13 h-13 rounded-full bg-gradient-to-tr from-[#613EEA] to-[#7758E2] text-white flex items-center justify-center shadow-lg shadow-[#7758E2]/40 hover:scale-105 active:scale-95 transition-all"
-          >
-            <FigmaIcon name="plus" size={26} color="#FFFFFF" />
-          </button>
-        </div>
-
-        {/* Activity */}
-        <button
-          type="button"
-          onClick={() => onTabChange('activity')}
-          className={`flex flex-col items-center justify-center p-2 rounded-2xl transition-all ${
-            currentTab === 'activity' ? 'text-[#7758E2] scale-105' : 'text-[#9490A2] hover:text-[#0E0727]'
-          }`}
-        >
-          <FigmaIcon name="ai" size={22} color={currentTab === 'activity' ? '#7758E2' : '#9490A2'} />
-          <span className="text-[10px] font-semibold mt-1">Hoạt động</span>
-        </button>
-
-        {/* Profile */}
-        <button
-          type="button"
-          onClick={() => onTabChange('profile')}
-          className={`flex flex-col items-center justify-center p-2 rounded-2xl transition-all ${
-            currentTab === 'profile' ? 'text-[#7758E2] scale-105' : 'text-[#9490A2] hover:text-[#0E0727]'
-          }`}
-        >
-          <div className="w-5.5 h-5.5 rounded-full overflow-hidden border border-[#9490A2]/40">
-            <img src="/assets/images/avatar.png" alt="Profile" className="w-full h-full object-cover" />
-          </div>
-          <span className="text-[10px] font-semibold mt-1">Cá nhân</span>
-        </button>
+      <div className="pointer-events-auto absolute inset-0 flex items-start justify-between px-3 pt-2">
+        <div className="flex gap-1">{LEFT_TABS.map(renderTab)}</div>
+        <div className="flex gap-1">{RIGHT_TABS.map(renderTab)}</div>
       </div>
+
+      {/* Floating action button, seated in the notch. */}
+      <button
+        type="button"
+        onClick={onAddClick}
+        aria-label="Thêm liên kết mới"
+        className="pointer-events-auto absolute flex h-14 w-14 items-center justify-center rounded-full bg-[#7758E2] shadow-[0_8px_20px_-6px_rgba(119,88,226,0.7)] transition-transform active:scale-95"
+        style={{ left: NOTCH_CENTER_X, top: -6, transform: 'translate(-50%, -50%)' }}
+      >
+        <FigmaIcon name="plus" size={24} />
+      </button>
     </div>
   );
 };

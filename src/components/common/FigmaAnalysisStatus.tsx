@@ -1,5 +1,5 @@
 import React from 'react';
-import { Check, Loader2 } from 'lucide-react';
+import { FigmaIcon } from './FigmaIcon';
 
 interface FigmaAnalysisStatusProps {
   done: boolean;
@@ -11,35 +11,28 @@ interface FigmaAnalysisStatusProps {
 export const FigmaAnalysisStatus: React.FC<FigmaAnalysisStatusProps> = ({
   done,
   inProgress,
-  size = 22,
+  size = 24,
   className = '',
 }) => {
   if (done) {
-    return (
-      <div
-        style={{ width: `${size}px`, height: `${size}px` }}
-        className={`rounded-full bg-[#31CF37] flex items-center justify-center text-white flex-shrink-0 transition-transform scale-100 ${className}`}
-      >
-        <Check size={size * 0.65} strokeWidth={3} />
-      </div>
-    );
+    // Figma ships this state as one filled vector, node 2159:13227.
+    return <FigmaIcon name="check-circle" size={size} className={className} />;
   }
 
   if (inProgress) {
+    // Figma has no spinner export; the ring below is the only synthesised mark.
     return (
-      <div
-        style={{ width: `${size}px`, height: `${size}px` }}
-        className={`rounded-full bg-[#F1EEFC] border-2 border-[#7758E2] flex items-center justify-center text-[#7758E2] flex-shrink-0 ${className}`}
-      >
-        <Loader2 size={size * 0.65} className="animate-spin" strokeWidth={2.5} />
-      </div>
+      <span
+        style={{ width: size, height: size }}
+        className={`inline-block shrink-0 animate-spin rounded-full border-2 border-[#F1EEFC] border-t-[#7758E2] ${className}`}
+      />
     );
   }
 
   return (
-    <div
-      style={{ width: `${size}px`, height: `${size}px` }}
-      className={`rounded-full border-2 border-[#D1D1D6] bg-transparent flex-shrink-0 ${className}`}
+    <span
+      style={{ width: size, height: size }}
+      className={`inline-block shrink-0 rounded-full border-2 border-[#D1D1D6] ${className}`}
     />
   );
 };

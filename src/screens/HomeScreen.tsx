@@ -36,19 +36,18 @@ export const HomeScreen: React.FC<HomeScreenProps> = ({
     <div className="pb-28 pt-4 px-4 space-y-5">
       {/* Toast Notification if newly added link */}
       {showSuccessToast && (
-        <div className="bg-[#31CF37]/15 border border-[#31CF37]/30 rounded-2xl p-3.5 flex items-center justify-between animate-fade-in text-[#0E0727]">
+        <div className="bg-[#31CF37]/15 border border-[#31CF37]/30 rounded-2xl p-3.5 flex items-center justify-between text-[#0E0727]">
           <div className="flex items-center gap-2.5">
-            <div className="w-6 h-6 rounded-full bg-[#31CF37] flex items-center justify-center text-white text-xs">
-              ✓
-            </div>
+            <FigmaIcon name="check-circle" size={24} />
             <span className="text-xs font-semibold">Đã thêm liên kết vào Mneme thành công!</span>
           </div>
           <button
             type="button"
             onClick={onDismissToast}
-            className="text-xs text-[#9490A2] hover:text-[#0E0727] p-1"
+            aria-label="Đóng thông báo"
+            className="p-1"
           >
-            ✕
+            <FigmaIcon name="close-small" size={16} color="#9490A2" />
           </button>
         </div>
       )}
