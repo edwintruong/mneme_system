@@ -4,7 +4,7 @@ Last updated: 2026-08-26
 
 ## Current milestone
 
-The first runnable Flutter showcase milestone is complete. The app is local-first, requires no login, and follows the Figma node `2143:4235` visual system.
+The first runnable Flutter showcase milestone is complete. The app is local-first, requires no login, and follows the legacy Figma node `2143:4235` visual system. A takeover audit has now started for the requested source-of-truth section `2159:12770`; the exact child-frame map and references are recorded in `kit/prompts/CONTINUE.md`.
 
 ## Completed
 
@@ -41,10 +41,10 @@ The first runnable Flutter showcase milestone is complete. The app is local-firs
 
 ## Next work
 
-1. Run the app on a 390x844 emulator and compare every happy-path screen against its Figma screenshot (no Android emulator is installed in the current environment).
-2. Capture pixel-diff screenshots on that emulator and refine any remaining per-screen spacing.
-3. Add the secondary Figma states: multi-select edit, rename/tag sheets, empty search/filter, and share states.
-4. Add an iOS Share Extension if the final recording must use an iPhone rather than the current Android showcase path.
+1. Rebuild the Flutter screens against the active section `2159:12770`, using the exact child nodes listed in `kit/prompts/CONTINUE.md`; the current implementation is still primarily mapped to legacy `2143` nodes.
+2. Download and namespace all assets from the active child-node contexts, then update the screen/asset map. Do not mix legacy assets without byte verification.
+3. Run the app on a 390x844/856 emulator and capture frame-by-frame screenshot comparisons. No Android emulator is installed in the current environment, so pixel-perfect completion is not yet verified.
+4. Preserve and re-test SQLite, Gemini offline fallback, sharing, and the existing demo script while replacing only the visual/content contract.
 
 ## Important context
 
