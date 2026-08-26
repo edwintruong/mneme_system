@@ -10,6 +10,7 @@ abstract final class AppColors {
   static const ink = FigmaColors.ink;
   static const muted = FigmaColors.muted;
   static const surfaceMuted = FigmaColors.neutral500;
+  static const surfaceDefault = FigmaColors.surfaceDefault;
   static const success = FigmaColors.success;
 }
 

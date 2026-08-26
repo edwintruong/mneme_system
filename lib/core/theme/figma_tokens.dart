@@ -11,6 +11,7 @@ abstract final class FigmaColors {
   static const dark = Color(0xFF28303F);
   static const muted = Color(0xFF9490A2);
   static const neutral500 = Color(0xFFF5F5F7);
+  static const surfaceDefault = Color(0xFFF7F7F8);
   static const success = Color(0xFF31CF37);
 }
 

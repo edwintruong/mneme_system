@@ -40,51 +40,51 @@ class NotebookScreen extends StatelessWidget {
           const SizedBox(height: 64),
           const SearchCard(),
           const SizedBox(height: 16),
-          Container(
-            padding: const EdgeInsets.all(16),
-            decoration: BoxDecoration(
-              color: Colors.white,
-              borderRadius: BorderRadius.circular(20),
-            ),
-            child: Column(
-              crossAxisAlignment: CrossAxisAlignment.start,
-              children: [
-                const SectionTitle('Gần đây'),
-                const SizedBox(height: 10),
-                SizedBox(
-                  height: 135,
-                  child: ListView.separated(
-                    scrollDirection: Axis.horizontal,
-                    itemCount: store.notebooks.length.clamp(0, 3),
-                    separatorBuilder: (_, _) => const SizedBox(width: 12),
-                    itemBuilder: (_, i) =>
-                        _RecentNotebook(image: store.notebooks[i].image),
+          Material(
+            color: Colors.white,
+            borderRadius: BorderRadius.circular(20),
+            child: Padding(
+              padding: const EdgeInsets.all(16),
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  const SectionTitle('Gần đây'),
+                  const SizedBox(height: 10),
+                  SizedBox(
+                    height: 135,
+                    child: ListView.separated(
+                      scrollDirection: Axis.horizontal,
+                      itemCount: store.notebooks.length.clamp(0, 3),
+                      separatorBuilder: (_, _) => const SizedBox(width: 12),
+                      itemBuilder: (_, i) =>
+                          _RecentNotebook(image: store.notebooks[i].image),
+                    ),
                   ),
-                ),
-                const SizedBox(height: 18),
-                const SectionTitle('Sổ tay của bạn hết toàn năng'),
-                ...store.notebooks.map(
-                  (notebook) => ListTile(
-                    contentPadding: const EdgeInsets.symmetric(vertical: 5),
-                    leading: MnemeImage(notebook.image, size: 80),
-                    title: Text(
-                      notebook.title,
-                      style: const TextStyle(fontWeight: FontWeight.w600),
-                    ),
-                    subtitle: Text(
-                      '${notebook.itemCount} mục',
-                      style: const TextStyle(color: AppColors.muted),
-                    ),
-                    onTap: () => Navigator.push(
-                      context,
-                      MaterialPageRoute(
-                        builder: (_) =>
-                            NotebookDetailScreen(notebook: notebook),
+                  const SizedBox(height: 18),
+                  const SectionTitle('Sổ tay của bạn hết toàn năng'),
+                  ...store.notebooks.map(
+                    (notebook) => ListTile(
+                      contentPadding: const EdgeInsets.symmetric(vertical: 5),
+                      leading: MnemeImage(notebook.image, size: 80),
+                      title: Text(
+                        notebook.title,
+                        style: const TextStyle(fontWeight: FontWeight.w600),
+                      ),
+                      subtitle: Text(
+                        '${notebook.itemCount} mục',
+                        style: const TextStyle(color: AppColors.muted),
+                      ),
+                      onTap: () => Navigator.push(
+                        context,
+                        MaterialPageRoute(
+                          builder: (_) =>
+                              NotebookDetailScreen(notebook: notebook),
+                        ),
                       ),
                     ),
                   ),
-                ),
-              ],
+                ],
+              ),
             ),
           ),
         ],

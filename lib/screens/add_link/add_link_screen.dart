@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 
 import '../../core/theme/app_theme.dart';
+import '../../models/app_models.dart';
 import '../../widgets/figma_icon.dart';
 import '../../state/store_scope.dart';
 import '../../widgets/common.dart';
@@ -46,9 +47,9 @@ class _AddLinkScreenState extends State<AddLinkScreen> {
         child: FilledButton(
           onPressed: saving
               ? null
-              : () {
+              : () async {
                   setState(() => saving = true);
-                  Navigator.pushReplacement(
+                  final link = await Navigator.push<SavedLink>(
                     context,
                     MaterialPageRoute(
                       builder: (_) => LinkAnalysisScreen(
@@ -58,6 +59,12 @@ class _AddLinkScreenState extends State<AddLinkScreen> {
                       ),
                     ),
                   );
+                  if (!context.mounted) return;
+                  if (link == null) {
+                    setState(() => saving = false);
+                    return;
+                  }
+                  Navigator.pop(context, link);
                 },
           child: Text(saving ? 'Đang phân tích...' : 'Lưu liên kết'),
         ),

@@ -1,9 +1,13 @@
+import 'dart:async';
+
 import 'package:flutter/material.dart';
 
 import '../../core/theme/app_theme.dart';
+import '../../models/app_models.dart';
 import '../activity/activity_screen.dart';
 import '../add_link/add_link_screen.dart';
 import '../home/home_screen.dart';
+import '../link/link_detail_screen.dart';
 import '../notebook/notebook_screen.dart';
 import '../profile/profile_screen.dart';
 import '../../platform/share_intent_bridge.dart';
@@ -18,12 +22,8 @@ class AppShell extends StatefulWidget {
 
 class _AppShellState extends State<AppShell> {
   int index = 0;
-  final screens = const [
-    HomeScreen(),
-    NotebookScreen(),
-    ActivityScreen(),
-    ProfileScreen(),
-  ];
+  SavedLink? addedLink;
+  Timer? toastTimer;
   @override
   void initState() {
     super.initState();
@@ -37,29 +37,61 @@ class _AppShellState extends State<AppShell> {
 
   @override
   void dispose() {
+    toastTimer?.cancel();
     ShareIntentBridge.stopListening();
     super.dispose();
   }
 
-  void _openSharedText(String text) {
+  void _openSharedText(String text) =>
+      unawaited(_openAddLink(initialUrl: text));
+
+  Future<void> _openAddLink({String? initialUrl}) async {
     if (!mounted) return;
+    final link = await Navigator.push<SavedLink>(
+      context,
+      MaterialPageRoute(builder: (_) => AddLinkScreen(initialUrl: initialUrl)),
+    );
+    if (!mounted || link == null) return;
+    toastTimer?.cancel();
+    setState(() {
+      index = 0;
+      addedLink = link;
+    });
+    toastTimer = Timer(const Duration(seconds: 4), () {
+      if (mounted) setState(() => addedLink = null);
+    });
+  }
+
+  void _openAddedLink() {
+    final link = addedLink;
+    if (link == null) return;
+    toastTimer?.cancel();
+    setState(() => addedLink = null);
     Navigator.push(
       context,
-      MaterialPageRoute(builder: (_) => AddLinkScreen(initialUrl: text)),
+      MaterialPageRoute(builder: (_) => LinkDetailScreen(link: link)),
     );
   }
 
   @override
   Widget build(BuildContext context) => Scaffold(
-    body: IndexedStack(index: index, children: screens),
+    body: IndexedStack(
+      index: index,
+      children: [
+        HomeScreen(
+          showAddedToast: addedLink != null,
+          onOpenAddedLink: _openAddedLink,
+        ),
+        const NotebookScreen(),
+        const ActivityScreen(),
+        const ProfileScreen(),
+      ],
+    ),
     extendBody: true,
     bottomNavigationBar: _FigmaBottomNavigation(
       selectedIndex: index,
       onSelected: (value) => setState(() => index = value),
-      onAdd: () => Navigator.push(
-        context,
-        MaterialPageRoute(builder: (_) => const AddLinkScreen()),
-      ),
+      onAdd: () => unawaited(_openAddLink()),
     ),
   );
 }

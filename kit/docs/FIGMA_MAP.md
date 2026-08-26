@@ -7,7 +7,7 @@ Active source-of-truth section: `2159:12770`. Section `2143:4235` is legacy refe
 | Flow/state | Active Figma node | Dart screen | Status |
 | --- | --- | --- | --- |
 | Home | `2159:12771` | `home/home_screen.dart` | Implemented and emulator-compared |
-| Home, add-link toast | `2159:13227` | pending | Pending |
+| Home, add-link toast | `2159:13227` | `home/home_screen.dart` | Implemented, flow-tested, and emulator-compared |
 | Home variant | `2159:13303` | pending | Pending |
 | Home variant | `2159:13676` | pending | Pending |
 | Link detail | `2159:12980` | `link/link_detail_screen.dart` | Legacy UI pending migration |

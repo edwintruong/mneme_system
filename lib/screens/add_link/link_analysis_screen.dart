@@ -66,16 +66,7 @@ class _LinkAnalysisScreenState extends State<LinkAnalysisScreen> {
     setState(() => completed = steps.length);
     await Future<void>.delayed(const Duration(milliseconds: 240));
     if (mounted) {
-      Navigator.pop(context);
-      ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(
-          content: Text(
-            result.usedGemini
-                ? 'Gemini đã đọc URL, phân loại và lưu liên kết'
-                : 'Đã lưu bằng dữ liệu demo local (${result.fallbackReason})',
-          ),
-        ),
-      );
+      Navigator.pop(context, result.value);
     }
   }
 

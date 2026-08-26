@@ -14,6 +14,7 @@ abstract final class FigmaAssets {
   static const filter = '$_root2159/2159_12771_filter.svg';
   static const moreVertical = '$_root/home_more_vertical.svg';
   static const homeMoreVertical = '$_root2159/2159_12771_more_vertical.svg';
+  static const homeAddedSuccess = '$_root2159/2159_13227_success.svg';
   static const moreHorizontal = '$_root/add_link_more.svg';
   static const back = '$_root/add_link_back.svg';
   static const link = '$_root/add_link_link.svg';
