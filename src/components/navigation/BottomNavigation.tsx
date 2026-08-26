@@ -3,37 +3,44 @@ import { FigmaIcon } from '../common/FigmaIcon';
 
 export type TabType = 'home' | 'notebook' | 'activity' | 'profile';
 
+/**
+ * Bottom Navigation Bar, Figma node 2159:12841. The bar is 115 tall: the FAB
+ * occupies the top 64 and the notched white bg starts at y=40.
+ *
+ * The bg node measures 428 wide in Figma but its exported vector is 390 and the
+ * node renders with the notch centred at x=194.5 of the 390 frame (measured off
+ * the Figma render), so it is drawn at 390 here.
+ */
+
 interface BottomNavigationProps {
   currentTab: TabType;
   onTabChange: (tab: TabType) => void;
   onAddClick: () => void;
 }
 
-/** Figma exports the bar as a single 390x75 vector whose top edge is notched. */
-const BAR_WIDTH = 390;
-const BAR_HEIGHT = 75;
-/** The notch arc is centred on this x in the exported path. */
-const NOTCH_CENTER_X = 195;
-
-const ACTIVE = '#7758E2';
-const INACTIVE = '#9490A2';
-
 interface TabSpec {
   tab: TabType;
   label: string;
   icon: string;
   activeIcon?: string;
+  /** "Cá nhân" is constrained to 47 in the design; the others to 74. */
+  labelWidth: number;
+  /**
+   * The design does not use one active colour: Home's node reads
+   * text-color-primary #7758e2 while the notebook list's reads
+   * primary-600 #6c50ce. Reproduced per tab rather than normalised.
+   */
+  activeColor: string;
 }
 
-/** Two tabs sit left of the notch, two right of it. */
 const LEFT_TABS: TabSpec[] = [
-  { tab: 'home', label: 'Trang chủ', icon: 'home', activeIcon: 'nav-home-active' },
-  { tab: 'notebook', label: 'Sổ tay', icon: 'notebook', activeIcon: 'nav-notebook-active' },
+  { tab: 'home', label: 'Home', icon: 'home', activeIcon: 'nav-home-active', labelWidth: 74, activeColor: '#7758e2' },
+  { tab: 'notebook', label: 'Sổ tay', icon: 'notebook', activeIcon: 'nav-notebook-active', labelWidth: 74, activeColor: '#6c50ce' },
 ];
 
 const RIGHT_TABS: TabSpec[] = [
-  { tab: 'activity', label: 'Hoạt động', icon: 'activity' },
-  { tab: 'profile', label: 'Cá nhân', icon: 'profile' },
+  { tab: 'activity', label: 'Hoạt động', icon: 'activity', labelWidth: 74, activeColor: '#7758e2' },
+  { tab: 'profile', label: 'Cá nhân', icon: 'profile', labelWidth: 47, activeColor: '#7758e2' },
 ];
 
 export const BottomNavigation: React.FC<BottomNavigationProps> = ({
@@ -41,7 +48,7 @@ export const BottomNavigation: React.FC<BottomNavigationProps> = ({
   onTabChange,
   onAddClick,
 }) => {
-  const renderTab = ({ tab, label, icon, activeIcon }: TabSpec) => {
+  const renderTab = ({ tab, label, icon, activeIcon, labelWidth, activeColor }: TabSpec) => {
     const isActive = currentTab === tab;
     return (
       <button
@@ -49,16 +56,19 @@ export const BottomNavigation: React.FC<BottomNavigationProps> = ({
         type="button"
         onClick={() => onTabChange(tab)}
         aria-current={isActive ? 'page' : undefined}
-        className="flex w-[70px] flex-col items-center justify-center gap-1 pt-1"
+        className="flex w-[74px] shrink-0 flex-col items-center gap-[5px] px-[15px] py-[12.5px]"
       >
         <FigmaIcon
           name={isActive && activeIcon ? activeIcon : icon}
           size={24}
-          color={isActive ? ACTIVE : INACTIVE}
+          color={isActive ? activeColor : '#9490a2'}
+          className="shrink-0"
         />
         <span
-          className="text-[10px] font-semibold leading-none"
-          style={{ color: isActive ? ACTIVE : INACTIVE }}
+          style={{ width: labelWidth, color: isActive ? activeColor : '#9490a2' }}
+          className={`whitespace-nowrap text-center text-[12px] leading-[16px] tracking-[0.4px] ${
+            isActive ? 'font-medium' : 'font-normal'
+          }`}
         >
           {label}
         </span>
@@ -67,31 +77,27 @@ export const BottomNavigation: React.FC<BottomNavigationProps> = ({
   };
 
   return (
-    <div
-      className="pointer-events-none absolute inset-x-0 bottom-0 z-40 mx-auto"
-      style={{ width: BAR_WIDTH, height: BAR_HEIGHT }}
-    >
-      {/* The notched white bar, straight from Figma. */}
-      <FigmaIcon
-        name="nav-bg"
-        className="absolute inset-0 h-full w-full drop-shadow-[0_-2px_12px_rgba(14,7,39,0.06)]"
-      />
-
-      <div className="pointer-events-auto absolute inset-0 flex items-start justify-between px-3 pt-2">
-        <div className="flex gap-1">{LEFT_TABS.map(renderTab)}</div>
-        <div className="flex gap-1">{RIGHT_TABS.map(renderTab)}</div>
-      </div>
-
-      {/* Floating action button, seated in the notch. */}
+    <div className="pointer-events-none absolute bottom-0 left-1/2 h-[115px] w-[390px] -translate-x-1/2">
+      {/* float-btn, node I2159:12841;287:3150 — 24px glyph inside 20px padding. */}
       <button
         type="button"
         onClick={onAddClick}
         aria-label="Thêm liên kết mới"
-        className="pointer-events-auto absolute flex h-14 w-14 items-center justify-center rounded-full bg-[#7758E2] shadow-[0_8px_20px_-6px_rgba(119,88,226,0.7)] transition-transform active:scale-95"
-        style={{ left: NOTCH_CENTER_X, top: -6, transform: 'translate(-50%, -50%)' }}
+        className="pointer-events-auto absolute top-0 left-1/2 flex -translate-x-1/2 flex-col items-center rounded-[50px] bg-gradient-to-b from-[#613eea] to-[#9f8aeb] p-[20px] transition-transform active:scale-95"
       >
-        <FigmaIcon name="plus" size={24} />
+        <FigmaIcon name="plus" size={24} className="shrink-0" />
       </button>
+
+      {/* bg, node I2159:12841;285:4122 */}
+      <div className="absolute top-[40px] left-0 h-[75px] w-[390px]">
+        <FigmaIcon name="nav-bg" className="absolute inset-0 h-full w-full" />
+      </div>
+
+      {/* menu, node I2159:12841;285:4125 */}
+      <div className="pointer-events-auto absolute top-[40px] right-0 left-0 flex h-[75px] items-start justify-between px-[16px]">
+        <div className="flex shrink-0 items-start gap-[10px]">{LEFT_TABS.map(renderTab)}</div>
+        <div className="flex shrink-0 items-start gap-[10px]">{RIGHT_TABS.map(renderTab)}</div>
+      </div>
     </div>
   );
 };

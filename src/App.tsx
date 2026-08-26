@@ -218,16 +218,26 @@ const MnemeApp: React.FC = () => {
   };
 
   return (
-    <div className="flex min-h-screen items-center justify-center bg-[#1B1533] p-0 sm:p-6">
-      {/* Figma frames in section 2159:12770 are 390 wide; keep the app at that width. */}
-      <div className="relative flex h-screen w-full flex-col overflow-hidden bg-[#F8F6FD] sm:h-[844px] sm:w-[390px] sm:rounded-[40px] sm:shadow-[0_30px_70px_-20px_rgba(0,0,0,0.55)]">
-        {/* iOS status bar, 44 tall in the Figma frames. */}
-        <div className="flex h-11 shrink-0 select-none items-center justify-between px-[26px] pt-2 text-[#0E0727]">
-          <span className="text-[15px] font-semibold tracking-tight">9:41</span>
-          <FigmaIcon name="status-right" size={67} />
+    <div className="flex min-h-screen items-center justify-center bg-[#1b1533] p-0 sm:p-6">
+      {/* Figma frame 2159:12771 is 390x856. */}
+      {/*
+        The Figma frame carries px-20, which is why the status bar is 350 wide and
+        starts at x=20 while Content is a full 390 and overflows that padding.
+      */}
+      <div className="relative flex h-screen w-full flex-col items-center overflow-hidden bg-[#f8f6fd] px-[20px] sm:h-[856px] sm:w-[390px] sm:rounded-[40px] sm:shadow-[0_30px_70px_-20px_rgba(0,0,0,0.55)]">
+        {/* iOS UI/Status Bar, node 2159:12772 */}
+        <div className="relative h-[44px] w-full shrink-0 overflow-hidden select-none">
+          <p className="absolute top-[13px] left-[24px] h-[20px] w-[54px] text-center font-['Inter',sans-serif] text-[15px] leading-[20px] font-semibold tracking-[-0.5px] text-[#161718]">
+            9:41
+          </p>
+          {/* flex, so the 11.336-tall vector is not pushed down by a text baseline */}
+          <div className="absolute top-[17.33px] right-[18.67px] flex">
+            <FigmaIcon name="status-right" />
+          </div>
         </div>
 
-        <main className="relative flex-1 overflow-y-auto overflow-x-hidden">
+        {/* no-scrollbar: a desktop scrollbar would narrow the 390 column and shift the layout. */}
+        <main className="no-scrollbar relative flex w-[390px] flex-1 flex-col items-center overflow-x-hidden overflow-y-auto">
           {renderActiveScreen()}
         </main>
 
@@ -238,6 +248,13 @@ const MnemeApp: React.FC = () => {
             onAddClick={() => pushView({ type: 'add_link' })}
           />
         )}
+
+        {/*
+          iOS Home Indicator: 144x5 at #3c3c432e, measured at x123..266 y831..835
+          of the 844-tall frames. It draws over the navigation bar, so it must
+          come after it.
+        */}
+        <div className="pointer-events-none absolute bottom-[8px] left-1/2 z-50 h-[5px] w-[144px] -translate-x-1/2 rounded-full bg-[#3c3c432e]" />
       </div>
     </div>
   );

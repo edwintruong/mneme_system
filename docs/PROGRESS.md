@@ -32,24 +32,34 @@ Flutter build had reached. Restoring that fidelity against section `2159:12770` 
   `PORT=8080 npm start` serves the SPA, `/api/health`, and the static Figma icons.
 - `tsc --noEmit`: clean. `npm run build`: clean.
 
-## Blocked
+## Home is rebuilt from the node
 
-Both items need the `claude.ai Figma` MCP server connected; it is currently disconnected.
+- Read node `2159:12771` with `get_design_context` and its tokens with `get_variable_defs`, then
+  downloaded all 18 of its assets: 10 SVGs and 8 JPEGs.
+- Rewrote `HomeScreen` against the node. The migration's version shared almost nothing with the
+  design: it had no greeting header, rendered "Đã lưu gần đây" as a list of link tiles instead of a
+  three-column 80px thumbnail rail, invented a "Danh mục kiến thức" carousel in place of the
+  "Categories" list, and used tab labels the design does not use.
+- Rebuilt the bottom navigation on the node's own 115px geometry: the FAB gradient
+  `#613eea → #9f8aeb`, the notched 390x75 bar, and four 74px tabs.
+- Put the Figma variables into `src/index.css` under names that mirror their Figma paths.
+- Fixed the frame structure: the Figma frame carries `px-20`, which is why the status bar is 350
+  wide starting at x=20 while Content is a full 390 overflowing that padding. Reproducing this is
+  what put the status bar and its clock in the right place.
+- Deleted the 14 corrupt rasters and repointed every reference to the new exports.
+- Measured: mean absolute difference 3.09 / 3.11 / 3.05 of 255 over the design area. Avatar, search
+  and filter icons, both 80px image rails, the FAB, the nav labels and the overflow dots all land
+  within 1px. See `kit/docs/FIGMA_MAP.md` for the method and the two export gotchas.
+- All four tabs and the add-link flow render with no broken images and no page errors.
 
-1. **No screen has been rebuilt against section `2159:12770` yet.** Every screen is still the
-   migration's loose Tailwind interpretation, not the node's fixed 390 px layout.
-2. **Every raster asset is corrupt.** All 14 PNGs under `public/assets/images/` were destroyed by a
-   UTF-8 text decode before the React migration; see `kit/docs/FIGMA_MAP.md` for the byte evidence.
-   They must be re-downloaded from Figma as binary.
+## Blocked## Next work
 
-## Next work
-
-1. Re-export the Home assets from `2159:12771` into `public/assets/icons/figma_2159/`; the 18
-   namespaced exports the migration deleted must not be substituted from the legacy `2143:*` set.
-2. Re-download all 14 rasters from their Figma nodes.
-3. Rebuild Home `2159:12771` and its toast state `2159:13227` against the node, then compare the
-   rendered 390x844 frame with the Figma export before moving on.
-4. Work through the remaining screens in `kit/docs/FIGMA_MAP.md` in the same way.
+1. Rebuild the remaining screens against their own `2159:*` nodes, in the order listed in
+   `kit/docs/FIGMA_MAP.md`. They are still the migration's loose interpretation and still consume
+   legacy `2143:*` icon exports.
+2. Implement the Home toast state `2159:13227` against its node; it currently uses the exact
+   success vector but its layout has not been node-verified.
+3. Implement the two remaining Home variants, `2159:13303` and `2159:13676`.
 
 ## Important context
 

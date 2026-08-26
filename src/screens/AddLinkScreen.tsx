@@ -1,7 +1,18 @@
 import React, { useState } from 'react';
 import { useMneme } from '../state/mnemeContext';
-import { FigmaBackButton } from '../components/common/FigmaBackButton';
 import { FigmaIcon } from '../components/common/FigmaIcon';
+
+/**
+ * Add link, Figma node 2159:13180.
+ *
+ * The design shows the screen mid-edit: a URL already pasted, its preview
+ * resolved, and an AI-suggested category. The fields below start on those
+ * values so the screen opens in the state the design specifies, and stay
+ * editable.
+ */
+const DESIGN_URL = 'https://mimimi.vn/skincare/routine-toi-gian-da-nhay-cam';
+const DESIGN_CATEGORY = 'Lifestyle';
+const DESIGN_FOLDER = 'Self-care';
 
 interface AddLinkScreenProps {
   initialFolder?: string;
@@ -9,196 +20,201 @@ interface AddLinkScreenProps {
   onStartAnalysis: (params: { url: string; folder: string; category: string }) => void;
 }
 
+/** A native select laid invisibly over a styled row, so the row keeps Figma's look. */
+const OverlaySelect: React.FC<{
+  value: string;
+  options: string[];
+  onChange: (v: string) => void;
+  label: string;
+}> = ({ value, options, onChange, label }) => (
+  <select
+    aria-label={label}
+    value={value}
+    onChange={(e) => onChange(e.target.value)}
+    className="absolute inset-0 cursor-pointer appearance-none opacity-0"
+  >
+    {options.map((o) => (
+      <option key={o} value={o}>
+        {o}
+      </option>
+    ))}
+  </select>
+);
+
 export const AddLinkScreen: React.FC<AddLinkScreenProps> = ({
   initialFolder,
   onBack,
   onStartAnalysis,
 }) => {
   const { folders, categories } = useMneme();
-  const [url, setUrl] = useState('');
-  const [folder, setFolder] = useState(initialFolder || folders[0] || 'UI/UX');
-  const [category, setCategory] = useState(categories[0]?.name || 'Học tập & Công việc');
+  const [url, setUrl] = useState(DESIGN_URL);
+  const [folder, setFolder] = useState(initialFolder || DESIGN_FOLDER);
+  const [category, setCategory] = useState(DESIGN_CATEGORY);
 
-  const presetSamples = [
-    {
-      label: 'YouTube · Figma Auto Layout Tips',
-      url: 'https://www.youtube.com/watch?v=mneme-figma-autolayout-2026',
-      folder: 'UI/UX',
-      category: 'Học tập & Công việc',
-    },
-    {
-      label: 'TikTok · Bánh chuối nồi chiên không dầu',
-      url: 'https://www.tiktok.com/@mneme/video/air-fryer-banana-cake',
-      folder: 'Công thức',
-      category: 'Công thức bánh',
-    },
-    {
-      label: 'Website · Design System Handbook',
-      url: 'https://designsystems.io/handbook/design-tokens-2026',
-      folder: 'Graphic',
-      category: 'Học tập & Công việc',
-    },
-  ];
-
-  const handlePaste = async () => {
-    try {
-      if (navigator.clipboard?.readText) {
-        const text = await navigator.clipboard.readText();
-        if (text && text.startsWith('http')) {
-          setUrl(text);
-        }
-      }
-    } catch {
-      // Ignore clipboard read permission failures
-    }
-  };
-
-  const handleSubmit = (e: React.FormEvent) => {
-    e.preventDefault();
-    if (!url.trim()) return;
-    onStartAnalysis({
-      url: url.trim(),
-      folder,
-      category,
-    });
-  };
+  const folderOptions = Array.from(new Set([DESIGN_FOLDER, ...folders]));
+  const categoryOptions = Array.from(new Set([DESIGN_CATEGORY, ...categories.map((c) => c.name)]));
 
   return (
-    <div className="min-h-screen bg-[#7758E2] flex flex-col">
-      {/* Top Header */}
-      <div className="px-4 py-3 flex items-center justify-between text-white">
-        <FigmaBackButton onClick={onBack} color="#FFFFFF" />
-        <h2 className="text-base font-semibold">Thêm liên kết mới</h2>
-        <div className="w-8" />
+    <div className="relative flex w-[390px] flex-1 flex-col items-start gap-[12px] px-[20px] py-[16px]">
+      {/* Header, node 2159:13183 */}
+      <div className="flex w-full shrink-0 items-center justify-center gap-[8px] px-[20px]">
+        <div className="flex w-[30px] shrink-0 items-center">
+          <button type="button" onClick={onBack} aria-label="Quay lại">
+            <FigmaIcon name="add-link-back" size={30} />
+          </button>
+        </div>
+        <div className="flex flex-1 self-stretch">
+          <div className="flex h-full min-w-px flex-1 items-center justify-center">
+            <p className="w-[166px] text-center text-[18px] leading-[28px] font-medium tracking-[0px] text-[#0e0727]">
+              Thêm liên kết
+            </p>
+          </div>
+        </div>
+        <div className="h-[30px] w-[24px] shrink-0" />
+        <button type="button" aria-label="Tuỳ chọn khác" className="shrink-0">
+          <FigmaIcon name="more-horizontal-figma" size={24} />
+        </button>
       </div>
 
-      {/* Main Curved Content Sheet */}
-      <div className="flex-1 bg-[#F8F6FD] rounded-t-[32px] px-4 pt-6 pb-28 space-y-5 overflow-y-auto">
-        <div className="text-center space-y-1.5 mb-2">
-          <div className="w-14 h-14 rounded-2xl bg-[#F1EEFC] text-[#7758E2] mx-auto flex items-center justify-center mb-2 shadow-xs">
-            <FigmaIcon name="link" size={28} color="#7758E2" />
-          </div>
-          <h3 className="text-lg font-bold text-[#0E0727]">Lưu liên kết vào Mneme</h3>
-          <p className="text-xs text-[#9490A2]">
-            AI sẽ tự động đọc, tóm tắt và phân loại liên kết của bạn
+      {/* Card, node 2159:13190 */}
+      <div
+        className="flex h-[706px] w-[356px] shrink-0 flex-col items-center gap-[20px] rounded-[20px] bg-white px-[16px] py-[20px]"
+        style={{ boxShadow: 'var(--shadow-card)' }}
+      >
+        {/* Liên kết, node 2159:13191 */}
+        <div className="flex w-full flex-col items-start gap-[8px]">
+          <p className="w-full text-[14px] leading-[20px] font-medium tracking-[0.4px] text-[#0e0727]">
+            Liên kết<span className="text-white">*</span>
           </p>
-        </div>
-
-        <form onSubmit={handleSubmit} className="space-y-4">
-          {/* URL Input */}
-          <div className="bg-white rounded-3xl p-5 shadow-xs space-y-2">
-            <div className="flex items-center justify-between">
-              <label className="text-xs font-bold text-[#0E0727]">Đường dẫn URL</label>
-              <button
-                type="button"
-                onClick={handlePaste}
-                className="text-xs font-semibold text-[#7758E2] hover:underline"
-              >
-                Dán từ bộ nhớ tạm
-              </button>
-            </div>
-            <div className="relative">
-              <input
-                type="url"
-                required
-                autoFocus
-                value={url}
-                onChange={(e) => setUrl(e.target.value)}
-                placeholder="https://..."
-                className="w-full px-4 py-3 bg-[#F5F5F7] rounded-xl text-sm font-medium text-[#0E0727] outline-none focus:ring-2 focus:ring-[#7758E2]"
-              />
-              {url && (
-                <button
-                  type="button"
-                  onClick={() => setUrl('')}
-                  className="absolute right-3 top-1/2 -translate-y-1/2 text-[#9490A2] hover:text-[#0E0727] p-1"
-                >
-                  ✕
-                </button>
-              )}
-            </div>
-          </div>
-
-          {/* Folder & Category selectors */}
-          <div className="bg-white rounded-3xl p-5 shadow-xs space-y-4">
-            <div>
-              <label className="text-xs font-bold text-[#0E0727] mb-1.5 block">
-                Thư mục lưu trữ
-              </label>
-              <div className="relative">
-                <select
-                  value={folder}
-                  onChange={(e) => setFolder(e.target.value)}
-                  className="w-full px-4 py-3 bg-[#F5F5F7] rounded-xl text-sm font-medium text-[#0E0727] appearance-none outline-none focus:ring-2 focus:ring-[#7758E2]"
-                >
-                  {folders.map((f) => (
-                    <option key={f} value={f}>
-                      {f}
-                    </option>
-                  ))}
-                </select>
-                <div className="absolute right-4 top-1/2 -translate-y-1/2 pointer-events-none text-[#9490A2]">
-                  <FigmaIcon name="dropdown" size={18} />
-                </div>
-              </div>
-            </div>
-
-            <div>
-              <label className="text-xs font-bold text-[#0E0727] mb-1.5 block">
-                Chủ đề chính
-              </label>
-              <div className="relative">
-                <select
-                  value={category}
-                  onChange={(e) => setCategory(e.target.value)}
-                  className="w-full px-4 py-3 bg-[#F5F5F7] rounded-xl text-sm font-medium text-[#0E0727] appearance-none outline-none focus:ring-2 focus:ring-[#7758E2]"
-                >
-                  {categories.map((c) => (
-                    <option key={c.id} value={c.name}>
-                      {c.name}
-                    </option>
-                  ))}
-                </select>
-                <div className="absolute right-4 top-1/2 -translate-y-1/2 pointer-events-none text-[#9490A2]">
-                  <FigmaIcon name="dropdown" size={18} />
-                </div>
-              </div>
-            </div>
-          </div>
-
-          {/* Preset Quick Links */}
-          <div className="space-y-2">
-            <span className="text-xs font-bold text-[#9490A2] px-1">Gợi ý liên kết mẫu</span>
-            <div className="space-y-1.5">
-              {presetSamples.map((sample) => (
-                <div
-                  key={sample.label}
-                  onClick={() => {
-                    setUrl(sample.url);
-                    setFolder(sample.folder);
-                    setCategory(sample.category);
-                  }}
-                  className="p-3 bg-white rounded-2xl shadow-2xs hover:bg-[#F1EEFC] hover:text-[#7758E2] text-xs font-medium text-[#0E0727] cursor-pointer transition-all flex items-center justify-between"
-                >
-                  <span className="truncate">{sample.label}</span>
-                  <FigmaIcon name="plus-small" size={16} />
-                </div>
-              ))}
-            </div>
-          </div>
-
-          {/* Submit Button */}
-          <div className="pt-2">
-            <button
-              type="submit"
-              disabled={!url.trim()}
-              className="w-full py-4 rounded-2xl bg-[#7758E2] text-white font-bold text-sm shadow-lg shadow-[#7758E2]/30 active:scale-[0.98] disabled:opacity-50 transition-all flex items-center justify-center gap-2"
-            >
-              <FigmaIcon name="ai" size={18} color="#FFFFFF" />
-              Lưu và phân tích với AI
+          <div className="flex w-full items-center gap-[10px] rounded-[11px] border-2 border-solid border-[#f5f5f7] bg-[#f7f7f9] px-[8px] py-[12px]">
+            <FigmaIcon name="link-field" size={24} />
+            <input
+              value={url}
+              onChange={(e) => setUrl(e.target.value)}
+              aria-label="Đường dẫn liên kết"
+              className="min-w-px flex-1 bg-transparent text-[16px] leading-[22px] font-normal tracking-[-0.18px] text-[#0e0727] outline-none"
+            />
+            <button type="button" onClick={() => setUrl('')} aria-label="Xoá liên kết">
+              <FigmaIcon name="url-clear" size={24} />
             </button>
           </div>
-        </form>
+        </div>
+
+        {/* Preview, node 2159:13192 */}
+        {url.trim() !== '' && (
+          <div className="flex w-[316px] shrink-0 items-center">
+            <div
+              className="flex w-[316px] items-center gap-[10px] rounded-[16px] bg-white p-[8px]"
+              style={{ boxShadow: 'var(--shadow-card)' }}
+            >
+              <div className="h-[84px] w-[80px] shrink-0 overflow-hidden rounded-[15px]">
+                <img
+                  src="/assets/images/figma_2159/2159_13180_preview.jpg"
+                  alt=""
+                  className="size-full rounded-[15px] object-cover"
+                />
+              </div>
+              <div className="flex min-w-px flex-1 flex-col items-start justify-center gap-[8px]">
+                <p className="w-full text-[14px] leading-[20px] font-medium tracking-[0px] text-[#0e0727]">
+                  Routine skincare tối giản
+                </p>
+                <p className="w-full text-[12px] leading-[16px] font-normal tracking-[0.4px] text-[#0e0727]">
+                  Routine đơn giản cho làn da khỏe và ít kích ứng.
+                </p>
+                <div className="flex w-full items-center">
+                  <p className="whitespace-nowrap text-[12px] leading-[16px] font-normal tracking-[0.4px] text-[#9490a2]">
+                    mimimi.com
+                  </p>
+                </div>
+              </div>
+            </div>
+          </div>
+        )}
+
+        {/* Categories, node 2159:13201 */}
+        <div className="flex w-full flex-col items-start gap-[8px]">
+          <div className="flex w-full items-start gap-[8px]">
+            <p className="min-w-px flex-1 text-[14px] leading-[20px] font-medium tracking-[0.4px] text-[#0e0727]">
+              Categories<span className="text-[#f12950]">*</span>
+            </p>
+            <span className="flex shrink-0 items-center rounded-full bg-[#7758e2] p-[4.032px]">
+              <FigmaIcon name="badge-check" size={11.935} />
+            </span>
+          </div>
+          <div className="relative flex w-full items-center gap-[20px] rounded-[11px] border-2 border-solid border-[#f1eefc] bg-[#fefefe] p-[8px]">
+            <div className="relative size-[60px] shrink-0 overflow-hidden rounded-[11.25px]">
+              <img
+                src="/assets/images/figma_2159/2159_13180_cat_thumb.jpg"
+                alt=""
+                className="size-full rounded-[11.25px] object-cover"
+              />
+              <span className="absolute top-[40.5px] left-[3.75px] flex items-center rounded-[10.765px] border-[0.487px] border-solid border-[#d9d9d9] bg-white p-[2.691px]">
+                <FigmaIcon name="img-badge" size={10.144} />
+              </span>
+            </div>
+            <div className="flex min-w-px flex-1 items-center gap-[10px]">
+              <div className="flex min-w-px flex-1 flex-col items-start justify-center gap-[4px]">
+                <div className="flex w-full items-center justify-center px-[8px]">
+                  <p className="min-w-px flex-1 overflow-hidden text-ellipsis whitespace-nowrap text-[16px] leading-[22px] font-medium tracking-[-0.18px] text-[#0e0727]">
+                    {category}
+                  </p>
+                </div>
+                <div className="flex items-center justify-center gap-[8px] overflow-hidden rounded-[24px] bg-[#f1eefc] px-[10px] py-[6px]">
+                  <span className="whitespace-nowrap text-[12px] leading-[16px] font-extrabold tracking-[0.4px] text-[#7758e2]">
+                    Đề xuất bởi AI
+                  </span>
+                </div>
+              </div>
+              <span className="flex shrink-0 items-center justify-center">
+                <FigmaIcon
+                  name="dropdown-close"
+                  size={24}
+                  style={{ transform: 'rotate(180deg) scaleY(-1)' }}
+                />
+              </span>
+            </div>
+            <OverlaySelect value={category} options={categoryOptions} onChange={setCategory} label="Danh mục" />
+          </div>
+        </div>
+
+        {/* Folder, node 2159:13217 */}
+        <div className="flex w-full flex-col items-start gap-[8px]">
+          <p className="w-full text-[14px] leading-[20px] font-medium tracking-[0.4px] text-[#0e0727]">
+            Folder
+          </p>
+          <div className="relative flex w-full items-center gap-[10px] rounded-[11px] border-2 border-solid border-[#f5f5f7] px-[8px] py-[12px]">
+            <p className="min-w-px flex-1 overflow-hidden text-ellipsis whitespace-nowrap text-[16px] leading-[22px] font-normal tracking-[-0.18px] text-[#0e0727]">
+              {folder}
+            </p>
+            <span className="flex shrink-0 items-center justify-center">
+              <span
+                className="relative block size-[24px] overflow-hidden rounded-[23px] bg-white"
+                style={{ transform: 'rotate(180deg)' }}
+              >
+                {/* inner vector at inset 38.54% / 26.04% of the 24px box */}
+                <FigmaIcon
+                  name="direction-down-figma"
+                  className="absolute"
+                  style={{ left: '6.25px', top: '9.25px' }}
+                />
+              </span>
+            </span>
+            <OverlaySelect value={folder} options={folderOptions} onChange={setFolder} label="Thư mục" />
+          </div>
+        </div>
+      </div>
+
+      {/* Save bar, node 2159:13225 — frame y=750, i.e. 706 inside the content area. */}
+      <div className="absolute top-[706px] left-0 flex w-[390px] flex-col items-start rounded-[16px] border-t border-solid border-[#f1eefc] bg-white px-[16px] py-[30px]">
+        <button
+          type="button"
+          onClick={() => onStartAnalysis({ url, folder, category })}
+          className="flex w-[354px] items-center justify-center gap-[10px] overflow-hidden rounded-[16px] bg-[#7758e2] px-[16px] py-[12px]"
+        >
+          <span className="whitespace-nowrap text-center text-[16px] leading-[22px] font-medium tracking-[-0.18px] text-white">
+            Lưu liên kết
+          </span>
+        </button>
       </div>
     </div>
   );

@@ -6,7 +6,7 @@ Active source-of-truth section: `2159:12770`. Section `2143:4235` is legacy refe
 
 | Flow/state | Active Figma node | React screen | Status |
 | --- | --- | --- | --- |
-| Home | `2159:12771` | `src/screens/HomeScreen.tsx` | Not yet rebuilt against the node in React |
+| Home | `2159:12771` | `src/screens/HomeScreen.tsx` | Rebuilt from the node and pixel-compared |
 | Home, add-link toast | `2159:13227` | `src/screens/HomeScreen.tsx` | Uses the exact success vector; layout not yet node-verified |
 | Home variant | `2159:13303` | pending | Pending |
 | Home variant | `2159:13676` | pending | Pending |
@@ -50,21 +50,45 @@ Token source: `src/index.css`. SVG registry/component: `src/components/common/Fi
 
 ## Asset status
 
-`FigmaIcon` resolves every glyph from `public/assets/icons/`. Two gaps remain, and both need the
-Figma MCP server connected before they can be closed.
+`FigmaIcon` resolves every glyph from `public/assets/icons/`.
 
-### Icons still exported from the legacy section
+### Home, node 2159:12771 — complete
 
-`public/assets/icons/figma/` holds 84 SVGs exported from section `2143:*`. Only
-`public/assets/icons/figma_2159/2159_13227_success.svg` comes from the active section. The 18
-namespaced Home exports (nav, search, filter, more-vertical, status bar) were deleted by commit
-`fce32d0` and must be re-exported from `2159:12771` rather than reused from the legacy set.
+18 assets were downloaded from the node: 10 SVGs into `public/assets/icons/figma_2159/` and 8
+JPEGs into `public/assets/images/figma_2159/`. `FigmaIcon` points Home's glyphs at these rather
+than the legacy `2143:*` stand-ins.
 
-### Every raster asset is corrupt
+Two exports need care, both verified against the Figma render:
 
-All 14 PNGs under `public/assets/images/` are unreadable. Their first bytes are `EF BF BD`
-repeated — the UTF-8 replacement character — followed by `JF` from a JFIF header, so the files were
-originally JPEG and were rewritten through a UTF-8 text decode that destroyed every non-UTF-8 byte.
-The damage predates the React migration: the same bytes are in `44ab612` and `ab0756c`. The
-original bytes are unrecoverable, so each image must be downloaded again from its Figma node and
-saved as binary.
+- `2159_12771_more_vertical.svg` is a 2.5x12.5 vector, but the instance is **rotated** in the
+  design: it renders as 12.5x2.5 centred at (12, 11) inside its 24px box. Render it rotated 90deg.
+- `2159_12771_nav_bg.svg` is 390x75 while the node declares 428 wide. The notch measures at
+  x=194.5 in the 390 render, so the vector is drawn at 390, not stretched.
+
+The frame itself carries `px-20`. That is why the status bar is 350 wide starting at x=20 while
+Content is a full 390 that overflows the padding — reproducing this is what aligns the status bar.
+
+### Remaining screens
+
+`public/assets/icons/figma/` still holds 84 SVGs exported from section `2143:*`. Screens other than
+Home still use them and must be re-exported from their own `2159:*` nodes when rebuilt.
+
+### Raster assets
+
+The 14 PNGs that used to sit in `public/assets/images/` were unreadable: their first bytes were
+`EF BF BD` repeated — the UTF-8 replacement character — followed by `JF` from a JFIF header, so
+they were JPEGs rewritten through a UTF-8 text decode. The damage predated the React migration
+(`44ab612` and `ab0756c` carry the same bytes). They were deleted and replaced by the 8 real
+exports above, which are JPEG and are named `.jpg` accordingly.
+
+## Comparison method
+
+Render the app at 390x856 with `device_scale_factor: 1`, screenshot it, and diff against
+`get_screenshot` of the node. Exclude pixels equal to `#444444`: that is the Figma canvas backdrop
+showing through the frame's 40px corner radius, not part of the design.
+
+Home currently measures a mean absolute difference of 3.09 / 3.11 / 3.05 out of 255 over the design
+area, with 3.6% of pixels differing by more than 28. Element bounding boxes for the avatar, search
+icon, filter icon, both 80px image rails, the FAB, the nav labels and the overflow dots all land
+within 1px. The residual is text antialiasing (Chrome subpixel versus Figma grayscale) and JPEG
+re-encoding in the photos.

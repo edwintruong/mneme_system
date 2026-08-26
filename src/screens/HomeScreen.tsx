@@ -1,11 +1,14 @@
 import React, { useState } from 'react';
 import { useMneme } from '../state/mnemeContext';
-import { SearchCard } from '../components/common/SearchCard';
-import { FilterChips } from '../components/common/FilterChips';
-import { SectionTitle } from '../components/common/SectionTitle';
-import { LinkTile } from '../components/common/LinkTile';
-import { MnemeCategory, SavedLink } from '../types';
 import { FigmaIcon } from '../components/common/FigmaIcon';
+import { MnemeCategory, SavedLink } from '../types';
+
+/**
+ * Home, Figma node 2159:12771. Every size, gap and colour below is read from
+ * that node; do not adjust them to taste.
+ */
+
+const FILTERS = ['Tất cả', 'Bài viết', 'Video', 'Ảnh'] as const;
 
 interface HomeScreenProps {
   onOpenSearch: () => void;
@@ -23,105 +26,161 @@ export const HomeScreen: React.FC<HomeScreenProps> = ({
   onDismissToast,
 }) => {
   const { categories, links } = useMneme();
-  const [filter, setFilter] = useState('Tất cả');
+  const [filter, setFilter] = useState<string>(FILTERS[0]);
 
-  const filteredLinks = links.filter((l) => {
-    if (filter === 'Bài viết') return l.source === 'Website' || l.source === 'Article';
-    if (filter === 'Video') return l.source === 'YouTube' || l.source === 'TikTok';
-    if (filter === 'Ảnh') return l.source === 'Instagram' || l.tags.includes('Photo');
-    return true;
-  });
+  const recent = links.slice(0, 3);
 
   return (
-    <div className="pb-28 pt-4 px-4 space-y-5">
-      {/* Toast Notification if newly added link */}
+    // Content, node 2159:12773
+    <div className="flex w-[390px] flex-1 flex-col items-start gap-[12px] px-[20px] py-[16px]">
       {showSuccessToast && (
-        <div className="bg-[#31CF37]/15 border border-[#31CF37]/30 rounded-2xl p-3.5 flex items-center justify-between text-[#0E0727]">
-          <div className="flex items-center gap-2.5">
+        // Add-link toast, node 2159:13227
+        <div className="flex w-[350px] items-center justify-between rounded-[16px] border border-[#31cf37]/30 bg-[#31cf37]/15 p-[12px]">
+          <div className="flex items-center gap-[10px]">
             <FigmaIcon name="check-circle" size={24} />
-            <span className="text-xs font-semibold">Đã thêm liên kết vào Mneme thành công!</span>
+            <span className="text-[12px] leading-[16px] font-medium tracking-[0.4px] text-[#0e0727]">
+              Đã thêm liên kết vào Mneme thành công!
+            </span>
           </div>
-          <button
-            type="button"
-            onClick={onDismissToast}
-            aria-label="Đóng thông báo"
-            className="p-1"
-          >
-            <FigmaIcon name="close-small" size={16} color="#9490A2" />
+          <button type="button" onClick={onDismissToast} aria-label="Đóng thông báo" className="p-[4px]">
+            <FigmaIcon name="close-small" size={16} color="#9490a2" />
           </button>
         </div>
       )}
 
-      {/* Search Header */}
-      <SearchCard onTap={onOpenSearch} />
-
-      {/* Filter Chips */}
-      <FilterChips onChange={(f) => setFilter(f)} />
-
-      {/* Categories Horizontal Carousel */}
-      <div className="space-y-2.5">
-        <SectionTitle
-          title="Danh mục kiến thức"
-          trailing={
-            <span className="text-xs text-[#7758E2] font-semibold cursor-pointer">
-              {categories.length} danh mục
-            </span>
-          }
-        />
-        <div className="flex gap-3 overflow-x-auto no-scrollbar pb-1 -mx-4 px-4">
-          {categories.map((cat) => (
-            <div
-              key={cat.id}
-              onClick={() => onSelectCategory(cat)}
-              className="w-[124px] flex-shrink-0 bg-white rounded-2xl p-3 shadow-xs hover:shadow-md transition-all cursor-pointer group active:scale-95"
-            >
-              <div className="w-full h-[76px] rounded-xl overflow-hidden bg-[#F5F5F7] mb-2 flex items-center justify-center">
-                <img
-                  src={cat.image}
-                  alt={cat.name}
-                  onError={(e) => {
-                    (e.target as HTMLElement).style.display = 'none';
-                  }}
-                  className="w-full h-full object-cover group-hover:scale-105 transition-transform"
-                />
-              </div>
-              <h4 className="text-xs font-semibold text-[#0E0727] truncate">{cat.name}</h4>
-              <p className="text-[10px] text-[#9490A2] mt-0.5">{cat.itemCount} mục</p>
-            </div>
-          ))}
+      {/* Header, node 2159:12774 */}
+      <div className="flex w-[350px] items-start justify-end">
+        <h1 className="min-w-px flex-1 self-stretch text-[24px] leading-[30px] font-medium tracking-[-0.15px] text-[#0e0727]">
+          Xin chào, echs
+        </h1>
+        <div className="size-[36px] shrink-0 overflow-hidden rounded-[18px] border-[1.385px] border-solid border-[#e5e5ea] bg-[#eef1f4]">
+          <img
+            src="/assets/images/figma_2159/2159_12771_avatar.jpg"
+            alt=""
+            className="size-full rounded-[18px] object-cover"
+          />
         </div>
       </div>
 
-      {/* Recently Saved Links */}
-      <div className="space-y-2 bg-white rounded-3xl p-4 shadow-xs">
-        <SectionTitle
-          title="Đã lưu gần đây"
-          trailing={
-            <button
-              type="button"
-              onClick={onOpenSearch}
-              className="text-xs text-[#7758E2] font-semibold hover:underline flex items-center gap-1"
-            >
-              Xem tất cả
-              <FigmaIcon name="chevron-right" size={14} color="#7758E2" />
-            </button>
-          }
-        />
+      {/* Search Card, node 2159:12777 */}
+      <div className="flex w-[350px] flex-col items-start overflow-hidden rounded-[30px] bg-white p-[12px]">
+        <div className="flex w-[326px] items-center justify-center gap-[18px]">
+          <button
+            type="button"
+            onClick={onOpenSearch}
+            className="flex min-w-px flex-1 items-center gap-[10px] rounded-[11px] bg-[#f5f5f7] px-[8px] py-[12px]"
+          >
+            <FigmaIcon name="search" size={16} />
+            <span className="whitespace-nowrap text-[16px] leading-[22px] font-normal tracking-[-0.18px] text-[#9490a2]">
+              Enter search terms...
+            </span>
+          </button>
+          <button type="button" onClick={onOpenSearch} aria-label="Bộ lọc" className="shrink-0">
+            <FigmaIcon name="filter" size={36} />
+          </button>
+        </div>
+      </div>
 
-        <div className="divide-y divide-black/5">
-          {filteredLinks.slice(0, 5).map((link) => (
-            <LinkTile
-              key={link.id}
-              link={link}
-              onClick={() => onSelectLink(link)}
-            />
-          ))}
+      {/* Card, node 2159:12779 */}
+      <div
+        className="flex w-full flex-col items-start gap-[20px] rounded-[20px] bg-white px-[16px] py-[20px]"
+        style={{ boxShadow: 'var(--shadow-card)' }}
+      >
+        {/* Filter Chips, node 2159:12780 */}
+        <div className="flex items-start gap-[10px] overflow-hidden">
+          {FILTERS.map((label) => {
+            const selected = filter === label;
+            return (
+              <button
+                key={label}
+                type="button"
+                onClick={() => setFilter(label)}
+                className={`flex w-[70px] items-center justify-center gap-[8px] overflow-hidden rounded-[24px] px-[10px] py-[6px] ${
+                  selected ? 'bg-[#f1eefc]' : 'bg-[#f5f5f7]'
+                }`}
+              >
+                <span
+                  className={`whitespace-nowrap text-[12px] leading-[16px] font-extrabold tracking-[0.4px] ${
+                    selected ? 'text-[#7758e2]' : 'text-[#9490a2]'
+                  }`}
+                >
+                  {label}
+                </span>
+              </button>
+            );
+          })}
+        </div>
 
-          {filteredLinks.length === 0 && (
-            <div className="py-8 text-center text-xs text-[#9490A2]">
-              Không có liên kết nào phù hợp với bộ lọc.
+        {/* node 2159:12785 */}
+        <div className="flex w-full flex-col items-start gap-[20px]">
+          {/* Đã lưu gần đây, node 2159:12786 */}
+          <div className="flex w-full flex-col items-start gap-[10px]">
+            <p className="w-full text-[14px] leading-[20px] font-medium tracking-[0.4px] text-[#0e0727]">
+              Đã lưu gần đây
+            </p>
+            <div className="flex w-full items-center gap-[12px]">
+              {recent.map((link) => (
+                <button
+                  key={link.id}
+                  type="button"
+                  onClick={() => onSelectLink(link)}
+                  className="flex min-w-px flex-1 flex-col items-center justify-center gap-[9px]"
+                >
+                  <div className="size-[80px] shrink-0 overflow-hidden rounded-[15px]">
+                    <img src={link.image} alt="" className="size-full rounded-[15px] object-cover" />
+                  </div>
+                  <p className="w-full min-w-full overflow-hidden text-ellipsis whitespace-nowrap text-left text-[12px] leading-[16px] font-medium tracking-[0px] text-[#0e0727]">
+                    {link.title}
+                  </p>
+                </button>
+              ))}
             </div>
-          )}
+          </div>
+
+          {/* Categories, node 2159:12801 */}
+          <div className="flex w-full flex-col items-start gap-[10px]">
+            <p className="w-full text-[14px] leading-[20px] font-medium tracking-[0.4px] text-[#0e0727]">
+              Categories
+            </p>
+            {categories.map((category, index) => (
+              <button
+                key={category.id}
+                type="button"
+                onClick={() => onSelectCategory(category)}
+                className="flex w-full items-center gap-[10px] text-left"
+              >
+                <div className="size-[80px] shrink-0 overflow-hidden rounded-[15px]">
+                  <img src={category.image} alt="" className="size-full rounded-[15px] object-cover" />
+                </div>
+                <div className="flex min-w-px flex-1 flex-col items-start justify-center gap-[8px]">
+                  <p className="w-full text-[16px] leading-[24px] font-medium tracking-[0px] text-[#0e0727]">
+                    {category.name}
+                  </p>
+                  <div className="flex w-full items-center gap-[4px]">
+                    <p className="whitespace-nowrap text-[14px] leading-[20px] font-normal tracking-[0.4px] text-[#9490a2]">
+                      {category.itemCount} mục
+                    </p>
+                  </div>
+                </div>
+                {/* Only the last row carries the overflow control in the design. */}
+                {index === categories.length - 1 && (
+                  // 24px box holding a 2.5x12.5 glyph, node 2143:3538
+                  <span className="relative size-[24px] shrink-0">
+                    {/*
+                      The instance is rotated in Figma: the exported vector is
+                      2.5x12.5 but the design renders it as 12.5x2.5 centred at
+                      (12, 11) in the 24px box, measured off the Figma render.
+                    */}
+                    <FigmaIcon
+                      name="more-vertical"
+                      className="absolute"
+                      style={{ left: '10.75px', top: '4.75px', transform: 'rotate(90deg)' }}
+                    />
+                  </span>
+                )}
+              </button>
+            ))}
+          </div>
         </div>
       </div>
     </div>

@@ -1,31 +1,41 @@
 import React from 'react';
 import { FigmaIcon } from './FigmaIcon';
 
+/**
+ * The white search card that opens every list screen. Figma nodes 2159:12777
+ * (Home) and 2159:12364 (Notebook list) — identical apart from the shadow,
+ * which Home's copy does not carry.
+ */
 interface SearchCardProps {
-  onTap?: () => void;
-  placeholder?: string;
+  onTap: () => void;
+  /** Home fixes this at 350; the notebook list fills its 356 column. */
   className?: string;
+  withShadow?: boolean;
 }
 
 export const SearchCard: React.FC<SearchCardProps> = ({
   onTap,
-  placeholder = 'Enter search terms...',
-  className = '',
-}) => {
-  return (
-    <div
-      onClick={onTap}
-      role="button"
-      tabIndex={0}
-      className={`bg-white rounded-[30px] p-3 shadow-sm hover:shadow-md transition-all cursor-pointer select-none flex items-center ${className}`}
-    >
-      <div className="flex-1 bg-[#F5F5F7] rounded-[11px] h-[46px] px-3 flex items-center gap-2.5">
-        <FigmaIcon name="search" size={16} className="text-[#9490A2]" />
-        <span className="text-base text-[#9490A2] tracking-tight">{placeholder}</span>
-      </div>
-      <div className="ml-4 pr-1 text-[#0E0727] hover:text-[#7758E2] transition-colors">
-        <FigmaIcon name="filter" size={26} />
-      </div>
+  className = 'w-[350px]',
+  withShadow = false,
+}) => (
+  <div
+    className={`flex flex-col items-start overflow-hidden rounded-[30px] bg-white p-[12px] ${className}`}
+    style={withShadow ? { boxShadow: 'var(--shadow-card)' } : undefined}
+  >
+    <div className="flex w-full items-center justify-center gap-[18px]">
+      <button
+        type="button"
+        onClick={onTap}
+        className="flex min-w-px flex-1 items-center gap-[10px] rounded-[11px] bg-[#f5f5f7] px-[8px] py-[12px]"
+      >
+        <FigmaIcon name="search" size={16} />
+        <span className="whitespace-nowrap text-[16px] leading-[22px] font-normal tracking-[-0.18px] text-[#9490a2]">
+          Enter search terms...
+        </span>
+      </button>
+      <button type="button" onClick={onTap} aria-label="Bộ lọc" className="shrink-0">
+        <FigmaIcon name="filter" size={36} />
+      </button>
     </div>
-  );
-};
+  </div>
+);

@@ -23,7 +23,7 @@ export const ProfileScreen: React.FC = () => {
       <div className="text-center space-y-2">
         <div className="mx-auto w-24 h-24 rounded-full overflow-hidden border-2 border-[#7758E2]/20 shadow-md">
           <img
-            src="/assets/images/avatar.png"
+            src="/assets/images/figma_2159/2159_12771_avatar.jpg"
             alt="Avatar"
             className="w-full h-full object-cover"
             onError={(e) => {

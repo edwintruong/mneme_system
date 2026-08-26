@@ -83,10 +83,10 @@ export const MnemeProvider: React.FC<{ children: React.ReactNode }> = ({ childre
 
   const getImageForCategory = (category: string): string => {
     const norm = category.toLowerCase();
-    if (norm.includes('du lịch') || norm.includes('travel')) return '/assets/images/travel.png';
-    if (norm.includes('phim') || norm.includes('movie')) return '/assets/images/movies.png';
-    if (norm.includes('ẩm thực') || norm.includes('công thức') || norm.includes('bánh')) return '/assets/images/cake.png';
-    return '/assets/images/figma.png';
+    if (norm.includes('du lịch') || norm.includes('travel')) return '/assets/images/figma_2159/2159_12771_category_travel.jpg';
+    if (norm.includes('phim') || norm.includes('movie')) return '/assets/images/figma_2159/2159_12771_category_movie.jpg';
+    if (norm.includes('ẩm thực') || norm.includes('công thức') || norm.includes('bánh')) return '/assets/images/figma_2159/2159_12771_category_cake.jpg';
+    return '/assets/images/figma_2159/2159_12771_category_study.jpg';
   };
 
   const addLink = async ({
@@ -230,7 +230,7 @@ export const MnemeProvider: React.FC<{ children: React.ReactNode }> = ({ childre
       id: Date.now(),
       title: notebookDraft?.title || `${selected[0]?.folder || 'Kiến thức'} · Tổng hợp`,
       description: notebookDraft?.description || 'Sổ tay AI tổng hợp từ các nội dung đã chọn.',
-      image: selected[0]?.image || '/assets/images/figma.png',
+      image: selected[0]?.image || '/assets/images/figma_2159/2159_12771_category_study.jpg',
       itemCount: selected.length,
       sections,
       createdAt: 'Hôm nay',

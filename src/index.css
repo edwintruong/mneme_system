@@ -1,28 +1,74 @@
 @import "tailwindcss";
 
+/*
+ * Values below are the Figma variables read from node 2159:12771 via
+ * get_variable_defs. The name after `--` mirrors the Figma variable path, so a
+ * token can be traced back to the design without guesswork.
+ */
 @layer base {
   :root {
-    --color-background: #F8F6FD;
-    --color-primary: #7758E2;
-    --color-primary-dark: #613EEA;
-    --color-primary-soft: #F1EEFC;
-    --color-ink: #0E0727;
-    --color-dark: #28303F;
-    --color-muted: #9490A2;
-    --color-neutral-500: #F5F5F7;
-    --color-surface-default: #F7F7F8;
-    --color-success: #31CF37;
+    /* Foundation */
+    --color-primary-500: #7758e2;
+    --color-primary-50: #f1eefc;
+    --color-neutral-500: #f5f5f7;
+    --color-background: #f8f6fd;
+
+    /* Text */
+    --color-text-default: #0e0727;
+    --color-text-subtle: #9490a2;
+    --color-text-on-primary: #7758e2;
+
+    /* Icon */
+    --color-icon-default: #28303f;
+    --color-icon-on-primary: #ffffff;
+
+    /* Misc */
+    --color-dark: #28303f;
+    --color-success: #31cf37;
+    --color-labels-quaternary: #3c3c432e;
+
+    /* Type ramp: font-size / line-height / letter-spacing */
+    --heading-h3-24: 24px;
+    --heading-h3-24-lh: 30px;
+    --heading-h3-24-ls: -0.15px;
+
+    --label-16: 16px;
+    --label-16-lh: 22px;
+    --label-16-ls: -0.18px;
+
+    --label-20: 14px;
+    --label-20-lh: 20px;
+
+    --label-12: 12px;
+    --label-12-lh: 16px;
+
+    --body-16: 16px;
+    --body-16-lh: 24px;
+
+    --body-12: 12px;
+    --body-12-lh: 16px;
+
+    --tracking-body-small: 0.4px;
+
+    /* Effects/Shadow */
+    --shadow-card: 0 4px 8px rgba(0, 0, 0, 0.06), 0 0 4px rgba(0, 0, 0, 0.04);
   }
 
   body {
     background-color: var(--color-background);
-    color: var(--color-ink);
-    font-family: 'Roboto', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+    color: var(--color-text-default);
+    font-family: 'Roboto', -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
     -webkit-font-smoothing: antialiased;
   }
 }
 
-/* Custom animations & scrollbar utilities */
+@utility no-scrollbar {
+  scrollbar-width: none;
+  &::-webkit-scrollbar {
+    display: none;
+  }
+}
+
 ::-webkit-scrollbar {
   width: 4px;
   height: 4px;

@@ -17,7 +17,7 @@ interface IconAsset {
 }
 
 const FIGMA = '/assets/icons/figma';
-const FIGMA_2159 = '/assets/icons/figma_2159';
+const N2159 = '/assets/icons/figma_2159';
 
 export const FIGMA_ICONS: Record<string, IconAsset> = {
   // Navigation chrome
@@ -26,25 +26,27 @@ export const FIGMA_ICONS: Record<string, IconAsset> = {
   dropdown: { src: `${FIGMA}/add_link_dropdown_close.svg`, w: 24, h: 24 },
   'direction-down': { src: `${FIGMA}/notebook_detail_direction_down.svg`, w: 11.5001, h: 5.50003 },
 
-  // Bottom tab bar
-  home: { src: `${FIGMA}/home_nav_home.svg`, w: 24, h: 24 },
-  'nav-home-active': { src: `${FIGMA}/notebook_nav_home.svg`, w: 24, h: 24 },
-  notebook: { src: `${FIGMA}/home_nav_notebook.svg`, w: 24, h: 24 },
-  'nav-notebook-active': { src: `${FIGMA}/notebook_nav_notebook.svg`, w: 24, h: 24 },
-  activity: { src: `${FIGMA}/home_nav_activity.svg`, w: 24, h: 24 },
-  profile: { src: `${FIGMA}/home_nav_profile.svg`, w: 24, h: 24 },
-  'nav-bg': { src: `${FIGMA}/home_nav_bg.svg`, w: 390, h: 75 },
+  // Bottom tab bar, exported from node 2159:12771
+  home: { src: `${N2159}/2159_12891_nav_home.svg`, w: 24, h: 24 },
+  'nav-home-active': { src: `${N2159}/2159_12771_nav_home.svg`, w: 24, h: 24 },
+  notebook: { src: `${N2159}/2159_12771_nav_notebook.svg`, w: 24, h: 24 },
+  'nav-notebook-active': { src: `${N2159}/2159_12891_nav_notebook_bold.svg`, w: 24, h: 24 },
+  activity: { src: `${N2159}/2159_12771_nav_activity.svg`, w: 24, h: 24 },
+  profile: { src: `${N2159}/2159_12771_nav_profile.svg`, w: 24, h: 24 },
+  'nav-bg': { src: `${N2159}/2159_12771_nav_bg.svg`, w: 390, h: 75 },
 
   // Actions
-  plus: { src: `${FIGMA}/home_plus.svg`, w: 24, h: 24 },
+  plus: { src: `${N2159}/2159_12771_plus.svg`, w: 24, h: 24 },
   'plus-small': { src: `${FIGMA}/category_icon_5.svg`, w: 16, h: 16 },
-  'add-circle': { src: `${FIGMA}/notebook_add_circle.svg`, w: 24, h: 24 },
-  'plus-circle': { src: `${FIGMA}/notebook_add_circle.svg`, w: 24, h: 24 },
-  search: { src: `${FIGMA}/category_icon_4.svg`, w: 16, h: 16 },
-  filter: { src: `${FIGMA}/category_filter.svg`, w: 36, h: 36 },
+  'add-circle': { src: `${N2159}/2159_12891_add_circle.svg`, w: 24, h: 24 },
+  'plus-circle': { src: `${N2159}/2159_12891_add_circle.svg`, w: 24, h: 24 },
+  'banner-close': { src: `${N2159}/2159_12891_banner_icon.svg`, w: 24, h: 24 },
+  notebooklm: { src: `${N2159}/2159_12891_notebooklm.svg`, w: 80, h: 80 },
+  search: { src: `${N2159}/2159_12771_search.svg`, w: 16, h: 16 },
+  filter: { src: `${N2159}/2159_12771_filter.svg`, w: 36, h: 36 },
   close: { src: `${FIGMA}/add_link_icon_1.svg`, w: 24, h: 24 },
   'close-small': { src: `${FIGMA}/category_icon_1.svg`, w: 16, h: 16 },
-  'more-vertical': { src: `${FIGMA}/home_more_vertical.svg`, w: 2.5, h: 12.5 },
+  'more-vertical': { src: `${N2159}/2159_12771_more_vertical.svg`, w: 2.5, h: 12.5 },
   'more-horizontal': { src: `${FIGMA}/link_detail_more.svg`, w: 24, h: 24 },
 
   // Link + notebook content
@@ -66,11 +68,21 @@ export const FIGMA_ICONS: Record<string, IconAsset> = {
   'radio-selected': { src: `${FIGMA}/select_sources_radio_1.svg`, w: 24, h: 24 },
   placeholder: { src: `${FIGMA}/notebook_detail_placeholder.svg`, w: 350, h: 280 },
 
+  // Add link, node 2159:13180
+  'add-link-back': { src: `${N2159}/2159_13180_back.svg`, w: 30, h: 30, flip: true },
+  'more-horizontal-figma': { src: `${N2159}/2159_13180_more_horizontal.svg`, w: 24, h: 24 },
+  'link-field': { src: `${N2159}/2159_13180_link.svg`, w: 24, h: 24 },
+  'url-clear': { src: `${N2159}/2159_13180_url_clear.svg`, w: 24, h: 24 },
+  'badge-check': { src: `${N2159}/2159_13180_badge_check.svg`, w: 11.9354, h: 11.9354 },
+  'img-badge': { src: `${N2159}/2159_13180_img_badge.svg`, w: 10.1441, h: 10.1441 },
+  'dropdown-close': { src: `${N2159}/2159_13180_dropdown_close.svg`, w: 24, h: 24 },
+  'direction-down-figma': { src: `${N2159}/2159_13180_direction_down.svg`, w: 11.5001, h: 5.50003 },
+
   // Status bar
-  'status-right': { src: `${FIGMA}/add_link_status_right.svg`, w: 66.6612, h: 11.336 },
+  'status-right': { src: `${N2159}/2159_12771_status_right.svg`, w: 66.6612, h: 11.336 },
 
   // Add-link toast, node 2159:13227
-  'check-circle': { src: `${FIGMA_2159}/2159_13227_success.svg`, w: 24, h: 24 },
+  'check-circle': { src: `${N2159}/2159_13227_success.svg`, w: 24, h: 24 },
 };
 
 export interface FigmaIconProps {
@@ -87,6 +99,8 @@ export interface FigmaIconProps {
    */
   color?: string;
   alt?: string;
+  /** Extra positioning styles; `transform` here composes after any flip. */
+  style?: React.CSSProperties;
 }
 
 export const FigmaIcon: React.FC<FigmaIconProps> = ({
@@ -96,6 +110,7 @@ export const FigmaIcon: React.FC<FigmaIconProps> = ({
   className = '',
   color,
   alt = '',
+  style,
 }) => {
   const entry = name ? FIGMA_ICONS[name] : undefined;
   const src = asset ?? entry?.src;
@@ -128,7 +143,8 @@ export const FigmaIcon: React.FC<FigmaIconProps> = ({
     height = `${entry.h}px`;
   }
 
-  const transform = entry?.flip ? 'scaleX(-1)' : undefined;
+  const flip = entry?.flip ? 'scaleX(-1)' : '';
+  const transform = [flip, style?.transform].filter(Boolean).join(' ') || undefined;
 
   if (color) {
     return (
@@ -138,6 +154,7 @@ export const FigmaIcon: React.FC<FigmaIconProps> = ({
         aria-hidden={alt ? undefined : true}
         className={`inline-block shrink-0 ${className}`}
         style={{
+          ...style,
           width,
           height,
           transform,
@@ -161,7 +178,7 @@ export const FigmaIcon: React.FC<FigmaIconProps> = ({
       alt={alt}
       aria-hidden={alt ? undefined : true}
       draggable={false}
-      style={{ width, height, transform }}
+      style={{ ...style, width, height, transform }}
       className={`inline-block shrink-0 ${className}`}
     />
   );

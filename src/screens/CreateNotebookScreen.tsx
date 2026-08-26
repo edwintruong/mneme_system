@@ -25,7 +25,7 @@ export const CreateNotebookScreen: React.FC<CreateNotebookScreenProps> = ({
         <div className="text-center space-y-2">
           <div className="w-20 h-20 rounded-3xl bg-[#F1EEFC] text-[#7758E2] mx-auto flex items-center justify-center shadow-xs">
             <img
-              src="/assets/images/create_sources.png"
+              src="/assets/images/figma_2159/2159_12771_category_study.jpg"
               alt="Sources"
               className="w-12 h-12 object-contain"
               onError={(e) => {
