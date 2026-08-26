@@ -5,6 +5,7 @@ import '../../state/store_scope.dart';
 import '../../widgets/common.dart';
 import '../folder/category_screen.dart';
 import '../search/search_screen.dart';
+import '../notebook/create_notebook_screen.dart';
 
 class HomeScreen extends StatelessWidget {
   const HomeScreen({super.key});
@@ -35,6 +36,51 @@ class HomeScreen extends StatelessWidget {
             onTap: () => Navigator.push(
               context,
               MaterialPageRoute(builder: (_) => const SearchScreen()),
+            ),
+          ),
+          const SizedBox(height: 12),
+          Material(
+            color: AppColors.primarySoft,
+            borderRadius: BorderRadius.circular(18),
+            child: InkWell(
+              onTap: () => Navigator.push(
+                context,
+                MaterialPageRoute(builder: (_) => const CreateNotebookScreen()),
+              ),
+              borderRadius: BorderRadius.circular(18),
+              child: const Padding(
+                padding: EdgeInsets.all(16),
+                child: Row(
+                  children: [
+                    CircleAvatar(
+                      backgroundColor: AppColors.primary,
+                      foregroundColor: Colors.white,
+                      child: Icon(Icons.auto_awesome),
+                    ),
+                    SizedBox(width: 12),
+                    Expanded(
+                      child: Column(
+                        crossAxisAlignment: CrossAxisAlignment.start,
+                        children: [
+                          Text(
+                            'Bạn đã lưu đủ nội dung về UI/UX',
+                            style: TextStyle(fontWeight: FontWeight.w600),
+                          ),
+                          SizedBox(height: 3),
+                          Text(
+                            'Tạo sổ tay để biến link rời rạc thành tri thức',
+                            style: TextStyle(
+                              color: AppColors.muted,
+                              fontSize: 12,
+                            ),
+                          ),
+                        ],
+                      ),
+                    ),
+                    Icon(Icons.chevron_right, color: AppColors.primary),
+                  ],
+                ),
+              ),
             ),
           ),
           const SizedBox(height: 12),

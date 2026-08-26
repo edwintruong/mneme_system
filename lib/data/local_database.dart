@@ -9,7 +9,7 @@ class LocalDatabase {
     final path = p.join(await getDatabasesPath(), 'mneme_demo.db');
     final db = await openDatabase(
       path,
-      version: 1,
+      version: 2,
       onCreate: (db, _) async {
         await db.execute(
           'CREATE TABLE categories(id INTEGER PRIMARY KEY, name TEXT NOT NULL, image TEXT NOT NULL, item_count INTEGER NOT NULL)',
@@ -24,6 +24,11 @@ class LocalDatabase {
           'CREATE TABLE notebooks(id INTEGER PRIMARY KEY AUTOINCREMENT, title TEXT NOT NULL, description TEXT NOT NULL, image TEXT NOT NULL, item_count INTEGER NOT NULL DEFAULT 0)',
         );
         await _seed(db);
+      },
+      onUpgrade: (db, oldVersion, _) async {
+        if (oldVersion < 2) {
+          await _seedRecipe(db);
+        }
       },
     );
     return LocalDatabase._(db);
@@ -80,6 +85,20 @@ class LocalDatabase {
       'description': 'Danh sách phim tuyển chọn.',
       'image': 'assets/images/movies.png',
       'item_count': 10,
+    });
+    await _seedRecipe(db);
+  }
+
+  static Future<void> _seedRecipe(Database db) async {
+    await db.insert('links', {
+      'title': 'Bánh chuối bằng nồi chiên không dầu',
+      'url': 'https://www.tiktok.com/@mneme/video/air-fryer-banana-cake',
+      'summary': 'Công thức làm bánh chuối mềm thơm bằng nồi chiên không dầu, nhanh và dễ làm tại nhà.',
+      'category': 'Ẩm thực',
+      'folder': 'Công thức',
+      'image': 'assets/images/cake.png',
+      'source': 'TikTok',
+      'favorite': 0,
     });
   }
 }

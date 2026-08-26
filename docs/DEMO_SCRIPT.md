@@ -1,27 +1,24 @@
-# Mneme showcase script
+# Mneme video demo script mapping
 
-This is the inferred happy-path script. Replace its copy with the original pasted script when that content is available.
+This implementation map is based on the original supplied 0:00–1:05 script.
 
-## 1. Show the problem and the home view (30 seconds)
+| Time | Story beat | App route / action | On-screen message |
+| --- | --- | --- | --- |
+| 0:00–0:06 | Hook: repeatedly save across social apps | Film TikTok/Facebook/Instagram externally | `Đã lưu: 47 → 89 → 132` |
+| 0:06–0:15 | Agitate: saved content becomes impossible to recover | Film external saved lists/bookmarks/notes | `Lưu thì dễ. Tìm lại — không dễ chút nào.` |
+| 0:15–0:20 | Reveal Mneme | Open Mneme from the staged share action, then center `+` | Mneme logo reveal |
+| 0:20–0:38 | AI reads and organizes a shared link | Add link → save → `LinkAnalysisScreen` → Home/Category | `Share vào → AI tự sắp xếp` |
+| 0:38–0:48 | Natural-language retrieval | Home search → type `video làm bánh bằng nồi chiên không dầu` | `Không nhớ tên. Vẫn tìm ra.` |
+| 0:48–0:58 | Turn related saves into knowledge | Home AI notebook CTA → select sources → analysis → notebook detail | `Từ link rời rạc → thành sổ tay tri thức` |
+| 0:58–1:05 | Close | Film clean logo/title card externally | `Mneme — Lưu · Phân loại · Biến thành tri thức` |
 
-Open Mneme. Explain that saved knowledge from YouTube, TikTok, articles, and images is automatically grouped into categories and folders. Point out recent saves and the Design, Travel, Movies, and Recipes categories.
+## Live app sequence
 
-## 2. Save and classify a link (45 seconds)
+1. Tap the center `+`, keep the prepared URL, confirm the AI-recommended Design category and UI/UX folder, then save.
+2. Let the five link-analysis steps complete. Open Design to show the persisted classified card and editable tags/folder.
+3. Search the exact fuzzy phrase `video làm bánh bằng nồi chiên không dầu`; the seeded TikTok recipe appears even though the user did not enter its exact title or source.
+4. Tap the purple notebook suggestion on Home. Select at least two links, continue, wait for AI analysis, expand the generated contents, and open AI suggestions from Activity.
 
-Tap the center `+`. Keep the prepared YouTube URL. Show the generated preview, AI-recommended `Design` category, then choose `UI/UX` as the folder and tap `Lưu liên kết`. Return to Design and show that the link persists locally.
+## Technology segment
 
-## 3. Search and manage knowledge (45 seconds)
-
-Open search and type `Auto Layout`. Open the result and show its summary, source, tags, favorite state, and open-link action. Use the menu to edit its title/folder. In a folder, long-press links to demonstrate multi-select, move, and delete confirmation.
-
-## 4. Turn saved sources into a notebook (60 seconds)
-
-Open `Sổ tay`, tap `Tạo sổ tay`, and choose content mode. Select two or more sources and continue. Let the five AI-analysis steps finish, then show the generated cover, reading time, table of contents, expandable sections, and share/read actions.
-
-## 5. Show proactive AI suggestions (30 seconds)
-
-Open `Hoạt động`, tap `Xem gợi ý`, explain the 95% relevance score and its three reasons, then add the proposed video to the notebook.
-
-## Closing
-
-Everything in this build works without login or a backend. Categories, links, folders, favorites, edits, and notebooks are persisted in on-device SQLite, so the showcase can run offline.
+The showcase intentionally uses SQLite and no authentication, so it is reliable offline. For a production architecture, the script's proposed mapping remains: Firebase Auth for identity, Cloud Firestore for link/category/folder/tag/notebook metadata, Cloud Functions for metadata ingestion and status updates, and Firebase AI Logic with Gemini for category/folder/tag recommendations. This future architecture is not enabled in the local demo build.

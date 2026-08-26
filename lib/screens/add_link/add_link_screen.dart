@@ -3,6 +3,7 @@ import 'package:flutter/material.dart';
 import '../../core/theme/app_theme.dart';
 import '../../state/store_scope.dart';
 import '../../widgets/common.dart';
+import 'link_analysis_screen.dart';
 
 class AddLinkScreen extends StatefulWidget {
   const AddLinkScreen({super.key});
@@ -26,21 +27,18 @@ class _AddLinkScreenState extends State<AddLinkScreen> {
         child: FilledButton(
           onPressed: saving
               ? null
-              : () async {
+              : () {
                   setState(() => saving = true);
-                  await store.addLink(
-                    url: controller.text,
-                    category: 'Design',
-                    folder: folder,
-                  );
-                  if (context.mounted) {
-                    Navigator.pop(context);
-                    ScaffoldMessenger.of(context).showSnackBar(
-                      const SnackBar(
-                        content: Text('Đã lưu và phân loại liên kết'),
+                  Navigator.pushReplacement(
+                    context,
+                    MaterialPageRoute(
+                      builder: (_) => LinkAnalysisScreen(
+                        url: controller.text,
+                        category: 'Design',
+                        folder: folder,
                       ),
-                    );
-                  }
+                    ),
+                  );
                 },
           child: Text(saving ? 'Đang phân tích...' : 'Lưu liên kết'),
         ),

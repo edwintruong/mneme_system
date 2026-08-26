@@ -17,6 +17,8 @@ The first runnable Flutter showcase milestone is complete. The app is local-firs
 - Completed the notebook showcase sequence: choose creation mode → select sources → animated AI analysis → notebook detail.
 - Added link editing, favorite/delete confirmation, share preview, and folder multi-select move/delete actions.
 - Added an inferred five-part showcase script in `docs/DEMO_SCRIPT.md`.
+- Re-read the original attached 0:00–1:05 video script and replaced the inferred version with an exact screen/action mapping.
+- Added the post-share AI analysis state, semantic natural-language retrieval for the script's air-fryer cake example, and a proactive Home notebook CTA.
 - Added durable agent handoff instructions and Figma node mapping under `kit/`.
 - `flutter analyze`: clean.
 - `flutter test`: passing.
@@ -37,7 +39,7 @@ The first runnable Flutter showcase milestone is complete. The app is local-firs
 1. Run the app on a 390x844 emulator and compare every happy-path screen against its Figma screenshot (no Android emulator is installed in the current environment).
 2. Refine spacing/typography and test smaller Android device overflow.
 3. Add the secondary Figma states: multi-select edit, rename/tag sheets, empty search/filter, and share states.
-4. Replace the inferred demo script once the missing pasted script content is available.
+4. Add a real Android share-target integration if the showcase must launch directly from TikTok instead of staging the external share shot and opening Mneme.
 
 ## Important context
 
