@@ -1,31 +1,23 @@
 # Mneme
 
-Flutter mobile showcase app generated from the Mneme Figma design. It runs without authentication and stores demo content locally in SQLite.
+Modern React & TypeScript rewrite of Mneme — an AI-powered smart bookmarking and knowledge organizer showcase app built to match the Mneme Figma design system (Tokens 2159 Edition).
 
-## Run
+## Overview
 
-```bash
-flutter pub get
-flutter run
-```
+- **Local-First & Showcase**: Runs out-of-the-box with no login required, with persistent local storage mirroring SQLite-style tables for categories, folders, links, and notebooks.
+- **Gemini AI Integration**: Server-side Gemini 2.5 Flash API proxies (`/api/gemini/analyze-url` and `/api/gemini/create-notebook`) for intelligent link analysis, URL summarization, automated category & folder tagging, and multi-source notebook synthesis.
+- **Offline & Fallback Ready**: If no Gemini API key is configured or network is disconnected, the app seamlessly provides local fallback categorization and synthesis.
+- **Design Tokens**: Precision-aligned with Figma nodes for Home, Categories, Folders, Link Details, Add Link intake, 5-stage AI analysis, Notebooks, Source Selection, AI Suggestions, and Semantic Fuzzy Search.
 
-## Gemini-powered demo
-
-Use a restricted Gemini API key from Google AI Studio. The key is injected at build time and is never committed:
+## Getting Started
 
 ```bash
-export GEMINI_API_KEY="your-key"
-flutter run --dart-define=GEMINI_API_KEY="$GEMINI_API_KEY"
+npm install
+npm run dev
 ```
 
-Optional model override:
-
+Build for production:
 ```bash
-flutter run \
-  --dart-define=GEMINI_API_KEY="$GEMINI_API_KEY" \
-  --dart-define=GEMINI_MODEL="gemini-3.7-flash"
+npm run build
+npm start
 ```
-
-With a key, Mneme uses Gemini URL Context and Google Search to read/classify links and write structured notebooks. Without a key, network, or successful Gemini response, the app stays runnable with its local demo fallback. See [docs/GEMINI.md](docs/GEMINI.md) for security and architecture details.
-
-See [docs/PROGRESS.md](docs/PROGRESS.md) for the implementation map, completed flows, and the next handoff tasks.

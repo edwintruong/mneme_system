@@ -1,0 +1,6 @@
+{
+  "name": "Mneme",
+  "description": "Smart bookmarking and AI knowledge organizer for links, videos, and notebooks with local-first persistence.",
+  "requestFramePermissions": [],
+  "majorCapabilities": ["MAJOR_CAPABILITY_SERVER_SIDE_GEMINI_API"]
+}
