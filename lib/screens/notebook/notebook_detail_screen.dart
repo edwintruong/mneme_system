@@ -8,6 +8,16 @@ import 'ai_suggestions_screen.dart';
 class NotebookDetailScreen extends StatelessWidget {
   const NotebookDetailScreen({super.key, required this.notebook});
   final Notebook notebook;
+  static const _fallbackSections = [
+    NotebookSection(
+      title: 'Tổng quan',
+      body: 'Sổ tay này tổng hợp các ý chính từ những nguồn đã chọn.',
+    ),
+    NotebookSection(
+      title: 'Các ý quan trọng',
+      body: 'Mở từng nguồn để xem thêm ví dụ và chi tiết triển khai.',
+    ),
+  ];
   @override
   Widget build(BuildContext context) => Scaffold(
     appBar: AppBar(
@@ -88,9 +98,9 @@ class NotebookDetailScreen extends StatelessWidget {
                 ),
               ),
               const SizedBox(height: 8),
-              const Text(
-                '3 video - 12 phút đọc',
-                style: TextStyle(color: Colors.white),
+              Text(
+                '${notebook.itemCount} nguồn · notebook tổng hợp',
+                style: const TextStyle(color: Colors.white),
               ),
               const SizedBox(height: 8),
               Text(
@@ -122,22 +132,28 @@ class NotebookDetailScreen extends StatelessWidget {
           ),
         ),
         const SizedBox(height: 8),
-        ...List.generate(
-          4,
-          (i) => ExpansionTile(
-            tilePadding: const EdgeInsets.symmetric(horizontal: 20),
-            title: Text(
-              '${i + 1}.  Norem ipsum dolor sit amet',
-              style: const TextStyle(fontWeight: FontWeight.w600),
+        ...(notebook.sections.isEmpty ? _fallbackSections : notebook.sections)
+            .asMap()
+            .entries
+            .map(
+              (entry) => ExpansionTile(
+                tilePadding: const EdgeInsets.symmetric(horizontal: 20),
+                trailing: const FigmaIcon(FigmaAssets.dropdown),
+                title: Text(
+                  '${entry.key + 1}.  ${entry.value.title}',
+                  style: const TextStyle(fontWeight: FontWeight.w600),
+                ),
+                children: [
+                  Padding(
+                    padding: const EdgeInsets.fromLTRB(20, 0, 20, 18),
+                    child: Align(
+                      alignment: Alignment.centerLeft,
+                      child: Text(entry.value.body),
+                    ),
+                  ),
+                ],
+              ),
             ),
-            children: i == 1
-                ? const [
-                    ListTile(title: Text('2.1  Norem ipsum dolor sit amet')),
-                    ListTile(title: Text('2.2  Constraint và Variants')),
-                  ]
-                : const [],
-          ),
-        ),
       ],
     ),
   );

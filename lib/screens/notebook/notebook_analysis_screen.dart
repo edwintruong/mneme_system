@@ -1,13 +1,15 @@
 import 'package:flutter/material.dart';
 
 import '../../core/theme/app_theme.dart';
+import '../../models/app_models.dart';
+import '../../state/mneme_store.dart';
 import '../../state/store_scope.dart';
 import '../../widgets/figma_icon.dart';
 import 'notebook_detail_screen.dart';
 
 class NotebookAnalysisScreen extends StatefulWidget {
-  const NotebookAnalysisScreen({super.key, required this.selectedCount});
-  final int selectedCount;
+  const NotebookAnalysisScreen({super.key, required this.selectedIds});
+  final List<int> selectedIds;
   @override
   State<NotebookAnalysisScreen> createState() => _NotebookAnalysisScreenState();
 }
@@ -29,18 +31,40 @@ class _NotebookAnalysisScreenState extends State<NotebookAnalysisScreen> {
   }
 
   Future<void> _runAnalysis() async {
-    for (var i = 1; i <= steps.length; i++) {
+    final creation = StoreScope.of(context).addNotebook(widget.selectedIds);
+    for (var i = 1; i < steps.length; i++) {
       await Future<void>.delayed(const Duration(milliseconds: 420));
       if (!mounted) return;
       setState(() => completed = i);
     }
-    final notebook = await StoreScope.of(context)
-        .addNotebook('Figma Tips & Tricks');
+    late AiExecutionResult<Notebook> result;
+    try {
+      result = await creation;
+    } on Object catch (error) {
+      if (!mounted) return;
+      ScaffoldMessenger.of(
+        context,
+      ).showSnackBar(SnackBar(content: Text('Không thể tạo notebook: $error')));
+      return;
+    }
+    if (!mounted) return;
+    setState(() => completed = steps.length);
+    await Future<void>.delayed(const Duration(milliseconds: 240));
     if (mounted) {
+      final messenger = ScaffoldMessenger.of(context);
       Navigator.pushReplacement(
         context,
         MaterialPageRoute(
-          builder: (_) => NotebookDetailScreen(notebook: notebook),
+          builder: (_) => NotebookDetailScreen(notebook: result.value),
+        ),
+      );
+      messenger.showSnackBar(
+        SnackBar(
+          content: Text(
+            result.usedGemini
+                ? 'Gemini đã tổng hợp và viết notebook'
+                : 'Đã tạo notebook demo local (${result.fallbackReason})',
+          ),
         ),
       );
     }
@@ -70,7 +94,7 @@ class _NotebookAnalysisScreenState extends State<NotebookAnalysisScreen> {
           ),
           const SizedBox(height: 8),
           Text(
-            '${widget.selectedCount} nguồn đã được chọn',
+            '${widget.selectedIds.length} nguồn đã được chọn',
             style: const TextStyle(color: AppColors.muted),
           ),
           const SizedBox(height: 26),

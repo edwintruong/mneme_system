@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 
 import '../../core/theme/app_theme.dart';
+import '../../models/app_models.dart';
 import '../../state/mneme_store.dart';
 import '../../state/store_scope.dart';
 import '../../widgets/figma_icon.dart';
@@ -41,20 +42,39 @@ class _LinkAnalysisScreenState extends State<LinkAnalysisScreen> {
   }
 
   Future<void> _analyze() async {
-    for (var i = 1; i <= steps.length; i++) {
-      await Future<void>.delayed(const Duration(milliseconds: 360));
-      if (!mounted) return;
-      setState(() => completed = i);
-    }
-    await store.addLink(
+    final analysis = store.addLink(
       url: widget.url,
       category: widget.category,
       folder: widget.folder,
     );
+    for (var i = 1; i < steps.length; i++) {
+      await Future<void>.delayed(const Duration(milliseconds: 360));
+      if (!mounted) return;
+      setState(() => completed = i);
+    }
+    late AiExecutionResult<SavedLink> result;
+    try {
+      result = await analysis;
+    } on Object catch (error) {
+      if (!mounted) return;
+      ScaffoldMessenger.of(
+        context,
+      ).showSnackBar(SnackBar(content: Text('Không thể lưu liên kết: $error')));
+      return;
+    }
+    if (!mounted) return;
+    setState(() => completed = steps.length);
+    await Future<void>.delayed(const Duration(milliseconds: 240));
     if (mounted) {
       Navigator.pop(context);
       ScaffoldMessenger.of(context).showSnackBar(
-        const SnackBar(content: Text('AI đã phân loại và lưu liên kết')),
+        SnackBar(
+          content: Text(
+            result.usedGemini
+                ? 'Gemini đã đọc URL, phân loại và lưu liên kết'
+                : 'Đã lưu bằng dữ liệu demo local (${result.fallbackReason})',
+          ),
+        ),
       );
     }
   }
@@ -83,10 +103,12 @@ class _LinkAnalysisScreenState extends State<LinkAnalysisScreen> {
             style: TextStyle(fontSize: 20, fontWeight: FontWeight.w600),
           ),
           const SizedBox(height: 8),
-          const Text(
-            'Mneme đang đọc, phân loại và gắn tag cho nội dung của bạn.',
+          Text(
+            store.gemini.isConfigured
+                ? 'Gemini đang dùng URL Context để đọc, phân loại và gắn tag.'
+                : 'Chưa có API key trong build, Mneme sẽ dùng dữ liệu demo local.',
             textAlign: TextAlign.center,
-            style: TextStyle(color: AppColors.muted),
+            style: const TextStyle(color: AppColors.muted),
           ),
           const SizedBox(height: 28),
           ...List.generate(

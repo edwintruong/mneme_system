@@ -24,6 +24,7 @@ The first runnable Flutter showcase milestone is complete. The app is local-firs
 - Re-read 11 exact Figma screen/component nodes with the design-to-code workflow and downloaded 130 SVG vector exports into the repository.
 - Removed all Material `Icons.*` usage, added fixed-size `FigmaIcon`/`FigmaVector` renderers, and rebuilt the notched bottom navigation with its exported Figma vectors.
 - Added CSS-equivalent Figma color, type, spacing, radius, and shadow tokens plus an enforceable asset contract for future agents.
+- Added Gemini REST integration with build-time API-key injection, URL Context/Google Search link classification, structured notebook writing, SQLite schema v3 persistence, and local fallback behavior.
 - `flutter analyze`: clean.
 - `flutter test`: passing.
 

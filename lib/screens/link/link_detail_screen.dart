@@ -189,9 +189,9 @@ class LinkDetailScreen extends StatelessWidget {
                   spacing: 8,
                   runSpacing: 8,
                   children: [
-                    const Tag('Design', primary: true),
+                    Tag(link.category, primary: true),
                     Tag(link.folder),
-                    const Tag('Figma', primary: true),
+                    ...link.tags.map((tag) => Tag(tag, primary: true)),
                     const FigmaIcon(FigmaAssets.plusCircle, size: 32),
                   ],
                 ),

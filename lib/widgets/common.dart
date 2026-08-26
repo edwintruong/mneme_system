@@ -161,7 +161,10 @@ class LinkTile extends StatelessWidget {
                   spacing: 6,
                   children: [
                     Tag(link.folder),
-                    const Tag('Figma', primary: true),
+                    if (link.tags.isNotEmpty)
+                      Tag(link.tags.first, primary: true)
+                    else
+                      const Tag('Figma', primary: true),
                   ],
                 ),
               ],

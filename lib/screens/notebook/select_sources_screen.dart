@@ -32,8 +32,9 @@ class _SelectSourcesScreenState extends State<SelectSourcesScreen> {
               : () => Navigator.pushReplacement(
                   context,
                   MaterialPageRoute(
-                    builder: (_) =>
-                        NotebookAnalysisScreen(selectedCount: selected.length),
+                    builder: (_) => NotebookAnalysisScreen(
+                      selectedIds: selected.toList(growable: false),
+                    ),
                   ),
                 ),
           child: Text('Tiếp tục (${selected.length})'),

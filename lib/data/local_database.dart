@@ -9,7 +9,7 @@ class LocalDatabase {
     final path = p.join(await getDatabasesPath(), 'mneme_demo.db');
     final db = await openDatabase(
       path,
-      version: 2,
+      version: 3,
       onCreate: (db, _) async {
         await db.execute(
           'CREATE TABLE categories(id INTEGER PRIMARY KEY, name TEXT NOT NULL, image TEXT NOT NULL, item_count INTEGER NOT NULL)',
@@ -18,16 +18,24 @@ class LocalDatabase {
           'CREATE TABLE folders(id INTEGER PRIMARY KEY AUTOINCREMENT, name TEXT NOT NULL, category TEXT NOT NULL)',
         );
         await db.execute(
-          'CREATE TABLE links(id INTEGER PRIMARY KEY AUTOINCREMENT, title TEXT NOT NULL, url TEXT NOT NULL, summary TEXT NOT NULL, category TEXT NOT NULL, folder TEXT NOT NULL, image TEXT NOT NULL, source TEXT NOT NULL, favorite INTEGER NOT NULL DEFAULT 0)',
+          "CREATE TABLE links(id INTEGER PRIMARY KEY AUTOINCREMENT, title TEXT NOT NULL, url TEXT NOT NULL, summary TEXT NOT NULL, category TEXT NOT NULL, folder TEXT NOT NULL, image TEXT NOT NULL, source TEXT NOT NULL, tags TEXT NOT NULL DEFAULT '[]', favorite INTEGER NOT NULL DEFAULT 0)",
         );
         await db.execute(
-          'CREATE TABLE notebooks(id INTEGER PRIMARY KEY AUTOINCREMENT, title TEXT NOT NULL, description TEXT NOT NULL, image TEXT NOT NULL, item_count INTEGER NOT NULL DEFAULT 0)',
+          "CREATE TABLE notebooks(id INTEGER PRIMARY KEY AUTOINCREMENT, title TEXT NOT NULL, description TEXT NOT NULL, image TEXT NOT NULL, item_count INTEGER NOT NULL DEFAULT 0, content TEXT NOT NULL DEFAULT '[]')",
         );
         await _seed(db);
       },
       onUpgrade: (db, oldVersion, _) async {
         if (oldVersion < 2) {
           await _seedRecipe(db);
+        }
+        if (oldVersion < 3) {
+          await db.execute(
+            "ALTER TABLE links ADD COLUMN tags TEXT NOT NULL DEFAULT '[]'",
+          );
+          await db.execute(
+            "ALTER TABLE notebooks ADD COLUMN content TEXT NOT NULL DEFAULT '[]'",
+          );
         }
       },
     );
