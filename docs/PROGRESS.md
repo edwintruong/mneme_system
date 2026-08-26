@@ -14,6 +14,8 @@ The first runnable Flutter showcase milestone is complete. The app is local-firs
 - Added SQLite persistence and seeded demo data for categories, folders, links, and notebooks.
 - Added exact raster assets exported from Figma under `assets/images/`.
 - Implemented working demo actions: search, add/classify a link, create a folder, open/delete/favorite a link, create a notebook, and accept an AI suggestion.
+- Completed the notebook showcase sequence: choose creation mode → select sources → animated AI analysis → notebook detail.
+- Added durable agent handoff instructions and Figma node mapping under `kit/`.
 - `flutter analyze`: clean.
 - `flutter test`: passing.
 
@@ -30,9 +32,9 @@ The first runnable Flutter showcase milestone is complete. The app is local-firs
 
 ## Next work
 
-1. Run the app on a 390x844 emulator and compare every happy-path screen against its Figma screenshot.
+1. Run the app on a 390x844 emulator and compare every happy-path screen against its Figma screenshot (no Android emulator is installed in the current environment).
 2. Refine spacing/typography and test smaller Android device overflow.
-3. Add the secondary Figma states: notebook analysis progress, multi-select edit, rename/tag sheets, empty search/filter, and share/delete confirmation states.
+3. Add the secondary Figma states: multi-select edit, rename/tag sheets, empty search/filter, and share states.
 4. Replace the inferred demo script once the missing pasted script content is available.
 
 ## Important context

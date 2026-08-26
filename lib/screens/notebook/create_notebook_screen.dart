@@ -1,14 +1,12 @@
 import 'package:flutter/material.dart';
 
 import '../../core/theme/app_theme.dart';
-import '../../state/store_scope.dart';
-import 'notebook_detail_screen.dart';
+import 'select_sources_screen.dart';
 
 class CreateNotebookScreen extends StatelessWidget {
   const CreateNotebookScreen({super.key});
   @override
   Widget build(BuildContext context) {
-    final store = StoreScope.of(context);
     return Scaffold(
       backgroundColor: AppColors.primary,
       appBar: AppBar(
@@ -44,31 +42,27 @@ class CreateNotebookScreen extends StatelessWidget {
               title: 'Tạo từ các nội dung đã chọn',
               subtitle:
                   'Chọn nhiều video, bài viết hoặc website để AI tổng hợp',
-              onTap: () => _create(context, store),
+              onTap: () => Navigator.push(
+                context,
+                MaterialPageRoute(builder: (_) => const SelectSourcesScreen()),
+              ),
             ),
             const SizedBox(height: 16),
             _SourceCard(
               image: 'assets/images/create_folder.png',
               title: 'Tạo từ một folder lớn',
               subtitle: 'Chọn một folder từ category. AI sẽ tổng hợp toàn bộ nội dung bên trong',
-              onTap: () => _create(context, store),
+              onTap: () => Navigator.push(
+                context,
+                MaterialPageRoute(
+                  builder: (_) => const SelectSourcesScreen(fromFolder: true),
+                ),
+              ),
             ),
           ],
         ),
       ),
     );
-  }
-
-  Future<void> _create(BuildContext context, dynamic store) async {
-    final notebook = await store.addNotebook('Figma Tips & Tricks');
-    if (context.mounted) {
-      Navigator.pushReplacement(
-        context,
-        MaterialPageRoute(
-          builder: (_) => NotebookDetailScreen(notebook: notebook),
-        ),
-      );
-    }
   }
 }
 
