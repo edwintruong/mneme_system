@@ -76,14 +76,19 @@ export const AddLinkScreen: React.FC<AddLinkScreenProps> = ({
         </button>
       </div>
 
-      {/* Card, node 2159:13190 */}
+      {/*
+        Card, node 2159:13190. The node reports gap-20, but its own render puts
+        every child 2px higher than that produces; 18 is what reproduces the
+        export at all four block boundaries (field 148, preview 218, category
+        box 364, folder label 466).
+      */}
       <div
-        className="flex h-[706px] w-[356px] shrink-0 flex-col items-center gap-[20px] rounded-[20px] bg-white px-[16px] py-[20px]"
+        className="flex h-[706px] w-[356px] shrink-0 flex-col items-center gap-[18px] rounded-[20px] bg-white px-[16px] py-[20px]"
         style={{ boxShadow: 'var(--shadow-card)' }}
       >
         {/* Liên kết, node 2159:13191 */}
         <div className="flex w-full flex-col items-start gap-[8px]">
-          <p className="w-full text-[14px] leading-[20px] font-medium tracking-[0.4px] text-[#0e0727]">
+          <p className="h-[18px] w-full text-[14px] leading-[20px] font-medium tracking-[0.4px] text-[#0e0727]">
             Liên kết<span className="text-white">*</span>
           </p>
           <div className="flex w-full items-center gap-[10px] rounded-[11px] border-2 border-solid border-[#f5f5f7] bg-[#f7f7f9] px-[8px] py-[12px]">
@@ -92,7 +97,7 @@ export const AddLinkScreen: React.FC<AddLinkScreenProps> = ({
               value={url}
               onChange={(e) => setUrl(e.target.value)}
               aria-label="Đường dẫn liên kết"
-              className="min-w-px flex-1 bg-transparent text-[16px] leading-[22px] font-normal tracking-[-0.18px] text-[#0e0727] outline-none"
+              className="block h-[24px] min-w-px flex-1 border-0 bg-transparent p-0 leading-[24px] text-[16px] font-normal tracking-[-0.18px] text-[#0e0727] outline-none"
             />
             <button type="button" onClick={() => setUrl('')} aria-label="Xoá liên kết">
               <FigmaIcon name="url-clear" size={24} />
@@ -134,7 +139,7 @@ export const AddLinkScreen: React.FC<AddLinkScreenProps> = ({
         {/* Categories, node 2159:13201 */}
         <div className="flex w-full flex-col items-start gap-[8px]">
           <div className="flex w-full items-start gap-[8px]">
-            <p className="min-w-px flex-1 text-[14px] leading-[20px] font-medium tracking-[0.4px] text-[#0e0727]">
+            <p className="h-[18px] min-w-px flex-1 text-[14px] leading-[20px] font-medium tracking-[0.4px] text-[#0e0727]">
               Categories<span className="text-[#f12950]">*</span>
             </p>
             <span className="flex shrink-0 items-center rounded-full bg-[#7758e2] p-[4.032px]">
@@ -179,7 +184,7 @@ export const AddLinkScreen: React.FC<AddLinkScreenProps> = ({
 
         {/* Folder, node 2159:13217 */}
         <div className="flex w-full flex-col items-start gap-[8px]">
-          <p className="w-full text-[14px] leading-[20px] font-medium tracking-[0.4px] text-[#0e0727]">
+          <p className="h-[18px] w-full text-[14px] leading-[20px] font-medium tracking-[0.4px] text-[#0e0727]">
             Folder
           </p>
           <div className="relative flex w-full items-center gap-[10px] rounded-[11px] border-2 border-solid border-[#f5f5f7] px-[8px] py-[12px]">
