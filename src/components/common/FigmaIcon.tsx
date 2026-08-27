@@ -78,6 +78,72 @@ export const FIGMA_ICONS: Record<string, IconAsset> = {
   'dropdown-close': { src: `${N2159}/2159_13180_dropdown_close.svg`, w: 24, h: 24 },
   'direction-down-figma': { src: `${N2159}/2159_13180_direction_down.svg`, w: 11.5001, h: 5.50003 },
 
+  // Link detail, node 2159:12980
+  'tag-add': { src: `${N2159}/2159_12980_tag_plus.svg`, w: 21.3333, h: 21.3333 },
+  'star-filled': { src: `${N2159}/2159_12980_star.svg`, w: 24, h: 24 },
+  'share-figma': { src: `${N2159}/2159_12980_share.svg`, w: 24, h: 24 },
+  'link-back': { src: `${N2159}/2159_12980_back.svg`, w: 30, h: 30 },
+  'copy-figma': { src: `${N2159}/2159_12980_copy.svg`, w: 21.3333, h: 21.3333 },
+  'layers-figma': { src: `${N2159}/2159_12980_layers.svg`, w: 16.2497, h: 16.7294 },
+  tiktok: { src: `${N2159}/2159_12980_tiktok.svg`, w: 24, h: 24 },
+  'saved-clock': { src: `${N2159}/2159_12980_saved.svg`, w: 20, h: 20 },
+  'more-horizontal-detail': { src: `${N2159}/2159_12980_more_horizontal.svg`, w: 24, h: 24 },
+  'detail-mobile-signal': { src: `${N2159}/2159_12980_mobile_signal.svg`, w: 17, h: 10.6667 },
+  'detail-wifi': { src: `${N2159}/2159_12980_wifi.svg`, w: 15.2724, h: 10.9656 },
+  'detail-battery': { src: `${N2159}/2159_12980_battery.svg`, w: 24.3281, h: 11.3333 },
+
+  // Category list, node 2159:13036
+  'category-back': { src: `${N2159}/2159_13036_back.svg`, w: 30, h: 30 },
+  'category-more-horizontal': { src: `${N2159}/2159_13036_more_horizontal.svg`, w: 24, h: 24 },
+  'category-search': { src: `${N2159}/2159_13036_search.svg`, w: 16, h: 16 },
+  'category-filter': { src: `${N2159}/2159_13036_filter.svg`, w: 36, h: 36 },
+  'category-plus-small': { src: `${N2159}/2159_13036_plus_small.svg`, w: 16, h: 16 },
+  'category-plus': { src: `${N2159}/2159_13036_plus.svg`, w: 14.3225, h: 14.3225 },
+  'category-dot': { src: `${N2159}/2159_13036_dot.svg`, w: 3, h: 3 },
+  'category-more-vertical': { src: `${N2159}/2159_13036_more_vertical.svg`, w: 1.875, h: 9.375 },
+  'create-folder-close': { src: `${N2159}/2159_13091_close.svg`, w: 24, h: 24 },
+
+  // Folder states, nodes 2159:13158 and 2159:13174
+  'folder-empty-back': { src: `${N2159}/2159_13158_back.svg`, w: 30, h: 30 },
+  'folder-empty-more': { src: `${N2159}/2159_13158_more_horizontal.svg`, w: 24, h: 24 },
+  'folder-empty-add': { src: `${N2159}/2159_13158_add_circle.svg`, w: 24, h: 24 },
+  'folder-back': { src: `${N2159}/2159_13174_back.svg`, w: 30, h: 30 },
+  'folder-more-horizontal': { src: `${N2159}/2159_13174_more_horizontal.svg`, w: 24, h: 24 },
+  'folder-search': { src: `${N2159}/2159_13174_search.svg`, w: 16, h: 16 },
+  'folder-filter': { src: `${N2159}/2159_13174_filter.svg`, w: 36, h: 36 },
+  'folder-detail-plus': { src: `${N2159}/2159_13174_plus.svg`, w: 14.3225, h: 14.3225 },
+  'folder-dot': { src: `${N2159}/2159_13174_dot.svg`, w: 3, h: 3 },
+  'folder-more-vertical-detail': { src: `${N2159}/2159_13174_more_vertical.svg`, w: 1.875, h: 9.375 },
+
+  // Notebook detail, node 2159:12842
+  'notebook-detail-back': { src: `${N2159}/2159_12842_back.svg`, w: 30, h: 30 },
+  'notebook-detail-more': { src: `${N2159}/2159_12842_more_vertical.svg`, w: 2.5, h: 12.5 },
+  'notebook-detail-cover': { src: `${N2159}/2159_12842_cover.svg`, w: 350, h: 280 },
+  'notebook-detail-logo': { src: `${N2159}/2159_12842_notebooklm.svg`, w: 59.0018, h: 44.2514 },
+  'notebook-detail-star': { src: `${N2159}/2159_12842_star.svg`, w: 24, h: 24 },
+  'notebook-detail-edit': { src: `${N2159}/2159_12842_edit.svg`, w: 15.0004, h: 18.0002 },
+  'notebook-detail-ai': { src: `${N2159}/2159_12842_ai.svg`, w: 20, h: 20 },
+  'notebook-detail-dropdown': { src: `${N2159}/2159_12842_dropdown_close.svg`, w: 24, h: 24 },
+  'notebook-detail-direction': { src: `${N2159}/2159_12842_direction_down.svg`, w: 11.5001, h: 5.50003 },
+  'notebook-detail-share': { src: `${N2159}/2159_12842_share.svg`, w: 24, h: 24 },
+  'notebook-detail-open-book': { src: `${N2159}/2159_12842_open_book.svg`, w: 24, h: 24 },
+
+  // Create notebook source choice, node 2159:13626
+  'create-notebook-back': { src: `${N2159}/2159_13626_back.svg`, w: 30, h: 30 },
+  'create-notebook-chevron': { src: `${N2159}/2159_13626_chevron.svg`, w: 24, h: 24 },
+  'create-notebook-status': { src: `${N2159}/2159_13626_status_right.svg`, w: 66.6612, h: 11.336 },
+
+  // Select sources, node 2159:13570
+  'select-sources-back': { src: `${N2159}/2159_13570_back.svg`, w: 30, h: 30 },
+  'select-search': { src: `${N2159}/2159_13570_search.svg`, w: 16, h: 16 },
+  'select-filter': { src: `${N2159}/2159_13570_filter.svg`, w: 36, h: 36 },
+  'select-radio-selected': { src: `${N2159}/2159_13570_radio_selected.svg`, w: 24, h: 24 },
+  'select-radio-empty': { src: `${N2159}/2159_13570_radio_empty.svg`, w: 24, h: 24 },
+  'select-dot': { src: `${N2159}/2159_13570_dot.svg`, w: 3, h: 3 },
+  'select-progress-sources': { src: `${N2159}/2159_13570_progress_sources.svg`, w: 17.45, h: 17.45 },
+  'select-progress-ai': { src: `${N2159}/2159_13570_progress_ai.svg`, w: 14.0115, h: 14.7304 },
+  'select-progress-notebook': { src: `${N2159}/2159_13570_progress_notebook.svg`, w: 17.4545, h: 17.4545 },
+
   // Status bar
   'status-right': { src: `${N2159}/2159_12771_status_right.svg`, w: 66.6612, h: 11.336 },
 

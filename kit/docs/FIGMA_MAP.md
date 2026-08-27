@@ -10,16 +10,16 @@ Active source-of-truth section: `2159:12770`. Section `2143:4235` is legacy refe
 | Home, add-link toast | `2159:13227` | `src/screens/HomeScreen.tsx` | Uses the exact success vector; layout not yet node-verified |
 | Home variant | `2159:13303` | pending | Pending |
 | Home variant | `2159:13676` | pending | Pending |
-| Link detail | `2159:12980` | `src/screens/LinkDetailScreen.tsx` | Legacy UI pending rebuild |
-| Add link | `2159:13180` | `src/screens/AddLinkScreen.tsx` | Legacy UI pending rebuild |
-| Category list | `2159:13036` | `src/screens/CategoryScreen.tsx` | Legacy UI pending rebuild |
-| Create-folder sheet | `2159:13091` | within folder flow | Pending |
-| Empty folder | `2159:13158` | `src/screens/FolderDetailScreen.tsx` | Pending state |
-| Folder detail list | `2159:13174` | `src/screens/FolderDetailScreen.tsx` | Legacy UI pending rebuild |
-| Notebook detail | `2159:12842` | `src/screens/NotebookDetailScreen.tsx` | Legacy UI pending rebuild |
-| Notebook list | `2159:12891` | `src/screens/NotebookScreen.tsx` | Legacy UI pending rebuild |
-| Create notebook source choice | `2159:13626` | `src/screens/CreateNotebookScreen.tsx` | Legacy UI pending rebuild |
-| Source selection | `2159:13570` | `src/screens/SelectSourcesScreen.tsx` | Legacy UI pending rebuild |
+| Link detail | `2159:12980` | `src/screens/LinkDetailScreen.tsx` | Rebuilt from node; pixel-compared |
+| Add link | `2159:13180` | `src/screens/AddLinkScreen.tsx` | Rebuilt from node; pixel-compared |
+| Category list | `2159:13036` | `src/screens/CategoryScreen.tsx` | Rebuilt from node; pixel-compared |
+| Create-folder sheet | `2159:13091` | `src/screens/CategoryScreen.tsx` | Rebuilt from node; pixel-compared |
+| Empty folder | `2159:13158` | `src/screens/FolderDetailScreen.tsx` | Rebuilt from node; pixel-compared |
+| Folder detail list | `2159:13174` | `src/screens/FolderDetailScreen.tsx` | Rebuilt from node; pixel-compared |
+| Notebook detail | `2159:12842` | `src/screens/NotebookDetailScreen.tsx` | Rebuilt from node; pixel-compared |
+| Notebook list | `2159:12891` | `src/screens/NotebookScreen.tsx` | Rebuilt from node; pixel-compared |
+| Create notebook source choice | `2159:13626` | `src/screens/CreateNotebookScreen.tsx` | Rebuilt from node; pixel-compared |
+| Source selection | `2159:13570` | `src/screens/SelectSourcesScreen.tsx` | Rebuilt from node; pixel-compared |
 | AI analysis | `2159:13602` | `src/screens/NotebookAnalysisScreen.tsx` | Legacy UI pending rebuild |
 | Notebook content | `2159:13374` | `src/screens/NotebookDetailScreen.tsx` | Pending state |
 | AI suggestions list | `2159:13407` | `src/screens/AiSuggestionsScreen.tsx` | Legacy UI pending rebuild |
@@ -70,8 +70,34 @@ Content is a full 390 that overflows the padding — reproducing this is what al
 
 ### Remaining screens
 
-`public/assets/icons/figma/` still holds 84 SVGs exported from section `2143:*`. Screens other than
-Home still use them and must be re-exported from their own `2159:*` nodes when rebuilt.
+`public/assets/icons/figma/` still holds 84 SVGs exported from section `2143:*`. Pending screens
+still using them must be re-exported from their own `2159:*` nodes when rebuilt.
+
+### Link detail, node 2159:12980 — complete
+
+The cover JPEG and twelve vectors were exported from the exact node. The link-specific status bar
+reverses the Home order (signals on the left, time on the right), so `App.tsx` switches the shared
+chrome only for this view. The 30px down-chevron export is rotated 90 degrees by the frame to become
+the visible back arrow.
+
+Production comparison measures 6.79 / 6.54 / 5.55 with 6.53% of pixels over 28. The difference
+mask contains image re-encoding detail and glyph rasterization, but no solid displaced regions;
+all large frames, the 350x164 cover, 350x368 card, tags, metadata rows, and bottom controls align.
+
+### Category list and create-folder sheet, nodes 2159:13036 and 2159:13091 — complete
+
+The category screen uses the exact folder crop, four link images, eight node vectors, and Figma's
+movie fixture text. The paired sheet uses its exact close vector and preserves the live local-first
+folder mutation. Production comparison measures 4.87 / 4.98 / 4.82 for the list and
+2.12 / 2.20 / 1.67 for the sheet; neither difference mask contains structural blocks.
+
+### Folder detail states, nodes 2159:13158 and 2159:13174 — complete
+
+`FolderDetailScreen` switches from the exact 356x706 empty card to the search/filter/list state
+using the existing `MnemeProvider` links. The empty illustration, add glyph, five populated
+thumbnails, and all visible controls come from their own nodes. Production comparison measures
+0.73 / 0.78 / 0.79 for empty and 6.29 / 6.26 / 6.04 for populated; the populated residual is
+limited to text/JPEG rasterization rather than displaced structures.
 
 ### Raster assets
 
@@ -87,8 +113,10 @@ Render the app at 390x856 with `device_scale_factor: 1`, screenshot it, and diff
 `get_screenshot` of the node. Exclude pixels equal to `#444444`: that is the Figma canvas backdrop
 showing through the frame's 40px corner radius, not part of the design.
 
-Home currently measures a mean absolute difference of 3.09 / 3.11 / 3.05 out of 255 over the design
-area, with 3.6% of pixels differing by more than 28. Element bounding boxes for the avatar, search
-icon, filter icon, both 80px image rails, the FAB, the nav labels and the overflow dots all land
-within 1px. The residual is text antialiasing (Chrome subpixel versus Figma grayscale) and JPEG
-re-encoding in the photos.
+Current production measurements are Home 3.10 / 3.13 / 3.06, Notebook list 4.40 / 4.57 / 3.23,
+Add link 4.71 / 4.86 / 3.94, Link detail 6.79 / 6.54 / 5.55, Category list
+4.87 / 4.98 / 4.82, Create folder 2.12 / 2.20 / 1.67, Empty folder 0.73 / 0.78 / 0.79, and
+Folder detail 6.29 / 6.26 / 6.04. Text-heavy states retain glyph/JPEG residuals without structural
+blocks. Notebook detail measures 5.43 / 5.14 / 4.47 with the same thin glyph-only residual, and
+Create notebook measures 3.28 / 3.28 / 2.34, and Source selection measures
+5.75 / 6.07 / 5.48.

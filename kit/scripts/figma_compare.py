@@ -36,6 +36,14 @@ SCREENS = [
     ('2159:12771', 'Home',          '2159_12771_home.png',     856, None),
     ('2159:12891', 'Notebook list', '2159_12891_notebook.png', 844, 'Sổ tay'),
     ('2159:13180', 'Add link',      '2159_13180_add_link.png', 856, 'Thêm liên kết mới'),
+    ('2159:12980', 'Link detail',   '2159_12980_link_detail.png', 844, 'Link detail'),
+    ('2159:13036', 'Category list', '2159_13036_category.png', 856, 'Phim ảnh'),
+    ('2159:13091', 'Create folder', '2159_13091_create_folder.png', 858, 'Create folder'),
+    ('2159:13158', 'Empty folder',  '2159_13158_empty_folder.png', 856, 'Empty folder'),
+    ('2159:13174', 'Folder detail', '2159_13174_folder_detail.png', 843, 'Folder detail'),
+    ('2159:12842', 'Notebook detail', '2159_12842_notebook_detail.png', 844, 'Notebook detail'),
+    ('2159:13626', 'Create notebook', '2159_13626_create_notebook.png', 844, 'Create notebook'),
+    ('2159:13570', 'Select sources', '2159_13570_select_sources.png', 844, 'Select sources'),
 ]
 
 
@@ -59,9 +67,42 @@ def corner_mask(w, h):
 def capture(page, tab, height, dest):
     page.set_viewport_size({'width': 390, 'height': height})
     page.goto(URL, wait_until='networkidle')
+    # Every comparison starts from the committed seed rather than a mutation
+    # left by an earlier screen in this same browser context.
+    page.evaluate('localStorage.clear()')
+    page.reload(wait_until='networkidle')
     page.wait_for_timeout(900)
     if tab:
-        page.get_by_role('button', name=tab).click()
+        if tab == 'Link detail':
+            page.get_by_role('button', name='Hoạt động').click()
+            page.get_by_text('Bún chả Hà Nội ngon ở phố cổ', exact=True).click()
+        elif tab == 'Create folder':
+            page.get_by_role('button', name='Phim ảnh').click()
+            page.get_by_role('button', name='Tạo folder').click()
+        elif tab in ('Empty folder', 'Folder detail'):
+            if tab == 'Empty folder':
+                page.evaluate(
+                    """() => {
+                      const key = 'mneme_links_v1';
+                      const links = JSON.parse(localStorage.getItem(key) || '[]');
+                      localStorage.setItem(key, JSON.stringify(links.filter(link => link.folder !== 'Phim tài liệu')));
+                    }"""
+                )
+                page.reload(wait_until='networkidle')
+            page.get_by_role('button', name='Phim ảnh').click()
+            page.get_by_role('button', name='Xem tất cả folder').click()
+        elif tab == 'Notebook detail':
+            page.get_by_role('button', name='Sổ tay').click()
+            page.get_by_role('button', name='Research với NotebookLM').click()
+        elif tab == 'Create notebook':
+            page.get_by_role('button', name='Sổ tay').click()
+            page.get_by_role('button', name='Tạo sổ tay').click()
+        elif tab == 'Select sources':
+            page.get_by_role('button', name='Sổ tay').click()
+            page.get_by_role('button', name='Tạo sổ tay').click()
+            page.get_by_role('button', name='Tạo từ các nội dung đã chọn').click()
+        else:
+            page.get_by_role('button', name=tab).click()
         page.wait_for_timeout(800)
     page.screenshot(path=str(dest))
     broken = page.evaluate(

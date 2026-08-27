@@ -10,10 +10,14 @@ export interface SavedLink {
   title: string;
   url: string;
   summary: string;
+  /** Optional detail lines shown as bullets on the link-detail screen. */
+  details?: string[];
   category: string;
   folder: string;
   image: string;
   source: string;
+  /** Optional source account/site label used by Figma list rows. */
+  author?: string;
   tags: string[];
   favorite: boolean;
   savedAt?: string;

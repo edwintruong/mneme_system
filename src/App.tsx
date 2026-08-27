@@ -41,6 +41,9 @@ const MnemeApp: React.FC = () => {
   const [showToast, setShowToast] = useState(false);
 
   const currentView = viewStack[viewStack.length - 1];
+  const usesReversedStatusBar = currentView.type === 'link_detail';
+  const usesWhiteCanvas = currentView.type === 'notebook_detail' || currentView.type === 'select_sources';
+  const usesPurpleStatusBar = currentView.type === 'create_notebook';
 
   const pushView = (view: ScreenView) => {
     setViewStack((prev) => [...prev, view]);
@@ -65,6 +68,7 @@ const MnemeApp: React.FC = () => {
             category={currentView.category}
             onBack={popView}
             onSelectFolder={(folderName) => pushView({ type: 'folder', folderName })}
+            onSelectLink={(link) => pushView({ type: 'link_detail', link })}
           />
         );
 
@@ -224,16 +228,28 @@ const MnemeApp: React.FC = () => {
         The Figma frame carries px-20, which is why the status bar is 350 wide and
         starts at x=20 while Content is a full 390 and overflows that padding.
       */}
-      <div className="relative flex h-screen w-full flex-col items-center overflow-hidden bg-[#f8f6fd] px-[20px] sm:h-[856px] sm:w-[390px] sm:rounded-[40px] sm:shadow-[0_30px_70px_-20px_rgba(0,0,0,0.55)]">
-        {/* iOS UI/Status Bar, node 2159:12772 */}
-        <div className="relative h-[44px] w-full shrink-0 overflow-hidden select-none">
-          <p className="absolute top-[13px] left-[24px] h-[20px] w-[54px] text-center font-['Inter',sans-serif] text-[15px] leading-[20px] font-semibold tracking-[-0.5px] text-[#161718]">
+      <div className={`relative flex h-screen w-full flex-col items-center overflow-hidden px-[20px] sm:h-[856px] sm:w-[390px] sm:rounded-[40px] sm:shadow-[0_30px_70px_-20px_rgba(0,0,0,0.55)] ${usesWhiteCanvas ? 'bg-white' : usesPurpleStatusBar ? 'bg-[#7758e2]' : 'bg-[#f8f6fd]'}`}>
+        {/* iOS UI/Status Bar. Link detail's node reverses the two sides. */}
+        <div className={`relative h-[44px] shrink-0 overflow-hidden select-none ${usesWhiteCanvas || usesPurpleStatusBar ? 'w-[390px]' : 'w-full'}`}>
+          <p
+            className={`absolute h-[20px] w-[54px] text-center font-['Inter',sans-serif] text-[15px] leading-[20px] font-semibold tracking-[-0.5px] ${
+              usesReversedStatusBar ? 'top-[17px] right-0 text-[#0e0727]' : `top-[13px] left-[24px] ${usesPurpleStatusBar ? 'text-[#fefefe]' : 'text-[#161718]'}`
+            }`}
+          >
             9:41
           </p>
           {/* flex, so the 11.336-tall vector is not pushed down by a text baseline */}
-          <div className="absolute top-[17.33px] right-[18.67px] flex">
-            <FigmaIcon name="status-right" />
-          </div>
+          {usesReversedStatusBar ? (
+            <div className="absolute top-[20.83px] left-0 flex h-[11.34px] items-center gap-[5px]">
+              <FigmaIcon name="detail-mobile-signal" />
+              <FigmaIcon name="detail-wifi" />
+              <FigmaIcon name="detail-battery" />
+            </div>
+          ) : (
+            <div className="absolute top-[17.33px] right-[18.67px] flex">
+              <FigmaIcon name={usesPurpleStatusBar ? 'create-notebook-status' : 'status-right'} color={usesPurpleStatusBar ? '#fefefe' : undefined} />
+            </div>
+          )}
         </div>
 
         {/* no-scrollbar: a desktop scrollbar would narrow the 390 column and shift the layout. */}
@@ -254,7 +270,7 @@ const MnemeApp: React.FC = () => {
           of the 844-tall frames. It draws over the navigation bar, so it must
           come after it.
         */}
-        <div className="pointer-events-none absolute bottom-[8px] left-1/2 z-50 h-[5px] w-[144px] -translate-x-1/2 rounded-full bg-[#3c3c432e]" />
+        <div className={`pointer-events-none absolute bottom-[8px] left-1/2 z-50 h-[5px] w-[144px] -translate-x-1/2 rounded-full ${usesWhiteCanvas || usesPurpleStatusBar ? 'bg-black' : 'bg-[#3c3c432e]'}`} />
       </div>
     </div>
   );

@@ -1,47 +1,90 @@
 # Figma asset contract
 
-All visual assets originate from Figma file `8T9Olnto5GDBzUjXyP1ybY`. Migration assets are downloaded from exact nodes in active section `2159:12770`; no SVG path is authored in this repository.
+All visual assets originate from Figma file `8T9Olnto5GDBzUjXyP1ybY`. Active migration assets come
+from section `2159:12770`; no SVG path is authored in this repository.
 
 ## Locations
 
-- Raster fills and illustrations: `assets/images/`
-- Vector layers and icons: `assets/icons/figma/`
-- Active-section raster fills: `assets/images/figma_2159/`
-- Active-section vectors: `assets/icons/figma_2159/`
-- Dart asset names and fixed-size renderer: `lib/widgets/figma_icon.dart`
-- Design/CSS-equivalent tokens: `lib/core/theme/figma_tokens.dart`
+- Active-section raster fills: `public/assets/images/figma_2159/`
+- Active-section vectors: `public/assets/icons/figma_2159/`
+- Legacy vectors awaiting replacement: `public/assets/icons/figma/`
+- SVG registry and fixed-size renderer: `src/components/common/FigmaIcon.tsx`
+- Design tokens: `src/index.css`
 
-## Naming
+Active-section files use `<node-id-with-underscore>_<semantic-layer>.<ext>`, for example
+`2159_12771_search.svg`. Check a raster's MIME type before choosing its extension. When Figma uses a
+generic layer name, inspect the bytes and screenshot before assigning a semantic name.
 
-Legacy files use `<screen>_<semantic-layer>.svg`. Active-section files use `<node-id-with-underscore>_<semantic-layer>.<ext>`, for example `2159_12771_search.svg`. When Figma exposes only a generic layer name such as `Huge-icon`, inspect the exported bytes and screenshot before assigning a semantic Dart constant.
+## Completed node exports
 
-## Active Home `2159:12771`
+### Home `2159:12771`
 
-Vectors committed from this exact node:
+- Ten vectors cover the status bar, search/filter controls, overflow glyph, add button, and bottom
+  navigation.
+- Eight JPEGs cover the avatar, three recently saved images, and four categories.
+- `2159_12771_more_vertical.svg` is intrinsically 2.5x12.5 and is rotated 90 degrees by the frame.
+- `2159_12771_nav_bg.svg` exports at 390x75 even though one node measurement reports 428px.
 
-- `2159_12771_plus.svg`: floating add button.
-- `2159_12771_more_vertical.svg`: exact 2.5x12.5 three-dot glyph; the Home frame rotates it to the visible horizontal state.
-- `2159_12771_search.svg`, `2159_12771_filter.svg`: search card.
-- `2159_12771_nav_bg.svg`, `2159_12771_nav_home.svg`, `2159_12771_nav_notebook.svg`, `2159_12771_nav_activity.svg`, `2159_12771_nav_profile.svg`: Home bottom navigation.
-- `2159_12771_status_right.svg`: Figma iOS status reference only; the app continues to use the native platform status bar.
+### Home toast `2159:13227`
 
-Raster bytes committed from this exact node:
+The unique success vector is `2159_13227_success.svg`. Its other assets are byte-identical to the
+base Home exports and are reused.
 
-- `2159_12771_avatar.png`.
-- `2159_12771_recent_crepe.png`, `2159_12771_recent_prompt.png`, `2159_12771_recent_movie.png`.
-- `2159_12771_category_study.png`, `2159_12771_category_travel.png`, `2159_12771_category_movie.png`, `2159_12771_category_cake.png`.
+### Notebook list `2159:12891`
 
-## Home toast `2159:13227`
+The node-specific navigation, add, banner, NotebookLM, and cover assets are stored under the
+`2159_12891_` prefix and registered where they are glyphs.
 
-All 19 assets returned by this exact node are committed with the `2159_13227_` prefix. SHA-256 verification confirms its 18 shared Home assets are byte-identical to the corresponding `2159_12771_` files, so the common Home implementation safely reuses the base constants. The unique `2159_13227_success.svg` is registered as `FigmaAssets.homeAddedSuccess` and rendered by the toast.
+### Add link `2159:13180`
 
-Remaining gap: nodes `2159:13303` and `2159:13676` have not yet been read or exported. Their assets must not be inferred from existing Home states.
+The node-specific back, overflow, link, clear, badge, image-badge, and dropdown vectors are stored
+under the `2159_13180_` prefix.
+
+### Link detail `2159:12980`
+
+The exact cover JPEG and twelve node vectors are committed under the `2159_12980_` prefix: back,
+share, star, copy, tag-add, layers, TikTok, saved-clock, overflow, mobile signal, Wi-Fi, and battery.
+SHA-256 checks against the current MCP asset URLs confirmed that the handoff's first nine files and
+cover are byte-identical; the three status vectors were then downloaded from the same node.
+
+### Category list `2159:13036` and create-folder sheet `2159:13091`
+
+The category node contributes the exact cropped folder PNG, four JPEG link thumbnails, and eight
+vectors for header/search/filter/add/metadata controls. The sheet state reuses byte-identical base
+assets and adds `2159_13091_close.svg` from its own node.
+
+### Folder states `2159:13158` and `2159:13174`
+
+The empty state contributes its chain illustration plus exact back, overflow, and add-circle
+vectors. The populated state contributes five JPEG thumbnails and node-specific header, search,
+filter, add, separator-dot, and overflow vectors.
+
+### Notebook detail `2159:12842`
+
+The cover gradient, NotebookLM mark, back/overflow controls, star, edit, AI sparkle, both dropdown
+states, share, and open-book actions are stored as eleven node-specific SVG exports. The raw back
+chevron and overflow vectors are rotated by their Figma instances; no CSS-authored glyph replaces
+them.
+
+### Create notebook `2159:13626`
+
+The node contributes the transparent source-collage and folder rasters plus exact 30px back,
+24px chevron, and status exports. The screen reproduces the node's multiple crop windows over the
+original high-resolution transparent images instead of baking approximate thumbnails.
+
+### Source selection `2159:13570`
+
+The shared source JPEG and node-specific back, search, filter, selected/empty radio, metadata dot,
+and three progress-step vectors are committed under the node prefix. The same exact thumbnail is
+cropped by CSS in each repeated Figma row; no stock or seed image substitutes for it.
 
 ## Implementation rules
 
-1. Call Figma design context on the exact target node before changing a screen.
-2. Download every referenced SVG immediately because MCP asset URLs expire.
-3. Commit the exact downloaded bytes. Never redraw paths or inline an invented SVG.
-4. Render with both width and height fixed through `FigmaIcon` or `FigmaVector`.
-5. Reuse a semantic constant from `FigmaAssets`; do not reference an arbitrary filename throughout screen code.
-6. Do not reintroduce Material `Icons.*`. `kit/scripts/check.sh` enforces this rule.
+1. Load the Figma design-to-code skill and call design context on the exact target node before
+   changing a screen.
+2. Download every referenced asset immediately because MCP URLs expire.
+3. Compare shared-looking exports byte-for-byte before reusing an existing file.
+4. Commit exact downloaded bytes. Never redraw paths or inline invented SVG.
+5. Register every glyph in `FigmaIcon` with both intrinsic width and height.
+6. Run `npm run build`, the production server, and `kit/scripts/figma_compare.py`; inspect the
+   generated difference mask in addition to the numeric score.

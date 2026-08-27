@@ -1,10 +1,7 @@
 import React, { useState } from 'react';
 import { SavedLink } from '../types';
 import { useMneme } from '../state/mnemeContext';
-import { FigmaBackButton } from '../components/common/FigmaBackButton';
 import { FigmaIcon } from '../components/common/FigmaIcon';
-import { MnemeImage } from '../components/common/MnemeImage';
-import { Tag } from '../components/common/Tag';
 
 interface FolderDetailScreenProps {
   folderName: string;
@@ -13,208 +10,118 @@ interface FolderDetailScreenProps {
   onAddNewLink: (folderName: string) => void;
 }
 
+const FILTERS = ['Tất cả', 'Bài viết', 'Video', 'Ảnh'] as const;
+
+const FolderLinkRow: React.FC<{ link: SavedLink; onClick: () => void }> = ({ link, onClick }) => (
+  <button type="button" onClick={onClick} className="flex h-[112px] w-[318px] items-center gap-[10px] text-left">
+    <span className="flex h-[112px] min-w-0 flex-1 items-center gap-[10px] rounded-[16px] bg-white p-[8px]">
+      <span className="relative size-[80px] shrink-0 overflow-hidden rounded-[15px]">
+        <img src={link.image} alt="" className="pointer-events-none absolute inset-0 size-full rounded-[15px] object-cover" />
+        <span className="absolute top-[58px] left-[40px] flex items-center justify-center rounded-[15px] bg-[#0e0727] px-[8px] py-[2px] text-[10px] leading-[13px] font-normal tracking-[0.06px] whitespace-nowrap text-white">2:12</span>
+      </span>
+      <span className="flex h-[96px] min-w-0 flex-1 flex-col items-start justify-center gap-[8px]">
+        <span className="line-clamp-2 min-h-[40px] w-full min-w-0 flex-1 text-[14px] leading-[20px] font-normal text-black underline [text-underline-position:from-font]">
+          {link.title}
+        </span>
+        <span className="flex w-full shrink-0 items-center gap-[4px] text-[12px] leading-[16px] font-normal tracking-[0.4px] whitespace-nowrap text-[#9490a2]">
+          <span>{link.source}</span>
+          <FigmaIcon name="folder-dot" />
+          <span>{link.author}</span>
+        </span>
+        <span className="flex shrink-0 items-start gap-[8px]">
+          <span className="flex items-center justify-center rounded-[24px] bg-[#f2f2f3] px-[12px] py-[4px] text-[12px] leading-[16px] font-normal whitespace-nowrap text-[#0e0727]">{link.tags[0]}</span>
+          <span className="flex items-center justify-center rounded-[24px] bg-[#f1eefc] px-[12px] py-[4px] text-[12px] leading-[16px] font-normal whitespace-nowrap text-[#7758e2]">{link.tags[1]}</span>
+        </span>
+      </span>
+      <span className="relative size-[18px] shrink-0 rotate-180 overflow-hidden">
+        <FigmaIcon name="folder-more-vertical-detail" className="absolute top-[3.75px] left-[7.5px]" />
+      </span>
+    </span>
+  </button>
+);
+
+/** Empty `2159:13158` and populated `2159:13174` folder-detail states. */
 export const FolderDetailScreen: React.FC<FolderDetailScreenProps> = ({
   folderName,
   onBack,
   onSelectLink,
   onAddNewLink,
 }) => {
-  const { links, folders, deleteLinks, moveLinks } = useMneme();
-  const [selectedIds, setSelectedIds] = useState<number[]>([]);
-  const [isSelectionMode, setIsSelectionMode] = useState(false);
-  const [showMoveModal, setShowMoveModal] = useState(false);
-
-  const folderLinks = links.filter((l) => l.folder === folderName);
-
-  const toggleSelect = (id: number) => {
-    setSelectedIds((prev) =>
-      prev.includes(id) ? prev.filter((item) => item !== id) : [...prev, id]
-    );
-  };
-
-  const handleSelectAll = () => {
-    if (selectedIds.length === folderLinks.length) {
-      setSelectedIds([]);
-    } else {
-      setSelectedIds(folderLinks.map((l) => l.id));
-    }
-  };
-
-  const handleDeleteSelected = () => {
-    if (selectedIds.length === 0) return;
-    deleteLinks(selectedIds);
-    setSelectedIds([]);
-    setIsSelectionMode(false);
-  };
-
-  const handleMoveTo = (targetFolder: string) => {
-    if (selectedIds.length === 0) return;
-    moveLinks(selectedIds, targetFolder);
-    setSelectedIds([]);
-    setShowMoveModal(false);
-    setIsSelectionMode(false);
-  };
+  const { links } = useMneme();
+  const [filter, setFilter] = useState<string>(FILTERS[0]);
+  const folderLinks = links.filter((link) => link.folder === folderName).slice(0, 5);
+  const isEmpty = folderLinks.length === 0;
 
   return (
-    <div className="min-h-screen bg-[#F8F6FD] pb-28">
-      {/* Top App Bar */}
-      <div className="sticky top-0 bg-[#F8F6FD]/90 backdrop-blur-md px-4 py-3 z-30 flex items-center justify-between">
-        <FigmaBackButton onClick={onBack} />
-        <h2 className="text-base font-semibold text-[#0E0727]">{folderName}</h2>
-        <button
-          type="button"
-          onClick={() => {
-            setIsSelectionMode(!isSelectionMode);
-            setSelectedIds([]);
-          }}
-          className="text-xs font-semibold text-[#7758E2] px-2 py-1 rounded-lg hover:bg-[#F1EEFC]"
-        >
-          {isSelectionMode ? 'Hủy chọn' : 'Chọn nhiều'}
+    <div className="flex w-[390px] shrink-0 flex-col items-start gap-[12px] overflow-visible bg-[#f8f6fd] px-[20px] py-[16px] font-['Roboto',sans-serif]">
+      <header className="flex h-[30px] w-[350px] items-center justify-center gap-[8px] px-[20px]">
+        <button type="button" onClick={onBack} aria-label="Quay lại" className="flex h-[30px] w-[30px] shrink-0 items-center">
+          <FigmaIcon name={isEmpty ? 'folder-empty-back' : 'folder-back'} style={{ transform: 'rotate(180deg)' }} />
         </button>
-      </div>
-
-      <div className="px-4 space-y-4 pt-1">
-        {/* Folder Header Summary */}
-        <div className="flex items-center justify-between bg-white rounded-2xl p-4 shadow-xs">
-          <div>
-            <span className="text-xs text-[#9490A2]">Tổng cộng</span>
-            <h3 className="text-lg font-bold text-[#0E0727]">{folderLinks.length} liên kết</h3>
-          </div>
-          <button
-            type="button"
-            onClick={() => onAddNewLink(folderName)}
-            className="px-3 py-1.5 rounded-full bg-[#F1EEFC] text-[#7758E2] text-xs font-bold flex items-center gap-1.5 hover:bg-[#7758E2] hover:text-white transition-colors"
-          >
-            <FigmaIcon name="plus" size={14} />
-            Thêm vào folder
-          </button>
+        <div className="flex h-full min-w-0 flex-1 items-center justify-center">
+          <h1 className="flex h-full w-[166px] items-center justify-center text-center text-[18px] leading-[28px] font-medium text-[#0e0727]">{folderName}</h1>
         </div>
+        <span className="h-[30px] w-[24px] shrink-0" />
+        <button type="button" aria-label="Thêm tùy chọn" className="flex size-[24px] shrink-0 items-center justify-center">
+          <FigmaIcon name={isEmpty ? 'folder-empty-more' : 'folder-more-horizontal'} />
+        </button>
+      </header>
 
-        {/* Multi-Selection Control Bar if active */}
-        {isSelectionMode && (
-          <div className="bg-white rounded-2xl p-3 shadow-sm flex items-center justify-between border border-[#7758E2]/20">
+      {isEmpty ? (
+        <section className="flex h-[706px] w-[356px] shrink-0 flex-col items-center justify-center gap-[20px] rounded-[20px] bg-white px-[16px] pt-[10px] pb-[20px] shadow-[0_0_4px_rgba(0,0,0,0.04),0_4px_8px_rgba(0,0,0,0.06)]">
+          <img src="/assets/images/figma_2159/2159_13158_empty.png" alt="" className="h-[78px] w-[117px] shrink-0 object-cover" />
+          <div className="flex w-full shrink-0 flex-col items-start gap-[20px]">
+            <p className="w-full text-center text-[14px] leading-[20px] font-normal tracking-[0.4px] text-[#9490a2]">Chưa có liên kết nào trong thư mục này</p>
             <button
               type="button"
-              onClick={handleSelectAll}
-              className="text-xs font-semibold text-[#7758E2]"
+              onClick={() => onAddNewLink(folderName)}
+              className="flex h-[46px] w-full items-center justify-center gap-[10px] rounded-[16px] bg-[#7758e2] px-[16px] py-[12px] text-[16px] leading-[22px] font-medium tracking-[-0.18px] text-white"
             >
-              {selectedIds.length === folderLinks.length ? 'Bỏ chọn tất cả' : 'Chọn tất cả'}
+              <span>Thêm liên kết</span>
+              <FigmaIcon name="folder-empty-add" />
             </button>
-            <span className="text-xs text-[#9490A2]">Đã chọn {selectedIds.length}</span>
-            <div className="flex gap-2">
-              <button
-                type="button"
-                disabled={selectedIds.length === 0}
-                onClick={() => setShowMoveModal(true)}
-                className="px-2.5 py-1 rounded-lg bg-[#F5F5F7] text-xs font-semibold text-[#0E0727] disabled:opacity-40"
-              >
-                Di chuyển
+          </div>
+        </section>
+      ) : (
+        <>
+          <div className="flex h-[70px] w-[350px] shrink-0 flex-col items-start overflow-hidden rounded-[30px] bg-white p-[12px]">
+            <div className="flex h-[46px] w-[326px] items-center justify-center gap-[18px]">
+              <button type="button" className="flex h-[46px] min-w-0 flex-1 items-center gap-[10px] rounded-[11px] bg-[#f5f5f7] px-[8px] py-[12px]">
+                <FigmaIcon name="folder-search" />
+                <span className="whitespace-nowrap text-[16px] leading-[22px] font-normal tracking-[-0.18px] text-[#9490a2]">Enter search terms...</span>
               </button>
-              <button
-                type="button"
-                disabled={selectedIds.length === 0}
-                onClick={handleDeleteSelected}
-                className="px-2.5 py-1 rounded-lg bg-red-50 text-xs font-semibold text-red-600 disabled:opacity-40"
-              >
-                Xóa
-              </button>
+              <button type="button" aria-label="Bộ lọc" className="size-[36px] shrink-0"><FigmaIcon name="folder-filter" /></button>
             </div>
           </div>
-        )}
 
-        {/* Links List */}
-        <div className="bg-white rounded-3xl p-4 shadow-xs divide-y divide-black/5">
-          {folderLinks.map((link) => {
-            const isSelected = selectedIds.includes(link.id);
-            return (
-              <div
-                key={link.id}
-                onClick={() => (isSelectionMode ? toggleSelect(link.id) : onSelectLink(link))}
-                className={`flex items-start gap-3 py-3 px-2 rounded-2xl transition-all cursor-pointer ${
-                  isSelected ? 'bg-[#F1EEFC]' : 'hover:bg-[#F5F5F7]/80'
-                }`}
-              >
-                {isSelectionMode && (
-                  <div className="pt-2 flex-shrink-0">
-                    <div
-                      className={`w-5 h-5 rounded-md border flex items-center justify-center ${
-                        isSelected
-                          ? 'bg-[#7758E2] border-[#7758E2] text-white'
-                          : 'border-[#D1D1D6] bg-white'
-                      }`}
-                    >
-                      {isSelected && '✓'}
-                    </div>
-                  </div>
-                )}
-
-                <div className="relative flex-shrink-0">
-                  <MnemeImage src={link.image} size={72} radius={14} alt={link.title} />
-                  <div className="absolute bottom-1 right-1 px-1.5 py-0.5 rounded-md bg-[#0E0727]/75 text-[10px] text-white">
-                    2:12
-                  </div>
-                </div>
-
-                <div className="flex-1 min-w-0">
-                  <h4 className="text-sm font-medium text-[#0E0727] line-clamp-2 underline leading-snug">
-                    {link.title}
-                  </h4>
-                  <div className="text-xs text-[#9490A2] mt-1">
-                    {link.source} · {link.savedAt || 'Gần đây'}
-                  </div>
-                  <div className="flex items-center gap-1.5 mt-1.5 flex-wrap">
-                    {link.tags?.map((t) => (
-                      <Tag key={t} label={t} primary={t === 'Figma'} />
-                    ))}
-                  </div>
-                </div>
-              </div>
-            );
-          })}
-
-          {folderLinks.length === 0 && (
-            <div className="py-12 text-center">
-              <p className="text-sm font-semibold text-[#0E0727]">Thư mục chưa có liên kết nào</p>
-              <p className="text-xs text-[#9490A2] mt-1">
-                Bấm "Thêm vào folder" để lưu tài liệu đầu tiên!
-              </p>
-            </div>
-          )}
-        </div>
-      </div>
-
-      {/* Move Folder Modal */}
-      {showMoveModal && (
-        <div className="fixed inset-0 bg-black/40 backdrop-blur-xs z-50 flex items-center justify-center p-4">
-          <div className="bg-white rounded-3xl p-6 max-w-sm w-full shadow-2xl animate-scale-up">
-            <h3 className="text-base font-bold text-[#0E0727] mb-2">Di chuyển liên kết</h3>
-            <p className="text-xs text-[#9490A2] mb-4">
-              Chọn thư mục đích cho {selectedIds.length} liên kết đã chọn:
-            </p>
-            <div className="space-y-2 max-h-60 overflow-y-auto mb-4">
-              {folders
-                .filter((f) => f !== folderName)
-                .map((f) => (
+          <div className="flex h-[722px] w-[350px] shrink-0 flex-col items-start gap-[20px] rounded-[20px] bg-white px-[16px] py-[20px] shadow-[0_0_2px_rgba(0,0,0,0.04),0_4px_4px_rgba(0,0,0,0.06)]">
+            <div className="flex h-[28px] shrink-0 items-start gap-[10px] overflow-hidden">
+              {FILTERS.map((label) => {
+                const selected = filter === label;
+                return (
                   <button
-                    key={f}
+                    key={label}
                     type="button"
-                    onClick={() => handleMoveTo(f)}
-                    className="w-full text-left px-4 py-3 rounded-xl bg-[#F5F5F7] hover:bg-[#F1EEFC] hover:text-[#7758E2] text-sm font-medium transition-colors flex items-center justify-between"
+                    onClick={() => setFilter(label)}
+                    className={`flex h-[28px] w-[70px] shrink-0 items-center justify-center rounded-[24px] px-[10px] py-[6px] text-[12px] leading-[16px] font-extrabold tracking-[0.4px] ${selected ? 'bg-[#f1eefc] text-[#7758e2]' : 'bg-[#f5f5f7] text-[#9490a2]'}`}
                   >
-                    <span>{f}</span>
-                    <FigmaIcon name="chevron-right" size={16} />
+                    {label}
                   </button>
-                ))}
+                );
+              })}
             </div>
-            <button
-              type="button"
-              onClick={() => setShowMoveModal(false)}
-              className="w-full py-2.5 rounded-xl bg-[#F5F5F7] text-xs font-semibold text-[#0E0727]"
-            >
-              Đóng
-            </button>
+
+            <section className="flex h-[634px] w-[318px] shrink-0 flex-col items-start gap-[10px]">
+              <div className="flex h-[24px] w-full items-center gap-[10px]">
+                <h2 className="min-w-0 flex-1 text-[14px] leading-[20px] font-medium tracking-[0.4px] text-[#0e0727]">Tất cả links</h2>
+                <button type="button" onClick={() => onAddNewLink(folderName)} aria-label="Thêm link" className="flex size-[24px] shrink-0 items-center justify-center rounded-full bg-[#7758e2]">
+                  <FigmaIcon name="folder-detail-plus" />
+                </button>
+              </div>
+              {folderLinks.map((link) => <FolderLinkRow key={link.id} link={link} onClick={() => onSelectLink(link)} />)}
+            </section>
           </div>
-        </div>
+        </>
       )}
     </div>
   );
