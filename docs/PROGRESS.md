@@ -142,6 +142,143 @@ Flutter build had reached. Restoring that fidelity against section `2159:12770` 
   Section 9 also contains many non-"details" screens (Activity, Home, Notebook detail
   variants for other demo categories) that are out of scope of this pass.
 
+## Standing goal (set 2026-08-28): finish every Section 9 details screen
+
+The user's instruction: work until all `2172:3041` ("LUỒNG SHOWCASE APP DEMO") "details"
+(Folder Detail) screens are complete, keep writing docs and rely on `/compact` so another
+agent can take over if usage runs out, skip matching the phone status bar (battery/wifi/
+clock — OS chrome, not app UI), and make sure Home's scrollable content below the fold is
+also coded correctly since this is a phone interface.
+
+There are 11 Folder Detail frames total in Section 9; see the table in
+`kit/docs/FIGMA_MAP.md` under "Section 9" for the exact node → folder → category mapping
+(confirmed by screenshot, not metadata layer names).
+
+### Section 9 remaining Folder Detail variants — tracking checklist
+
+- [x] `2172:5877` Phim Hàn (Phim ảnh) — done, pixel-compared 6.60/6.92/6.86
+- [x] `2172:5991` Phim kinh dị (Phim ảnh) — item 1 is now id:152 (was wrongly reusing
+      id:12's text; see "Content-accuracy audit" below), pixel-compared 6.43/6.23/5.93
+- [x] `2172:6105` Phim ngắn (Phim ảnh) — item 1 is now id:153 (was wrongly reusing id:13's
+      text), pixel-compared 5.87/5.74/5.42
+- [x] `2172:6221` Anime (Phim ảnh) — item 1 is now id:154 (was wrongly reusing id:11's
+      text), pixel-compared 6.33/6.29/6.20.
+      First pass scored 9.96/10.02/10.00 (structurally off): 4 of its 5 thumbnails use a
+      Figma-specified crop leaf larger than the 80x80 container with a non-center
+      top/left offset (e.g. `w-[80px] h-[91.966px] top-[-12px]`), not a plain centered
+      `object-cover`. Fixed by computing each leaf's exact crop rectangle in the source
+      image's native pixel space (scale = renderedW / originalW, then map the leaf's
+      top/left offsets through that scale) and baking the crop into the saved asset
+      instead of changing `FolderLinkRow`'s generic `object-cover` renderer — score
+      dropped to 6.48/6.55/6.51. If a future folder's thumbnail looks structurally wrong
+      only in that one folder, check the node's `get_design_context` leaf `w-[]`/`h-[]`/
+      `top-[]`/`left-[]` on the image div before assuming it's a seeding mistake.
+- [x] `2172:7015` Nhật Bản (Du lịch) — new folder, 5 links, pixel-compared 5.21/5.04/4.94
+- [x] `2172:7130` Đông Nam Á (Du lịch) — new folder, 5 links, pixel-compared 5.39/5.32/5.26
+- [x] `2172:7244` Mẹo du lịch tiết kiệm (Du lịch) — new folder, 5 links, pixel-compared 5.79/5.93/6.04
+- [x] `2172:7414` Bánh Âu (Công thức bánh) — new folder, 5 links, pixel-compared 4.68/4.72/4.72
+- [x] `2172:7512` Bánh Á (Công thức bánh) — new folder, 5 links, pixel-compared 5.05/5.08/5.04
+- [x] `2172:7610` Bánh không cần lò nướng (Công thức bánh) — new folder, 5 links,
+      pixel-compared 7.31/7.21/6.93 (single-tag row layout; see note below)
+- [x] `2172:7704` Trang trí bánh (Công thức bánh) — new folder, 5 links, pixel-compared
+      5.03/5.03/5.18. First pass scored 25.32/27.67/27.68 (structurally off): this node's
+      item 1 also carries an image override (`imgImagePlaceholder` background +
+      `imgImage` real photo on top), which I initially assumed only items 2–5 had. That
+      shifted every item's real-photo variable by one (item1 got the placeholder,
+      item2 got item1's photo, etc.) across all 5 rows. Fixed by re-fetching the node
+      and mapping each card's *last* `src={imgN}` inside its
+      `data-name="Image placeholder"` → `data-name="Button"` span, not the first —
+      the same fix already applied to the 5 other new folders via the corrected regex
+      parser (`n7015`/`7130`/`7244`/`7414`/`7512`), which this one had skipped because
+      it was hand-read from an inline tool result instead of re-verified programmatically.
+- [x] `FolderDetailScreen.tsx`'s `FolderLinkRow` now renders each tag chip
+      conditionally (`link.tags[0] && …`, `link.tags[1] && …`) instead of assuming both
+      always exist — `2172:7610` and `2172:7704` are single-tag rows.
+- [x] `CategoryScreen.tsx` folder tiles made category-aware via a `CATEGORY_FOLDERS`
+      map keyed by `category.name` (was hardcoded to the movie folders for every
+      category — a real pre-existing bug: opening "Du lịch" or "Công thức bánh" showed
+      movie folder tiles). `Phim ảnh`'s entry is byte-identical to the old hardcoded
+      array so its pixel-verified state (4.87/4.98/4.82) is untouched; `Du lịch` and
+      `Công thức bánh` have no dedicated category-list Figma frame in this file, so
+      their tiles are functional rather than pixel-targeted.
+- [x] Full `figma_compare.py` re-run: all 22 rows (11 original + 11 Section 9 Folder
+      Detail nodes) pass under the 8.0 worst-score bar, zero regressions on any
+      previously-verified screen.
+- [x] Fixed two real, general navigation bugs found while wiring up the new folders'
+      click-through paths in `figma_compare.py` (not showcase-specific — both would
+      affect the real app on any tab with enough content to scroll):
+      1. **Bottom nav permanently covering scrolled content.** `BottomNavigation` is
+         `absolute bottom-0` over the scrollable `<main>` in `App.tsx`, 115px tall, so
+         any content scrolled to the bottom of a tab screen ended up permanently hidden
+         behind it (opaque from y=40 of that 115px down) — there was no bottom padding
+         reserving that space. Fixed by adding `pb-[115px]` to `<main>` when
+         `currentView.type === 'tabs'`.
+      2. **Scroll position leaking between screens.** `<main>` is one persistent DOM
+         node that swaps children via `renderActiveScreen()`; navigating away from a
+         scrolled-down screen (e.g. Home scrolled to reach "Công thức bánh") left the
+         *next* screen rendered at that same scroll offset instead of at its own top —
+         on a "details" screen this meant the header/search bar scrolled half off-screen
+         before any user interaction. Fixed with a `mainRef` + `useEffect` that calls
+         `mainRef.current?.scrollTo(0, 0)` whenever `currentView` or `currentTab`
+         changes (covers both push/pop navigation and bottom-nav tab switches).
+      Both fixes were verified to cause zero regression across all 22
+      `figma_compare.py` rows (each screen is captured at its own top-of-scroll state).
+- [x] Status bar (battery/wifi/clock) intentionally excluded from matching per user
+      instruction — do not spend effort chasing it in future comparisons.
+- [x] Checked whether the two pending "Home variant" nodes (`2159:13303`, `2159:13676`)
+      were a scrolled-down state of Home relevant to the scroll-fix above — they render
+      pixel-identical to the already-verified Home frame (`2159:12771`), so no separate
+      implementation was needed for them specifically.
+
+Section 9's Folder Detail work is now fully complete. If resuming other Section 9 work
+(Activity/Notebook-detail/HỌC TẬP-CV demo variants — out of scope of this pass) from a
+fresh context: read `kit/docs/FIGMA_MAP.md`'s Section 9 table for what's already done,
+and note the seed-array position sensitivity in `CategoryScreen`'s `.slice(0, 4)` —
+always append new links at the very end of `INITIAL_LINKS`, never in the middle.
+
+## Content-accuracy audit (set 2026-08-28, same session)
+
+The user ran the app themselves and reported real title/content mismatches inside
+"Đã lưu gần đây"-style rows despite the pixel scores above all passing. Their follow-up
+instruction, to stay in force for the rest of this goal: **check every screen carefully
+and get each content, each icon, and the UI exactly right** — pixel-score-under-8 is
+necessary but not sufficient; text content must match the source node's actual copy too.
+
+Root cause found: `id:11` (Anime), `id:12` (Phim kinh dị), `id:13` (Phim ngắn) were each
+being reused for **two different Figma frames that show two different titles for the same
+photo** — the original Category List "Tất cả links" section (`2159:13036`) and Section 9's
+own Folder Detail frame for that folder (`2172:6221`/`2172:5991`/`2172:6105`). A prior
+session's "extend the existing fixture to be item 1" approach (see the `2172:6221`/
+`2172:7704` notes above) assumed one record could serve both frames; it can't when the
+frames disagree. Confirmed via fresh `get_design_context` on all 4 nodes — e.g. `2172:5991`
+item 1 title is "Gia đình phát hiện đoạn băng bí ẩn giấu sau bức tường" while `2159:13036`'s
+own copy for the same photo is "Gia đình chuyển vào căn nhà mới và phát hiện những đoạn
+băng bị giấu trong tường". (First attempt: overwrote id:11/12/13's titles to the Section 9
+wording, which fixed those 3 folders but regressed Category List from 4.87/4.98/4.82 to
+5.61/5.70/5.41, since those ids are also the first 3 of `categoryLinks.slice(0, 4)` there.)
+
+Fix: kept `id:11/12/13` exactly matching `2159:13036` (their original titles restored,
+`folder` changed to the category name `'Phim ảnh'` so they no longer double-list inside
+`FolderDetailScreen`), and added three new records — `id:152` (Phim kinh dị), `id:153`
+(Phim ngắn), `id:154` (Anime) — carrying each Folder Detail node's own exact title, reusing
+the same image asset. Inserted at the front of each folder's existing items 2–5 block so
+`folderLinks` filter order keeps item 1 first. Re-verified: Category List back to
+4.87/4.98/4.82, all three Folder Detail scores improved (see checklist above), all 22
+`figma_compare.py` rows still pass with zero regressions.
+
+Icon audit: grepped the whole `src/` tree for `lucide-react` imports, raw `<svg>` outside
+`FigmaIcon.tsx`, and leftover unicode glyphs — none found in any Section 9 / Folder Detail
+code path. The `✓`/`✕` unicode glyphs that do exist (`EditLinkScreen`, `ProfileScreen`,
+`AiSuggestionsScreen`, `SearchScreen`) are all in screens already flagged "Legacy UI
+pending rebuild" in `kit/docs/FIGMA_MAP.md`, outside this goal's Folder Detail scope —
+left as-is, not a new finding.
+
+If more content mismatches like this turn up later: the pixel-diff score is computed over
+the whole frame and averages out a single wrong row, so a folder can score under 8 while
+still having one visibly wrong title. When auditing, read the actual rendered text in
+`kit/figma-refs/out/compare_*.png` (Figma | app | diff columns) side by side rather than
+trusting the aggregate number alone — that's how these three were caught.
+
 ## Next work
 
 1. Continue the remaining Notebook analysis/content states against their own nodes, starting with

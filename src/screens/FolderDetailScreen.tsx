@@ -31,8 +31,12 @@ const FolderLinkRow: React.FC<{ link: SavedLink; onClick: () => void }> = ({ lin
           <span>{link.author}</span>
         </span>
         <span className="flex shrink-0 items-start gap-[8px]">
-          <span className="flex items-center justify-center rounded-[24px] bg-[#f2f2f3] px-[12px] py-[4px] text-[12px] leading-[16px] font-normal whitespace-nowrap text-[#0e0727]">{link.tags[0]}</span>
-          <span className="flex items-center justify-center rounded-[24px] bg-[#f1eefc] px-[12px] py-[4px] text-[12px] leading-[16px] font-normal whitespace-nowrap text-[#7758e2]">{link.tags[1]}</span>
+          {link.tags[0] && (
+            <span className="flex items-center justify-center rounded-[24px] bg-[#f2f2f3] px-[12px] py-[4px] text-[12px] leading-[16px] font-normal whitespace-nowrap text-[#0e0727]">{link.tags[0]}</span>
+          )}
+          {link.tags[1] && (
+            <span className="flex items-center justify-center rounded-[24px] bg-[#f1eefc] px-[12px] py-[4px] text-[12px] leading-[16px] font-normal whitespace-nowrap text-[#7758e2]">{link.tags[1]}</span>
+          )}
         </span>
       </span>
       <span className="relative size-[18px] shrink-0 rotate-180 overflow-hidden">

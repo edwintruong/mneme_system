@@ -45,6 +45,16 @@ SCREENS = [
     ('2159:13626', 'Create notebook', '2159_13626_create_notebook.png', 844, 'Create notebook'),
     ('2159:13570', 'Select sources', '2159_13570_select_sources.png', 844, 'Select sources'),
     ('2172:5877', 'Folder detail (Phim Hàn, showcase)', '2172_5877_folder_detail_phimhan.png', 843, 'Folder Phim Hàn'),
+    ('2172:5991', 'Folder detail (Phim kinh dị, showcase)', '2172_5991_folder_detail_phimkinhdi.png', 843, 'Folder Phim kinh dị'),
+    ('2172:6105', 'Folder detail (Phim ngắn, showcase)', '2172_6105_folder_detail_phimngan.png', 843, 'Folder Phim ngắn'),
+    ('2172:6221', 'Folder detail (Anime, showcase)', '2172_6221_folder_detail_anime.png', 843, 'Folder Anime'),
+    ('2172:7015', 'Folder detail (Nhật Bản, showcase)', '2172_7015_folder_detail_nhatban.png', 843, 'Folder Nhật Bản'),
+    ('2172:7130', 'Folder detail (Đông Nam Á, showcase)', '2172_7130_folder_detail_dongnama.png', 843, 'Folder Đông Nam Á'),
+    ('2172:7244', 'Folder detail (Mẹo du lịch, showcase)', '2172_7244_folder_detail_meodulich.png', 843, 'Folder Mẹo du lịch tiết kiệm'),
+    ('2172:7414', 'Folder detail (Bánh Âu, showcase)', '2172_7414_folder_detail_banhau.png', 843, 'Folder Bánh Âu'),
+    ('2172:7512', 'Folder detail (Bánh Á, showcase)', '2172_7512_folder_detail_banha.png', 843, 'Folder Bánh Á'),
+    ('2172:7610', 'Folder detail (Bánh không lò, showcase)', '2172_7610_folder_detail_banhkhongcanlo.png', 843, 'Folder Bánh không cần lò nướng'),
+    ('2172:7704', 'Folder detail (Trang trí bánh, showcase)', '2172_7704_folder_detail_trangtribanh.png', 837, 'Folder Trang trí bánh'),
 ]
 
 
@@ -105,6 +115,36 @@ def capture(page, tab, height, dest):
         elif tab == 'Folder Phim Hàn':
             page.get_by_role('button', name='Phim ảnh').click()
             page.get_by_role('button', name='Phim Hàn 24 links').click()
+        elif tab == 'Folder Phim kinh dị':
+            page.get_by_role('button', name='Phim ảnh').click()
+            page.get_by_role('button', name='Phim kinh dị 24 links').click()
+        elif tab == 'Folder Phim ngắn':
+            page.get_by_role('button', name='Phim ảnh').click()
+            page.get_by_role('button', name='Phim ngắn 24 links').click()
+        elif tab == 'Folder Anime':
+            page.get_by_role('button', name='Phim ảnh').click()
+            page.get_by_role('button', name='Anime 24 links').click()
+        elif tab == 'Folder Nhật Bản':
+            page.get_by_role('button', name='Du lịch').click()
+            page.get_by_role('button', name='Nhật Bản 24 links').click()
+        elif tab == 'Folder Đông Nam Á':
+            page.get_by_role('button', name='Du lịch').click()
+            page.get_by_role('button', name='Đông Nam Á 24 links').click()
+        elif tab == 'Folder Mẹo du lịch tiết kiệm':
+            page.get_by_role('button', name='Du lịch').click()
+            page.get_by_role('button', name='Mẹo du lịch tiết kiệm 24 links').click()
+        elif tab == 'Folder Bánh Âu':
+            page.get_by_role('button', name='Công thức bánh 10 mục').click()
+            page.get_by_role('button', name='Bánh Âu 24 links').click()
+        elif tab == 'Folder Bánh Á':
+            page.get_by_role('button', name='Công thức bánh 10 mục').click()
+            page.get_by_role('button', name='Bánh Á 24 links').click()
+        elif tab == 'Folder Bánh không cần lò nướng':
+            page.get_by_role('button', name='Công thức bánh 10 mục').click()
+            page.get_by_role('button', name='Bánh không cần lò nướng 24 links').click()
+        elif tab == 'Folder Trang trí bánh':
+            page.get_by_role('button', name='Công thức bánh 10 mục').click()
+            page.get_by_role('button', name='Trang trí bánh 24 links').click()
         else:
             page.get_by_role('button', name=tab).click()
         page.wait_for_timeout(800)

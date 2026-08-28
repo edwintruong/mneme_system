@@ -11,7 +11,23 @@ interface CategoryScreenProps {
 }
 
 const FILTERS = ['Tất cả', 'Bài viết', 'Video', 'Ảnh'] as const;
-const MOVIE_FOLDERS = ['Phim Hàn', 'Phim kinh dị', 'Phim ngắn', 'Anime'] as const;
+
+/**
+ * Folder tiles shown per category. `Phim ảnh`'s order/count comes straight from node
+ * 2159:13036 and is pixel-verified — do not reorder it. `Du lịch` and `Công thức bánh`
+ * have no dedicated category-list Figma frame in this file, so their tiles are
+ * functional (reachable, no broken layout) rather than pixel-targeted; see Section 9
+ * in kit/docs/FIGMA_MAP.md for the folders' own verified Folder Detail nodes.
+ */
+const CATEGORY_FOLDERS: Record<string, readonly string[]> = {
+  'Phim ảnh': ['Phim Hàn', 'Phim kinh dị', 'Phim ngắn', 'Anime'],
+  'Du lịch': ['Nhật Bản', 'Đông Nam Á', 'Mẹo du lịch tiết kiệm'],
+  'Công thức bánh': ['Bánh Âu', 'Bánh Á', 'Bánh không cần lò nướng', 'Trang trí bánh'],
+};
+/** The node's "Folders (6)" header text is exact copy, not a live count; only Phim ảnh is verified. */
+const CATEGORY_FOLDER_LABEL: Record<string, string> = { 'Phim ảnh': 'Folders (6)' };
+/** Only Phim ảnh's "Xem tất cả folder" link is node-verified (goes to its 5th folder). */
+const CATEGORY_VIEW_ALL_FOLDER: Record<string, string> = { 'Phim ảnh': 'Phim tài liệu' };
 
 const FolderThumbnail: React.FC = () => (
   <span className="relative h-[32px] w-[36px] shrink-0 overflow-hidden">
@@ -71,6 +87,9 @@ export const CategoryScreen: React.FC<CategoryScreenProps> = ({
   const [newFolderName, setNewFolderName] = useState('');
 
   const categoryLinks = links.filter((link) => link.category === category.name).slice(0, 4);
+  const categoryFolders = CATEGORY_FOLDERS[category.name] ?? [];
+  const folderLabel = CATEGORY_FOLDER_LABEL[category.name] ?? `Folders (${categoryFolders.length})`;
+  const viewAllFolder = CATEGORY_VIEW_ALL_FOLDER[category.name];
 
   const handleCreateFolder = (event: React.FormEvent) => {
     event.preventDefault();
@@ -130,7 +149,7 @@ export const CategoryScreen: React.FC<CategoryScreenProps> = ({
         <div className="flex h-[752px] w-[318px] shrink-0 flex-col items-start gap-[20px]">
           <section className="flex h-[220px] w-full shrink-0 flex-col items-start gap-[10px]">
             <div className="flex h-[30px] w-full items-center gap-[10px]">
-              <h2 className="min-w-0 flex-1 text-[14px] leading-[20px] font-medium tracking-[0.4px] text-[#0e0727]">Folders (6)</h2>
+              <h2 className="min-w-0 flex-1 text-[14px] leading-[20px] font-medium tracking-[0.4px] text-[#0e0727]">{folderLabel}</h2>
               <button
                 type="button"
                 onClick={() => setShowAddModal(true)}
@@ -141,31 +160,37 @@ export const CategoryScreen: React.FC<CategoryScreenProps> = ({
               </button>
             </div>
 
-            <div className="flex h-[72px] w-full items-center gap-[10px]">
-              {MOVIE_FOLDERS.slice(0, 2).map((folder) => (
-                <button key={folder} type="button" onClick={() => onSelectFolder(folder)} className="flex h-[72px] min-w-0 flex-1 items-center justify-center gap-[10px] rounded-[12px] bg-[#f7f7f8] px-[8px] py-[12px] text-left">
-                  <FolderThumbnail />
-                  <span className="flex min-w-0 flex-1 flex-col items-start justify-center gap-[4px] whitespace-nowrap">
-                    <span className="text-[16px] leading-[24px] font-medium text-[#0e0727]">{folder}</span>
-                    <span className="text-[14px] leading-[20px] font-normal tracking-[0.4px] text-[#9490a2]">24 links</span>
-                  </span>
-                </button>
-              ))}
-            </div>
+            {categoryFolders.slice(0, 2).length > 0 && (
+              <div className="flex h-[72px] w-full items-center gap-[10px]">
+                {categoryFolders.slice(0, 2).map((folder) => (
+                  <button key={folder} type="button" onClick={() => onSelectFolder(folder)} className="flex h-[72px] min-w-0 flex-1 items-center justify-center gap-[10px] rounded-[12px] bg-[#f7f7f8] px-[8px] py-[12px] text-left">
+                    <FolderThumbnail />
+                    <span className="flex min-w-0 flex-1 flex-col items-start justify-center gap-[4px] whitespace-nowrap">
+                      <span className="text-[16px] leading-[24px] font-medium text-[#0e0727]">{folder}</span>
+                      <span className="text-[14px] leading-[20px] font-normal tracking-[0.4px] text-[#9490a2]">24 links</span>
+                    </span>
+                  </button>
+                ))}
+              </div>
+            )}
 
-            <div className="flex h-[72px] w-full items-center gap-[10px]">
-              {MOVIE_FOLDERS.slice(2).map((folder) => (
-                <button key={folder} type="button" onClick={() => onSelectFolder(folder)} className="flex h-[72px] min-w-0 flex-1 items-center justify-center gap-[10px] rounded-[12px] bg-[#f7f7f8] px-[8px] py-[12px] text-left">
-                  <FolderThumbnail />
-                  <span className="flex min-w-0 flex-1 flex-col items-start justify-center gap-[4px] whitespace-nowrap">
-                    <span className="text-[16px] leading-[24px] font-medium text-[#0e0727]">{folder}</span>
-                    <span className="text-[14px] leading-[20px] font-normal tracking-[0.4px] text-[#9490a2]">24 links</span>
-                  </span>
-                </button>
-              ))}
-            </div>
+            {categoryFolders.slice(2, 4).length > 0 && (
+              <div className="flex h-[72px] w-full items-center gap-[10px]">
+                {categoryFolders.slice(2, 4).map((folder) => (
+                  <button key={folder} type="button" onClick={() => onSelectFolder(folder)} className="flex h-[72px] min-w-0 flex-1 items-center justify-center gap-[10px] rounded-[12px] bg-[#f7f7f8] px-[8px] py-[12px] text-left">
+                    <FolderThumbnail />
+                    <span className="flex min-w-0 flex-1 flex-col items-start justify-center gap-[4px] whitespace-nowrap">
+                      <span className="text-[16px] leading-[24px] font-medium text-[#0e0727]">{folder}</span>
+                      <span className="text-[14px] leading-[20px] font-normal tracking-[0.4px] text-[#9490a2]">24 links</span>
+                    </span>
+                  </button>
+                ))}
+              </div>
+            )}
 
-            <button type="button" onClick={() => onSelectFolder('Phim tài liệu')} className="h-[16px] w-full text-center text-[12px] leading-[16px] font-medium tracking-[0.4px] text-[#0098fd]">Xem tất cả folder</button>
+            {viewAllFolder && (
+              <button type="button" onClick={() => onSelectFolder(viewAllFolder)} className="h-[16px] w-full text-center text-[12px] leading-[16px] font-medium tracking-[0.4px] text-[#0098fd]">Xem tất cả folder</button>
+            )}
           </section>
 
           <section className="flex h-[512px] w-full shrink-0 flex-col items-start gap-[10px]">

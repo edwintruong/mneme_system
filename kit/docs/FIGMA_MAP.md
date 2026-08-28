@@ -37,11 +37,57 @@ video, not new screen designs. Its `Folder Detail` frames (11 instances) use the
 same component structure as `2159:13174`, confirmed by direct `get_design_context`
 diff against `2172:5877` ("Phim Hàn").
 
-| Flow/state | Node | React screen | Status |
+All 11 `Folder Detail` frame node IDs were confirmed by screenshot (not metadata layer
+names, which are stale — see the G1 gotcha below). None are "UI/UX"; the earlier guess in
+this table was wrong. The real set is 3 more movie folders (extending categories already
+seeded), 3 new travel folders, and 4 new cake folders:
+
+All 11 nodes are now seeded and pixel-compared. Scores (mean abs diff / 255, R/G/B):
+
+| Node | Folder name | Category | Score |
 | --- | --- | --- | --- |
-| Folder detail, "Phim Hàn" (5 links) | `2172:5877` | `src/screens/FolderDetailScreen.tsx` | Verified: seeded the 4 missing demo links, added per-link `duration` (was hardcoded "2:12"), pixel-compared |
-| Folder detail, other categories (Phim kinh dị, Phim ngắn, Anime, UI/UX, DU LỊCH, "Bánh không cần lò nướng", etc.) | `2172:5991`, `2172:6105`, `2172:6221`, `2172:7015`, `2172:7130`, `2172:7244`, `2172:7414`, `2172:7512`, `2172:7610`, `2172:7704` | `src/screens/FolderDetailScreen.tsx` | Same component, not seeded/verified individually — same template already confirmed pixel-accurate |
-| Activity, Home, Notebook-detail, and category-specific (HỌC TẬP/CV, DU LỊCH) demo variants | many (see `Section 9` root) | existing screens | Not audited — out of scope of this pass, which focused on the details screen |
+| `2172:5877` | Phim Hàn | Phim ảnh | 6.60 / 6.92 / 6.86 |
+| `2172:5991` | Phim kinh dị | Phim ảnh | 6.43 / 6.23 / 5.93 |
+| `2172:6105` | Phim ngắn | Phim ảnh | 5.87 / 5.74 / 5.42 |
+| `2172:6221` | Anime | Phim ảnh | 6.33 / 6.29 / 6.20 (see crop-fix note in `docs/PROGRESS.md`) |
+| `2172:7015` | Nhật Bản | Du lịch | 5.21 / 5.04 / 4.94 |
+| `2172:7130` | Đông Nam Á | Du lịch | 5.39 / 5.32 / 5.26 |
+| `2172:7244` | Mẹo du lịch tiết kiệm | Du lịch | 5.79 / 5.93 / 6.04 |
+| `2172:7414` | Bánh Âu | Công thức bánh | 4.68 / 4.72 / 4.72 |
+| `2172:7512` | Bánh Á | Công thức bánh | 5.05 / 5.08 / 5.04 |
+| `2172:7610` | Bánh không cần lò nướng | Công thức bánh | 7.31 / 7.21 / 6.93 (long folder name wraps to 2 lines in the 166px header vs Figma's 1 line — cosmetic, no structural block) |
+| `2172:7704` | Trang trí bánh | Công thức bánh | 5.03 / 5.03 / 5.18 |
+
+`2172:7610` and `2172:7704` are the only two Folder Detail nodes whose link rows carry a
+single tag chip instead of two — `FolderLinkRow` in `FolderDetailScreen.tsx` now renders
+each tag chip conditionally rather than assuming both `tags[0]` and `tags[1]` exist.
+
+Two Home-variant nodes listed in "Next work" below, `2159:13303` and `2159:13676`, turned
+out to be pixel-duplicates of the already-verified Home frame (`2159:12771`) — not a
+distinct scrolled-down state. No separate implementation was needed for them.
+
+`CategoryScreen.tsx`'s folder-tile section was hardcoded to a single `MOVIE_FOLDERS` array
+regardless of which category was open (a pre-existing bug: opening "Du lịch" showed movie
+folder tiles). Fixed by keying the tile list off `category.name`, with the `Phim ảnh` entry
+kept byte-identical to the old `MOVIE_FOLDERS` order so its pixel-verified state
+(4.87/4.98/4.82) is untouched. `Du lịch` and `Công thức bánh` have no Figma category-list
+frame of their own in this file, so their tile layout is functional (reachable, no broken
+image/layout) rather than pixel-targeted.
+
+All 11 Folder Detail frames in Section 9 are now complete — see `docs/PROGRESS.md`'s
+"Standing goal" checklist for the full history of this pass, including two real bugs
+found and fixed along the way (image-crop leaf geometry, an off-by-one image mapping)
+and two app-wide navigation fixes (bottom-nav scroll clearance, scroll-position reset
+between screens).
+
+`id:11`/`id:12`/`id:13` (Anime/Phim kinh dị/Phim ngắn) no longer double as their Folder
+Detail's item 1 — `2159:13036` and their `2172:*` Folder Detail node show different title
+text for the same reused photo, so one record can't satisfy both frames. `id:11/12/13`
+now stay matched to `2159:13036` only (`folder: 'Phim ảnh'`, unreachable from Folder
+Detail); `id:152/153/154` are the Folder Detail-only item-1 records. See
+`docs/PROGRESS.md`'s "Content-accuracy audit" section for the full root cause.
+
+| Activity, Home, Notebook-detail, and category-specific (HỌC TẬP/CV) demo variants | many (see `Section 9` root) | existing screens | Not audited — out of scope of this pass, which focuses on Folder Detail ("details") screens per the user's goal |
 
 ## Legacy implementation reference
 

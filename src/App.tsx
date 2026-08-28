@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useEffect, useRef, useState } from 'react';
 import { MnemeProvider } from './state/mnemeContext';
 import { BottomNavigation, TabType } from './components/navigation/BottomNavigation';
 import { HomeScreen } from './screens/HomeScreen';
@@ -41,6 +41,14 @@ const MnemeApp: React.FC = () => {
   const [showToast, setShowToast] = useState(false);
 
   const currentView = viewStack[viewStack.length - 1];
+  const mainRef = useRef<HTMLElement>(null);
+
+  // Each pushed/popped screen, and each bottom-nav tab switch, is a fresh view on a
+  // phone, not a continuation of whatever scroll offset the previous one was left at.
+  useEffect(() => {
+    mainRef.current?.scrollTo(0, 0);
+  }, [currentView, currentTab]);
+
   const usesReversedStatusBar = currentView.type === 'link_detail';
   const usesWhiteCanvas = currentView.type === 'notebook_detail' || currentView.type === 'select_sources';
   const usesPurpleStatusBar = currentView.type === 'create_notebook';
@@ -252,8 +260,16 @@ const MnemeApp: React.FC = () => {
           )}
         </div>
 
-        {/* no-scrollbar: a desktop scrollbar would narrow the 390 column and shift the layout. */}
-        <main className="no-scrollbar relative flex w-[390px] flex-1 flex-col items-center overflow-x-hidden overflow-y-auto">
+        {/*
+          no-scrollbar: a desktop scrollbar would narrow the 390 column and shift the layout.
+          The bottom nav is absolutely positioned over this scroll area (115px tall), so on
+          the tab screens content needs matching bottom padding or the last rows scroll in
+          permanently hidden behind it instead of clearing it like a real phone app.
+        */}
+        <main
+          ref={mainRef}
+          className={`no-scrollbar relative flex w-[390px] flex-1 flex-col items-center overflow-x-hidden overflow-y-auto ${currentView.type === 'tabs' ? 'pb-[115px]' : ''}`}
+        >
           {renderActiveScreen()}
         </main>
 
