@@ -28,6 +28,21 @@ Active source-of-truth section: `2159:12770`. Section `2143:4235` is legacy refe
 | Search results | `2159:13747`, `2159:13763` | `src/screens/SearchScreen.tsx` | Pending variants |
 | Open-link confirmation | `2159:13778` | within search flow | Pending |
 
+## Section 9 — showcase demo flow (`2172:3041`)
+
+A separate, much larger section ("LUỒNG SHOWCASE APP DEMO") that restages the same
+screens above with realistic demo content across several sample folders/categories
+(K-drama, horror, anime, study/CV, travel, etc.) — apparently a storyboard for a demo
+video, not new screen designs. Its `Folder Detail` frames (11 instances) use the exact
+same component structure as `2159:13174`, confirmed by direct `get_design_context`
+diff against `2172:5877` ("Phim Hàn").
+
+| Flow/state | Node | React screen | Status |
+| --- | --- | --- | --- |
+| Folder detail, "Phim Hàn" (5 links) | `2172:5877` | `src/screens/FolderDetailScreen.tsx` | Verified: seeded the 4 missing demo links, added per-link `duration` (was hardcoded "2:12"), pixel-compared |
+| Folder detail, other categories (Phim kinh dị, Phim ngắn, Anime, UI/UX, DU LỊCH, "Bánh không cần lò nướng", etc.) | `2172:5991`, `2172:6105`, `2172:6221`, `2172:7015`, `2172:7130`, `2172:7244`, `2172:7414`, `2172:7512`, `2172:7610`, `2172:7704` | `src/screens/FolderDetailScreen.tsx` | Same component, not seeded/verified individually — same template already confirmed pixel-accurate |
+| Activity, Home, Notebook-detail, and category-specific (HỌC TẬP/CV, DU LỊCH) demo variants | many (see `Section 9` root) | existing screens | Not audited — out of scope of this pass, which focused on the details screen |
+
 ## Legacy implementation reference
 
 | Flow | Figma node | React screen |

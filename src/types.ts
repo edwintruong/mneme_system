@@ -18,6 +18,8 @@ export interface SavedLink {
   source: string;
   /** Optional source account/site label used by Figma list rows. */
   author?: string;
+  /** Optional video-length badge shown over the folder-detail thumbnail. */
+  duration?: string;
   tags: string[];
   favorite: boolean;
   savedAt?: string;

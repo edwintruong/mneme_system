@@ -116,6 +116,32 @@ Flutter build had reached. Restoring that fidelity against section `2159:12770` 
 - Production comparison: 5.75 / 6.07 / 5.48 (6.27% over 28); residuals are limited to glyph and
   JPEG interpolation edges.
 
+## Details screen cross-checked against the Section 9 showcase demo
+
+- The user pointed at `2172:3041` ("LUỒNG SHOWCASE APP DEMO"), a separate, much larger
+  section that restages Home/Folder Detail/Activity/etc. with realistic demo content
+  (K-drama, horror, anime, study, travel folders) — a demo-video storyboard, not a new
+  design. `get_design_context` on one of its 11 `Folder Detail` frames (`2172:5877`,
+  "Phim Hàn") confirmed the component is code-identical to the already-rebuilt
+  `2159:13174`; only the demo content differs.
+- Found and fixed a real bug while wiring that content in: `FolderLinkRow`'s duration
+  badge was hardcoded to `"2:12"` for every row. Added `duration?: string` to
+  `SavedLink` and render it conditionally.
+- Found and fixed a seed-ordering regression I nearly introduced: `CategoryScreen`
+  filters by `category` alone and takes `.slice(0, 4)`, so inserting the 4 new
+  "Phim Hàn" links after the existing fixture item shifted which links populate that
+  already-verified screen. Moved the new links to the end of the array — filtering by
+  folder for `FolderDetailScreen` doesn't care about position, but `.slice(0, 4)` on
+  the full category list does.
+- Seeded the folder's remaining 4 links (exact titles/sources/tags/durations/images
+  from the node) so `2172:5877` renders as a real 5-link populated state.
+- Production comparison: 6.60 / 6.92 / 6.86 (7.66% over 28), in line with the original
+  populated Folder Detail score (6.68 / 6.71 / 6.39). Mask has no structural blocks.
+- The other 10 `Folder Detail` demo variants in Section 9 use the same verified
+  template but were not individually seeded/compared — see `kit/docs/FIGMA_MAP.md`.
+  Section 9 also contains many non-"details" screens (Activity, Home, Notebook detail
+  variants for other demo categories) that are out of scope of this pass.
+
 ## Next work
 
 1. Continue the remaining Notebook analysis/content states against their own nodes, starting with

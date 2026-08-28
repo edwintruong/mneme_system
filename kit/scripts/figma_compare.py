@@ -44,6 +44,7 @@ SCREENS = [
     ('2159:12842', 'Notebook detail', '2159_12842_notebook_detail.png', 844, 'Notebook detail'),
     ('2159:13626', 'Create notebook', '2159_13626_create_notebook.png', 844, 'Create notebook'),
     ('2159:13570', 'Select sources', '2159_13570_select_sources.png', 844, 'Select sources'),
+    ('2172:5877', 'Folder detail (Phim Hàn, showcase)', '2172_5877_folder_detail_phimhan.png', 843, 'Folder Phim Hàn'),
 ]
 
 
@@ -101,6 +102,9 @@ def capture(page, tab, height, dest):
             page.get_by_role('button', name='Sổ tay').click()
             page.get_by_role('button', name='Tạo sổ tay').click()
             page.get_by_role('button', name='Tạo từ các nội dung đã chọn').click()
+        elif tab == 'Folder Phim Hàn':
+            page.get_by_role('button', name='Phim ảnh').click()
+            page.get_by_role('button', name='Phim Hàn 24 links').click()
         else:
             page.get_by_role('button', name=tab).click()
         page.wait_for_timeout(800)

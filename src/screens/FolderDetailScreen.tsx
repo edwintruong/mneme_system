@@ -17,7 +17,9 @@ const FolderLinkRow: React.FC<{ link: SavedLink; onClick: () => void }> = ({ lin
     <span className="flex h-[112px] min-w-0 flex-1 items-center gap-[10px] rounded-[16px] bg-white p-[8px]">
       <span className="relative size-[80px] shrink-0 overflow-hidden rounded-[15px]">
         <img src={link.image} alt="" className="pointer-events-none absolute inset-0 size-full rounded-[15px] object-cover" />
-        <span className="absolute top-[58px] left-[40px] flex items-center justify-center rounded-[15px] bg-[#0e0727] px-[8px] py-[2px] text-[10px] leading-[13px] font-normal tracking-[0.06px] whitespace-nowrap text-white">2:12</span>
+        {link.duration && (
+          <span className="absolute top-[58px] left-[40px] flex items-center justify-center rounded-[15px] bg-[#0e0727] px-[8px] py-[2px] text-[10px] leading-[13px] font-normal tracking-[0.06px] whitespace-nowrap text-white">{link.duration}</span>
+        )}
       </span>
       <span className="flex h-[96px] min-w-0 flex-1 flex-col items-start justify-center gap-[8px]">
         <span className="line-clamp-2 min-h-[40px] w-full min-w-0 flex-1 text-[14px] leading-[20px] font-normal text-black underline [text-underline-position:from-font]">
