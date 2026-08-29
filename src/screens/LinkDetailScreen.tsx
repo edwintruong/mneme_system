@@ -24,6 +24,7 @@ export const LinkDetailScreen: React.FC<LinkDetailScreenProps> = ({
 }) => {
   const { toggleFavorite } = useMneme();
   const [copied, setCopied] = useState(false);
+  const [showOpenConfirm, setShowOpenConfirm] = useState(false);
 
   const details = link.details?.length ? link.details : [link.summary];
   const visibleTags = link.tags.slice(0, 3);
@@ -157,14 +158,13 @@ export const LinkDetailScreen: React.FC<LinkDetailScreenProps> = ({
       <div className="absolute -bottom-[1px] left-0 z-40 h-[102px] w-[390px] rounded-[16px] border-t border-solid border-[#f1eefc] bg-white px-[16px] py-[28px]">
         {/* The border is painted without consuming the node's 28px content offset. */}
         <div className="flex h-[46px] w-full -translate-y-px items-center gap-[16px] px-[12px]">
-          <a
-            href={link.url}
-            target="_blank"
-            rel="noopener noreferrer"
+          <button
+            type="button"
+            onClick={() => setShowOpenConfirm(true)}
             className="flex h-[46px] min-w-0 flex-1 items-center justify-center rounded-[16px] bg-[#7758e2] px-[16px] py-[12px] text-center text-[16px] leading-[22px] font-medium tracking-[-0.18px] text-white"
           >
             Mở Link
-          </a>
+          </button>
           <button
             type="button"
             onClick={() => onEdit(link)}
@@ -175,6 +175,40 @@ export const LinkDetailScreen: React.FC<LinkDetailScreenProps> = ({
           </button>
         </div>
       </div>
+
+      {showOpenConfirm && (
+        // "Open link" confirm sheet, Figma node 2159:13794.
+        <div className="fixed inset-0 z-60 flex flex-col items-center justify-end overflow-hidden bg-black/40 px-[8px] pb-[40px]">
+          <div className="flex w-[373px] flex-col items-start gap-[8px]">
+            <div className="flex w-full flex-col items-start overflow-hidden rounded-[14px] bg-[#f7f7f8]">
+              <div className="flex w-full flex-col items-start gap-[4px] border-b border-solid border-[#d9d9d9] px-[16px] pt-[16px] pb-[17px]">
+                <p className="w-full text-center text-[18px] leading-[24px] font-normal text-[#0e0727]">
+                  Bạn có chắc muốn mở liên kết này?
+                </p>
+                <p className="w-full text-center text-[14px] leading-[20px] font-normal tracking-[0.4px] text-[#9490a2]">
+                  Bạn sẽ rời khỏi ứng dụng và mở liên kết này trên trình duyệt.
+                </p>
+              </div>
+              <a
+                href={link.url}
+                target="_blank"
+                rel="noopener noreferrer"
+                onClick={() => setShowOpenConfirm(false)}
+                className="flex w-full items-center justify-center p-[16px] text-center text-[20px] leading-[24px] font-normal text-[#007aff]"
+              >
+                Mở Link
+              </a>
+            </div>
+            <button
+              type="button"
+              onClick={() => setShowOpenConfirm(false)}
+              className="flex w-full items-center justify-center rounded-[14px] bg-[#f7f7f8] p-[16px] text-center text-[20px] leading-[24px] font-normal text-[#0e0727]"
+            >
+              Hủy
+            </button>
+          </div>
+        </div>
+      )}
     </div>
   );
 };

@@ -30,33 +30,6 @@ const CATEGORY_FOLDERS: Record<string, readonly string[]> = {
   'Du lịch': ['Việt Nam', 'Nhật Bản', 'Đông Nam Á', 'Mẹo du lịch tiết kiệm'],
   'Công thức bánh': ['Bánh Âu', 'Bánh Á', 'Bánh không cần lò nướng', 'Trang trí bánh'],
 };
-const CATEGORY_FOLDER_COUNTS: Record<string, Record<string, number>> = {
-  'Học tập & Công việc': {
-    'Ngoại ngữ': 18,
-    'Kỹ năng làm việc': 15,
-    'Tài liệu học tập': 20,
-    'Công cụ AI': 12,
-  },
-  'Du lịch': {
-    'Việt Nam': 22,
-    'Nhật Bản': 14,
-    'Đông Nam Á': 16,
-    'Mẹo du lịch tiết kiệm': 11,
-  },
-  'Công thức bánh': {
-    'Bánh Âu': 16,
-    'Bánh Á': 13,
-    'Bánh không cần lò nướng': 19,
-    'Trang trí bánh': 9,
-  },
-};
-/** "Folders (6)" is exact storyboard copy rather than the number of visible tiles. */
-const CATEGORY_FOLDER_LABEL: Record<string, string> = {
-  'Học tập & Công việc': 'Folders (6)',
-  'Du lịch': 'Folders (6)',
-  'Phim ảnh': 'Folders (6)',
-  'Công thức bánh': 'Folders (6)',
-};
 /** The view-all affordance stays live by opening the first available showcased folder. */
 const CATEGORY_VIEW_ALL_FOLDER: Record<string, string> = {
   'Học tập & Công việc': 'Ngoại ngữ',
@@ -149,7 +122,10 @@ export const CategoryScreen: React.FC<CategoryScreenProps> = ({
         .filter((link): link is SavedLink => Boolean(link))
     : links.filter((link) => link.category === category.name).slice(0, 4);
   const categoryFolders = CATEGORY_FOLDERS[category.name] ?? [];
-  const folderLabel = CATEGORY_FOLDER_LABEL[category.name] ?? `Folders (${categoryFolders.length})`;
+  const categoryLinksForCounts = links.filter((link) => link.category === category.name);
+  const folderLabel = `Folders (${new Set(categoryLinksForCounts.map((link) => link.folder)).size})`;
+  const folderLinkCount = (folder: string) =>
+    categoryLinksForCounts.filter((link) => link.folder === folder).length;
   const viewAllFolder = CATEGORY_VIEW_ALL_FOLDER[category.name];
   const folderThumbnail = isStudyShowcase
     ? '/assets/images/figma_2172/2172_6335_folder.png'
@@ -233,7 +209,7 @@ export const CategoryScreen: React.FC<CategoryScreenProps> = ({
                     <FolderThumbnail source={folderThumbnail} />
                     <span className="flex min-w-0 flex-1 flex-col items-start justify-center gap-[4px] whitespace-nowrap">
                       <span className={`${truncatesFolderNames ? 'w-full truncate' : ''} text-[16px] leading-[24px] font-medium text-[#0e0727]`}>{folder}</span>
-                      <span className="text-[14px] leading-[20px] font-normal tracking-[0.4px] text-[#9490a2]">{CATEGORY_FOLDER_COUNTS[category.name]?.[folder] ?? 24} links</span>
+                      <span className="text-[14px] leading-[20px] font-normal tracking-[0.4px] text-[#9490a2]">{folderLinkCount(folder)} links</span>
                     </span>
                   </button>
                 ))}
@@ -247,7 +223,7 @@ export const CategoryScreen: React.FC<CategoryScreenProps> = ({
                     <FolderThumbnail source={folderThumbnail} />
                     <span className="flex min-w-0 flex-1 flex-col items-start justify-center gap-[4px] whitespace-nowrap">
                       <span className={`${truncatesFolderNames ? 'w-full truncate' : ''} text-[16px] leading-[24px] font-medium text-[#0e0727]`}>{folder}</span>
-                      <span className="text-[14px] leading-[20px] font-normal tracking-[0.4px] text-[#9490a2]">{CATEGORY_FOLDER_COUNTS[category.name]?.[folder] ?? 24} links</span>
+                      <span className="text-[14px] leading-[20px] font-normal tracking-[0.4px] text-[#9490a2]">{folderLinkCount(folder)} links</span>
                     </span>
                   </button>
                 ))}

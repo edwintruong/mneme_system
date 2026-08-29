@@ -175,7 +175,7 @@ export const HomeScreen: React.FC<HomeScreenProps> = ({
                   </p>
                   <div className="flex w-full items-center gap-[4px]">
                     <p className="whitespace-nowrap text-[14px] leading-[20px] font-normal tracking-[0.4px] text-[#9490a2]">
-                      {category.itemCount} mục
+                      {links.filter((link) => link.category === category.name).length} mục
                     </p>
                   </div>
                 </div>

@@ -22,7 +22,10 @@ const N2172 = '/assets/icons/figma_2172';
 
 export const FIGMA_ICONS: Record<string, IconAsset> = {
   // Navigation chrome
-  back: { src: `${FIGMA}/create_notebook_back.svg`, w: 30, h: 30, flip: true },
+  // create_notebook_back.svg is white (for CreateNotebookScreen's purple header,
+  // see 'create-notebook-back' below) — the generic back chevron needs the dark
+  // stroke variant since every other caller sits on a light background.
+  back: { src: `${N2159}/2159_13180_back.svg`, w: 30, h: 30, flip: true },
   'chevron-right': { src: `${FIGMA}/create_notebook_chevron.svg`, w: 24, h: 24 },
   dropdown: { src: `${FIGMA}/add_link_dropdown_close.svg`, w: 24, h: 24 },
   'direction-down': { src: `${FIGMA}/notebook_detail_direction_down.svg`, w: 11.5001, h: 5.50003 },
@@ -146,6 +149,19 @@ export const FIGMA_ICONS: Record<string, IconAsset> = {
   'select-progress-sources': { src: `${N2159}/2159_13570_progress_sources.svg`, w: 17.45, h: 17.45 },
   'select-progress-ai': { src: `${N2159}/2159_13570_progress_ai.svg`, w: 14.0115, h: 14.7304 },
   'select-progress-notebook': { src: `${N2159}/2159_13570_progress_notebook.svg`, w: 17.4545, h: 17.4545 },
+
+  // Notebook AI synthesis, node 2159:13602
+  'nb-synth-robot': { src: '/assets/images/figma_2159/2159_13602_ai.png', w: 159, h: 159 },
+  'nb-synth-progress-done': { src: `${N2159}/2159_13602_progress_done.svg`, w: 17.245, h: 17.245 },
+  'nb-synth-progress-active': { src: `${N2159}/2159_13602_progress_active.svg`, w: 13.8125, h: 14.5212 },
+  'nb-synth-progress-upcoming': { src: `${N2159}/2159_13602_progress_upcoming.svg`, w: 17.4545, h: 17.4545 },
+  'nb-synth-status-done': { src: `${N2159}/2159_13602_status_done_check.svg`, w: 12, h: 12 },
+  'nb-synth-status-pending': { src: `${N2159}/2159_13602_status_pending.svg`, w: 17.5, h: 18.595 },
+  'nb-synth-step-transcript': { src: `${N2159}/2159_13602_step_transcript.svg`, w: 18.6667, h: 18.6667 },
+  'nb-synth-step-topic': { src: `${N2159}/2159_13602_step_topic.svg`, w: 18.6667, h: 18.6667 },
+  'nb-synth-step-group': { src: `${N2159}/2159_13602_step_group.svg`, w: 18.6667, h: 18.6667 },
+  'nb-synth-step-synthesize': { src: `${N2159}/2159_13602_step_synthesize.svg`, w: 18.6667, h: 18.6667 },
+  'nb-synth-step-structure': { src: `${N2159}/2159_13602_step_structure.svg`, w: 18.6667, h: 18.6667 },
 
   // Status bar
   'status-right': { src: `${N2159}/2159_12771_status_right.svg`, w: 66.6612, h: 11.336 },

@@ -9,6 +9,7 @@ import { EditLinkScreen } from './screens/EditLinkScreen';
 import { AddLinkScreen } from './screens/AddLinkScreen';
 import { NotebookScreen } from './screens/NotebookScreen';
 import { SelectSourcesScreen } from './screens/SelectSourcesScreen';
+import { NotebookAnalysisScreen } from './screens/NotebookAnalysisScreen';
 import { NotebookDetailScreen } from './screens/NotebookDetailScreen';
 import { NotebookReadingScreen } from './screens/NotebookReadingScreen';
 import { AiSuggestionsScreen } from './screens/AiSuggestionsScreen';
@@ -28,8 +29,8 @@ type ScreenView =
   | { type: 'link_detail'; link: SavedLink }
   | { type: 'edit_link'; link: SavedLink }
   | { type: 'add_link'; initialFolder?: string; initialCategory?: string }
-  | { type: 'link_analysis'; url: string; folder: string; category: string }
   | { type: 'select_sources'; fromFolder: boolean }
+  | { type: 'notebook_synthesis'; sourceIds: number[] }
   | { type: 'notebook_detail'; notebook: Notebook }
   | { type: 'notebook_reading'; notebook: Notebook }
   | { type: 'ai_suggestions' }
@@ -84,7 +85,8 @@ const MnemeApp: React.FC = () => {
   const usesWhiteCanvas =
     currentView.type === 'notebook_detail' ||
     currentView.type === 'notebook_reading' ||
-    currentView.type === 'select_sources';
+    currentView.type === 'select_sources' ||
+    currentView.type === 'notebook_synthesis';
   const usesDarkCanvas = currentView.type === 'ai_suggestion_detail';
 
   const pushView = (view: ScreenView) => {
@@ -173,12 +175,23 @@ const MnemeApp: React.FC = () => {
           <SelectSourcesScreen
             fromFolder={currentView.fromFolder}
             onBack={popView}
-            onSynthesize={() => {
+            onSynthesize={(sourceIds) => pushView({ type: 'notebook_synthesis', sourceIds })}
+          />
+        );
+
+      case 'notebook_synthesis':
+        return (
+          <NotebookAnalysisScreen
+            sourceIds={currentView.sourceIds}
+            onCancel={popView}
+            onFinished={() => {
               // Showcase-only deterministic transition: the selected-source
               // frame resolves to the canonical Research notebook locally.
               // No Gemini endpoint is called on this route.
               const researchNotebook = notebooks.find((notebook) => notebook.id === 1);
-              if (researchNotebook) pushView({ type: 'notebook_detail', notebook: researchNotebook });
+              if (researchNotebook) {
+                setViewStack((prev) => [...prev.slice(0, -1), { type: 'notebook_detail', notebook: researchNotebook }]);
+              }
             }}
           />
         );

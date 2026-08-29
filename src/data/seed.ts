@@ -1568,7 +1568,8 @@ export const INITIAL_NOTEBOOKS: Notebook[] = [
     description: 'Tổng hợp kỹ thuật thiết kế Auto Layout, Design System và tối ưu component trong Figma.',
     // An 80px SVG rather than a cover photo, per node 2159:12905.
     image: '/assets/icons/figma_2159/2159_12891_notebooklm.svg',
-    itemCount: 24,
+    // Matches the "3 video" in `meta` above — not the visible outline/section count.
+    itemCount: 3,
     createdAt: '2/2/2022',
     outline: [
       {
@@ -1622,7 +1623,8 @@ export const INITIAL_NOTEBOOKS: Notebook[] = [
     summary: 'Tổng hợp món ăn nấu nhanh kèm nguyên liệu và các bước thực hiện chi tiết.',
     description: 'Những công thức nhanh gọn cho bữa tối trong tuần.',
     image: `${IMG_NB}cover_food.jpg`,
-    itemCount: 10,
+    // Matches the "5 công thức" in `meta` above.
+    itemCount: 5,
     createdAt: '2/2/2022',
     outline: [
       {
@@ -1667,7 +1669,8 @@ export const INITIAL_NOTEBOOKS: Notebook[] = [
     summary: 'Tổng hợp các mẹo dùng AI hiệu quả hơn trong công việc hằng ngày.',
     description: 'Mẹo dùng AI để tăng tốc công việc hằng ngày.',
     image: `${IMG_NB}cover_ai.jpg`,
-    itemCount: 10,
+    // Matches the "5 mẹo" in `meta` above.
+    itemCount: 5,
     createdAt: '2/2/2022',
     outline: [
       {
@@ -1711,7 +1714,8 @@ export const INITIAL_NOTEBOOKS: Notebook[] = [
     summary: 'Tổng hợp đánh giá thực tế các địa điểm du lịch nổi bật tại Việt Nam.',
     description: 'Địa điểm và trải nghiệm đáng lưu lại cho kỳ nghỉ tiếp theo.',
     image: `${IMG_NB}cover_travel.jpg`,
-    itemCount: 10,
+    // Matches the "4 địa điểm" in `meta` above.
+    itemCount: 4,
     createdAt: '2/2/2022',
     outline: [
       {
