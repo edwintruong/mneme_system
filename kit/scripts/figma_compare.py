@@ -14,6 +14,7 @@ chased in CSS.
 """
 import subprocess
 import sys
+import os
 from pathlib import Path
 
 try:
@@ -28,7 +29,7 @@ except ImportError:
 ROOT = Path(__file__).resolve().parents[2]
 REFS = ROOT / 'kit' / 'figma-refs'
 OUT = REFS / 'out'
-URL = 'http://localhost:8080/'
+URL = os.environ.get('MNEME_URL', 'http://localhost:8080/')
 CORNER_RADIUS = 40
 
 # node id -> (reference file, frame height, nav tab to click first)
@@ -68,6 +69,12 @@ SCREENS = [
     # storyboard. "Tạo sổ tay" now opens showcase node 2172:4631 directly.
     ('2172:4631', 'Select sources (showcase)', '2172_4631_select_sources.png', 844, 'Select sources'),
     ('2172:4536', 'Notebook list (showcase)', '2172_4536_notebook_list.png', 844, 'Sổ tay'),
+    ('2172:7956', 'Notebook AI banner', '2172_7956_notebook_ai_banner.png', 844, 'Sổ tay'),
+    ('2172:5336', 'AI Suggestions', '2172_5336_ai_suggestions.png', 844, 'AI Suggestions'),
+    ('2172:5510', 'AI Suggestion (Research)', '2172_5510_ai_suggestion_research.png', 844, 'AI Suggestion Research'),
+    ('2172:5409', 'AI Suggestion (Food)', '2172_5409_ai_suggestion_food.png', 844, 'AI Suggestion Food'),
+    ('2172:5614', 'AI Suggestion (AI Tips)', '2172_5614_ai_suggestion_ai_tips.png', 844, 'AI Suggestion AI Tips'),
+    ('2172:5717', 'AI Suggestion (Figma)', '2172_5717_ai_suggestion_figma.png', 844, 'AI Suggestion Figma'),
     ('2172:5877', 'Folder detail (Phim Hàn, showcase)', '2172_5877_folder_detail_phimhan.png', 843, 'Folder Phim Hàn'),
     ('2172:5991', 'Folder detail (Phim kinh dị, showcase)', '2172_5991_folder_detail_phimkinhdi.png', 843, 'Folder Phim kinh dị'),
     ('2172:6105', 'Folder detail (Phim ngắn, showcase)', '2172_6105_folder_detail_phimngan.png', 843, 'Folder Phim ngắn'),
@@ -81,6 +88,14 @@ SCREENS = [
     ('2172:7704', 'Folder detail (Trang trí bánh, showcase)', '2172_7704_folder_detail_trangtribanh.png', 837, 'Folder Trang trí bánh'),
     ('2172:4208', 'Activity',      '2172_4208_activity.png',  824, 'Hoạt động'),
 ]
+
+NODE_FILTER = {
+    node.strip()
+    for node in os.environ.get('MNEME_FIGMA_NODES', '').split(',')
+    if node.strip()
+}
+if NODE_FILTER:
+    SCREENS = [screen for screen in SCREENS if screen[0] in NODE_FILTER]
 
 
 def corner_mask(w, h):
@@ -193,6 +208,17 @@ def capture(page, tab, height, dest):
         elif tab == 'Select sources':
             page.get_by_role('button', name='Sổ tay').click()
             page.get_by_role('button', name='Tạo sổ tay').click()
+        elif tab.startswith('AI Suggestion'):
+            page.get_by_role('button', name='Sổ tay').click()
+            page.get_by_role('button', name='Cập nhật ngay').click()
+            review_targets = {
+                'AI Suggestion Research': 'Research với NotebookLM',
+                'AI Suggestion Food': 'Món ăn dễ nấu trong 15 phút',
+                'AI Suggestion AI Tips': 'AI Tips & Tricks',
+                'AI Suggestion Figma': 'Figma Tips & Tricks',
+            }
+            if tab in review_targets:
+                page.get_by_role('button', name=f'Review {review_targets[tab]}').click()
         elif tab == 'Folder Phim Hàn':
             page.get_by_role('button', name='Phim ảnh').click()
             page.get_by_role('button', name='Phim Hàn 24 links').click()

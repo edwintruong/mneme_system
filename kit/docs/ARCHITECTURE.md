@@ -52,6 +52,13 @@ existing local fallback keeps the showcase functional without a configured key.
   source-choice and analysis screens remain as legacy files but are intentionally not inserted into
   this showcase route. This transition is a deterministic local fixture: it intentionally does not
   call Gemini, which keeps the no-login showcase reliable offline.
+- The notebook AI-update storyboard is also deterministic/local: Notebook tab (`2172:7956`) →
+  “Cập nhật ngay” → suggestion list (`2172:5336`) → one data-driven review detail
+  (`2172:5510`, `5409`, `5614`, or `5717`). `AiSuggestionDetailScreen` owns the shared review
+  geometry; `src/data/aiSuggestions.ts` owns the per-notebook copy, images, scores, and reasons.
+  Review/add/ignore state never calls Gemini. Run `kit/scripts/ai_suggestions_smoke.py` after edits
+  to this route; it walks all four variants and audits scroll, image loading, text containment, and
+  `/api/gemini/*` traffic.
 - A screen must not use `overflow-hidden` to discard Figma layers below the static frame. Off-screen
   rows remain in normal scroll reach; floating actions use sticky positioning inside the phone
   viewport.

@@ -814,6 +814,42 @@ user-created notebook. The notebook smoke test injects both historical variants 
 two duplicates are deleted, an unrelated local notebook survives, and the four canonical fixtures are
 still restored.
 
+## Notebook AI Suggestions flow rebuilt (2026-08-29)
+
+Implemented the full supplied storyboard from the exact Figma nodes (the duplicated `2172:5510`
+URL maps to one screen, so it is implemented once):
+
+`2172:7956` Notebook banner → “Cập nhật ngay” → `2172:5336` Suggestions list → Review →
+`2172:5510` Research / `2172:5409` Món ăn / `2172:5614` AI Tips / `2172:5717` Figma Tips.
+
+- Rebuilt `AiSuggestionsScreen.tsx` with the exact white header/tabs, grouped Today/Yesterday cards,
+  notebook covers, “Mới” badges, scores, and Review actions. All/New/Ignored are interactive.
+- Added `AiSuggestionDetailScreen.tsx` as one shared, data-driven review layout. It renders each
+  notebook's dark header, two exact suggested resources, match percentages, three AI reasons, and
+  Add/Choose other/Ignore actions without duplicating four full-screen components.
+- Added `src/data/aiSuggestions.ts` for the four fixtures and committed the exact Figma raw image
+  assets. The one new settings glyph was exported from `2172:5336` and registered in `FigmaIcon`;
+  existing exact Figma exports were reused for the shared back/more/AI/check glyphs.
+- The route is local/fake by design and sends no Gemini request. Add changes only the local visual
+  state; Ignore returns to the list and moves the notebook into the “Đã bỏ qua” tab; “Chọn sổ tay
+  khác” returns to the Notebook tab.
+- Every screen remains in the shared phone `<main>` and exposes all below-frame resources through
+  vertical touch scrolling. Long titles, authors, URLs, and reason text wrap/truncate inside their
+  own cards instead of leaking horizontally.
+
+Added `kit/scripts/ai_suggestions_smoke.py`. Production smoke walked all four Review screens,
+confirmed `scrollHeight > clientHeight` for list and details, exercised Add and Ignore, found zero
+broken images/page errors/visible text overflow, and recorded `gemini_requests: 0`. `tsc --noEmit`
+and `npm run build` are clean.
+
+All six nodes were added to `figma_compare.py`, together with an optional `MNEME_FIGMA_NODES`
+filter for targeted reruns. Final scores are banner 4.26/4.44/3.13, list 11.31/11.71/8.75,
+Research 16.37/15.94/15.02, Food 15.62/15.24/14.32, AI Tips 15.61/15.27/14.62, and Figma
+14.87/14.43/13.72. The detail values are elevated for the same reason as Notebook Reading: many
+small text lines and JPEG edges accumulate Chrome-vs-Figma raster residuals. Side-by-side and diff
+masks show aligned headers/cards/images/buttons rather than displaced structural blocks; the
+Research reason wrap was explicitly corrected to remain inside its lavender area.
+
 ## Next work
 
 1. Add `2172:7830`, `2172:5821`, `2172:8010`, and `2172:8057` as rows in

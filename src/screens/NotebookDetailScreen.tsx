@@ -5,7 +5,6 @@ import { FigmaIcon } from '../components/common/FigmaIcon';
 interface NotebookDetailScreenProps {
   notebook: Notebook;
   onBack: () => void;
-  onOpenSuggestions: (notebook: Notebook) => void;
   onOpenReading: (notebook: Notebook) => void;
 }
 

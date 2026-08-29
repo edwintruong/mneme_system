@@ -26,12 +26,14 @@ interface NotebookScreenProps {
   onSelectNotebook: (notebook: Notebook) => void;
   onCreateNotebook: () => void;
   onOpenSearch: () => void;
+  onOpenSuggestions: () => void;
 }
 
 export const NotebookScreen: React.FC<NotebookScreenProps> = ({
   onSelectNotebook,
   onCreateNotebook,
   onOpenSearch,
+  onOpenSuggestions,
 }) => {
   const { notebooks } = useMneme();
 
@@ -99,6 +101,7 @@ export const NotebookScreen: React.FC<NotebookScreenProps> = ({
                       <div className="flex w-[100px] shrink-0 items-center">
                         <button
                           type="button"
+                          onClick={onOpenSuggestions}
                           className="flex h-[36px] w-[108px] shrink-0 items-center justify-center gap-[7.582px] overflow-hidden rounded-[16px] bg-white px-[12.131px] py-[9.098px]"
                         >
                           <span className="whitespace-nowrap text-center text-[12.13px] leading-[16.68px] font-medium tracking-[-0.18px] text-[#0e0727]">

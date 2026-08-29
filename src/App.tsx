@@ -13,12 +13,14 @@ import { SelectSourcesScreen } from './screens/SelectSourcesScreen';
 import { NotebookDetailScreen } from './screens/NotebookDetailScreen';
 import { NotebookReadingScreen } from './screens/NotebookReadingScreen';
 import { AiSuggestionsScreen } from './screens/AiSuggestionsScreen';
+import { AiSuggestionDetailScreen } from './screens/AiSuggestionDetailScreen';
 import { SearchScreen } from './screens/SearchScreen';
 import { ActivityScreen } from './screens/ActivityScreen';
 import { ProfileScreen } from './screens/ProfileScreen';
 import { FigmaIcon } from './components/common/FigmaIcon';
 import { AppErrorBoundary } from './components/common/AppErrorBoundary';
 import { AddLinkParams, MnemeCategory, SavedLink, Notebook } from './types';
+import { AiSuggestionId, getAiSuggestion } from './data/aiSuggestions';
 
 type ScreenView =
   | { type: 'tabs' }
@@ -31,7 +33,8 @@ type ScreenView =
   | { type: 'select_sources'; fromFolder: boolean }
   | { type: 'notebook_detail'; notebook: Notebook }
   | { type: 'notebook_reading'; notebook: Notebook }
-  | { type: 'ai_suggestions'; notebook: Notebook }
+  | { type: 'ai_suggestions' }
+  | { type: 'ai_suggestion_detail'; suggestionId: AiSuggestionId }
   | { type: 'search' };
 
 /** Ho Chi Minh City clock (Asia/Ho_Chi_Minh, UTC+7) for the status bar. */
@@ -67,6 +70,7 @@ const MnemeApp: React.FC = () => {
   const [currentTab, setCurrentTab] = useState<TabType>('home');
   const [viewStack, setViewStack] = useState<ScreenView[]>([{ type: 'tabs' }]);
   const [successCategory, setSuccessCategory] = useState<string | null>(null);
+  const [ignoredSuggestionIds, setIgnoredSuggestionIds] = useState<AiSuggestionId[]>([]);
   const statusBarTime = useStatusBarClock();
 
   const currentView = viewStack[viewStack.length - 1];
@@ -82,6 +86,7 @@ const MnemeApp: React.FC = () => {
     currentView.type === 'notebook_detail' ||
     currentView.type === 'notebook_reading' ||
     currentView.type === 'select_sources';
+  const usesDarkCanvas = currentView.type === 'ai_suggestion_detail';
 
   const pushView = (view: ScreenView) => {
     setViewStack((prev) => [...prev, view]);
@@ -208,7 +213,6 @@ const MnemeApp: React.FC = () => {
             key={currentView.notebook.id}
             notebook={currentView.notebook}
             onBack={popView}
-            onOpenSuggestions={(nb) => pushView({ type: 'ai_suggestions', notebook: nb })}
             onOpenReading={(nb) => pushView({ type: 'notebook_reading', notebook: nb })}
           />
         );
@@ -224,10 +228,27 @@ const MnemeApp: React.FC = () => {
       case 'ai_suggestions':
         return (
           <AiSuggestionsScreen
-            notebook={currentView.notebook}
+            ignoredIds={ignoredSuggestionIds}
             onBack={popView}
+            onReview={(suggestionId) => pushView({ type: 'ai_suggestion_detail', suggestionId })}
           />
         );
+
+      case 'ai_suggestion_detail': {
+        const suggestion = getAiSuggestion(currentView.suggestionId);
+        if (!suggestion) return null;
+        return (
+          <AiSuggestionDetailScreen
+            suggestion={suggestion}
+            onBack={popView}
+            onChooseNotebook={() => resetToTabs('notebook')}
+            onIgnore={() => {
+              setIgnoredSuggestionIds((current) => current.includes(suggestion.id) ? current : [...current, suggestion.id]);
+              popView();
+            }}
+          />
+        );
+      }
 
       case 'search':
         return (
@@ -256,6 +277,7 @@ const MnemeApp: React.FC = () => {
                 onSelectNotebook={(nb) => pushView({ type: 'notebook_detail', notebook: nb })}
                 onCreateNotebook={() => pushView({ type: 'select_sources', fromFolder: false })}
                 onOpenSearch={() => pushView({ type: 'search' })}
+                onOpenSuggestions={() => pushView({ type: 'ai_suggestions' })}
               />
             );
           case 'activity':
@@ -273,16 +295,16 @@ const MnemeApp: React.FC = () => {
         The Figma frame carries px-20, which is why the status bar is 350 wide and
         starts at x=20 while Content is a full 390 and overflows that padding.
       */}
-      <div className={`relative flex h-screen w-full flex-col items-center overflow-hidden px-[20px] sm:h-[856px] sm:w-[390px] sm:rounded-[40px] sm:shadow-[0_30px_70px_-20px_rgba(0,0,0,0.55)] ${usesWhiteCanvas ? 'bg-white' : 'bg-[#f8f6fd]'}`}>
+      <div className={`relative flex h-screen w-full flex-col items-center overflow-hidden px-[20px] sm:h-[856px] sm:w-[390px] sm:rounded-[40px] sm:shadow-[0_30px_70px_-20px_rgba(0,0,0,0.55)] ${usesDarkCanvas ? 'bg-[#2e1442]' : usesWhiteCanvas ? 'bg-white' : 'bg-[#f8f6fd]'}`}>
         {/* iOS UI/Status Bar. Same layout on every screen: live Ho Chi Minh City clock, left. */}
-        <div className={`relative h-[44px] shrink-0 overflow-hidden select-none ${usesWhiteCanvas ? 'w-[390px]' : 'w-full'}`}>
+        <div className={`relative h-[44px] shrink-0 overflow-hidden select-none ${usesWhiteCanvas || usesDarkCanvas ? 'w-[390px]' : 'w-full'} ${usesDarkCanvas ? 'bg-[#2e1442]' : ''}`}>
           <p
-            className="absolute top-[13px] left-[24px] h-[20px] w-[54px] text-center font-['Inter',sans-serif] text-[15px] leading-[20px] font-semibold tracking-[-0.5px] text-[#161718]"
+            className={`absolute top-[13px] left-[24px] h-[20px] w-[54px] text-center font-['Inter',sans-serif] text-[15px] leading-[20px] font-semibold tracking-[-0.5px] ${usesDarkCanvas ? 'text-white' : 'text-[#161718]'}`}
           >
             {statusBarTime}
           </p>
           <div className="absolute top-[17.33px] right-[18.67px] flex">
-            <FigmaIcon name="status-right" />
+            <FigmaIcon name="status-right" color={usesDarkCanvas ? '#ffffff' : undefined} />
           </div>
         </div>
 
@@ -313,7 +335,7 @@ const MnemeApp: React.FC = () => {
           of the 844-tall frames. It draws over the navigation bar, so it must
           come after it.
         */}
-        <div className={`pointer-events-none absolute bottom-[8px] left-1/2 z-50 h-[5px] w-[144px] -translate-x-1/2 rounded-full ${usesWhiteCanvas ? 'bg-black' : 'bg-[#3c3c432e]'}`} />
+        <div className={`pointer-events-none absolute bottom-[8px] left-1/2 z-50 h-[5px] w-[144px] -translate-x-1/2 rounded-full ${usesWhiteCanvas || usesDarkCanvas ? 'bg-black' : 'bg-[#3c3c432e]'}`} />
       </div>
     </div>
   );

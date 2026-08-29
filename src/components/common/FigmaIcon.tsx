@@ -157,6 +157,12 @@ export const FIGMA_ICONS: Record<string, IconAsset> = {
   // Distinct from `notebook-detail-edit` (a solid pencil glyph for the dark
   // cover) — this is an outline edit-in-rectangle glyph for the white header.
   'notebook-reading-edit': { src: `${N2172}/2172_4589_edit_rectangle.svg`, w: 24, h: 24 },
+
+  // AI Suggestions list/detail, nodes 2172:5336, 5409, 5510, 5614, 5717.
+  'ai-suggestions-settings': { src: `${N2172}/2172_5336_settings.svg`, w: 28, h: 28 },
+  'ai-suggestions-back': { src: `${FIGMA}/ai_suggestions_dropdown_close.svg`, w: 30, h: 30 },
+  'ai-suggestions-more': { src: `${FIGMA}/ai_suggestions_more_vertical.svg`, w: 2.5, h: 12.5 },
+  'ai-suggestions-check': { src: `${FIGMA}/ai_suggestions_radio.svg`, w: 18.6667, h: 18.6667 },
 };
 
 export interface FigmaIconProps {

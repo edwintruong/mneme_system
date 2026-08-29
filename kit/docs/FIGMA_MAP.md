@@ -22,7 +22,7 @@ Active source-of-truth section: `2159:12770`. Section `2143:4235` is legacy refe
 | Source selection | `2159:13570` | `src/screens/SelectSourcesScreen.tsx` | Superseded — the screen's only reachable path now renders showcase node `2172:4631`'s content instead of this node's lorem-ipsum rows; see Section 9 table |
 | AI analysis | `2159:13602` | `src/screens/NotebookAnalysisScreen.tsx` | Legacy, intentionally unreachable in the direct `4536 → 4631 → 7907` showcase route |
 | Notebook content | `2159:13374` | `src/screens/NotebookDetailScreen.tsx` | Pending state |
-| AI suggestions list | `2159:13407` | `src/screens/AiSuggestionsScreen.tsx` | Legacy UI pending rebuild |
+| AI suggestions list | `2159:13407` | `src/screens/AiSuggestionsScreen.tsx` | Superseded by the active showcase node `2172:5336` |
 | AI suggestion detail | `2159:13479` | pending | Pending |
 | Search empty | `2159:13796` | `src/screens/SearchScreen.tsx` | Legacy UI pending rebuild |
 | Search results | `2159:13747`, `2159:13763` | `src/screens/SearchScreen.tsx` | Pending variants |
@@ -105,6 +105,12 @@ Detail); `id:152/153/154` are the Folder Detail-only item-1 records. See
 | Add link to category (Du lịch/Kyoto preset) | `2172:8010` | `src/screens/AddLinkScreen.tsx` | Complete — `initialCategory` prop swaps in the exact Kyoto preset and skips Gemini analysis via `addLink({ preset })`. Screenshot-verified, not yet in `figma_compare.py` |
 | Home add-link toast (category variant) | `2172:8057` | `src/screens/HomeScreen.tsx` | Complete — replaces old dismissable toast with `Đã thêm vào category "…"` + `Mở` action. Screenshot-verified, not yet in `figma_compare.py` |
 | Notebook list (showcase) | `2172:4536` | `src/screens/NotebookScreen.tsx` | Complete — 4.26 / 4.44 / 3.13, 4.69% over 28. Pixel-duplicate of `2159:12891` except one word ("15’" vs "15 phút"); fixed in `INITIAL_NOTEBOOKS`, see `docs/PROGRESS.md` |
+| Notebook list with AI update banner | `2172:7956` | `src/screens/NotebookScreen.tsx` | Complete — “Cập nhật ngay” now opens the live Suggestions route; 4.26 / 4.44 / 3.13, 4.69% over 28 |
+| AI Suggestions list | `2172:5336` | `src/screens/AiSuggestionsScreen.tsx` | Complete — grouped cards, live All/New/Ignored tabs, and Review navigation; 11.31 / 11.71 / 8.75, 8.90% over 28 |
+| AI Suggestion Review — Research | `2172:5510` | `src/screens/AiSuggestionDetailScreen.tsx` | Complete — 16.37 / 15.94 / 15.02, 11.49% over 28; text/JPEG-heavy residual without displaced layout blocks |
+| AI Suggestion Review — Món ăn | `2172:5409` | `src/screens/AiSuggestionDetailScreen.tsx` | Complete — 15.62 / 15.24 / 14.32, 10.25% over 28 |
+| AI Suggestion Review — AI Tips & Tricks | `2172:5614` | `src/screens/AiSuggestionDetailScreen.tsx` | Complete — 15.61 / 15.27 / 14.62, 10.74% over 28 |
+| AI Suggestion Review — Figma Tips & Tricks | `2172:5717` | `src/screens/AiSuggestionDetailScreen.tsx` | Complete — 14.87 / 14.43 / 13.72, 10.26% over 28 |
 | Select sources for notebook (showcase) | `2172:4631` | `src/screens/SelectSourcesScreen.tsx` | Complete — active direct route from `2172:4536`; static viewport remains 5.57 / 5.90 / 5.21, while rows 5–6 are now reachable by touch scroll and the CTA stays sticky |
 | Notebook detail (showcase) | `2172:7907` | `src/screens/NotebookDetailScreen.tsx` | Complete — direct local/fake-AI transition from `2172:4631`, no Gemini request. Persisted pre-outline notebooks are migrated before render to prevent the former blank-screen crash |
 | Notebook Mục lục — Research | `2172:4487` | `src/screens/NotebookDetailScreen.tsx` | Complete — 5.45 / 5.17 / 4.51, 6.02% over 28. Pixel-duplicate of `2159:12842`/`2172:7907` |
