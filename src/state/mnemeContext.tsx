@@ -1,5 +1,5 @@
 import React, { createContext, useContext, useState, useEffect } from 'react';
-import { MnemeCategory, SavedLink, Notebook, AiExecutionResult } from '../types';
+import { MnemeCategory, SavedLink, Notebook, NotebookOutlineItem, AiExecutionResult, AddLinkParams } from '../types';
 import {
   CAKE_SHOWCASE_LINK_IDS,
   HOME_CATEGORY_IDS,
@@ -19,7 +19,7 @@ interface MnemeContextType {
   folders: string[];
   links: SavedLink[];
   notebooks: Notebook[];
-  addLink: (params: { url: string; category?: string; folder?: string }) => Promise<AiExecutionResult<SavedLink>>;
+  addLink: (params: AddLinkParams) => Promise<AiExecutionResult<SavedLink>>;
   updateLink: (id: number, updates: { title?: string; folder?: string; tags?: string[] }) => void;
   deleteLink: (id: number) => void;
   deleteLinks: (ids: number[]) => void;
@@ -108,26 +108,96 @@ const migrateSavedLinks = (links: SavedLink[]): SavedLink[] => {
   return [...normalized, ...missing];
 };
 
+/**
+ * Notebook gained `meta`, `summary`, and `outline` after the first localStorage
+ * schema shipped. Never trust an old persisted record to satisfy today's
+ * TypeScript interface: storage is untyped at runtime and a missing outline
+ * previously crashed NotebookDetailScreen into a blank page.
+ */
+const migrateSavedNotebooks = (notebooks: Partial<Notebook>[]): Notebook[] => {
+  const normalizeLegacyTitle = (title: unknown) => typeof title === 'string'
+    ? title
+        .normalize('NFD')
+        .replace(/[\u0300-\u036f]/g, '')
+        .toLowerCase()
+        .replace(/[^a-z0-9]+/g, ' ')
+        .trim()
+    : '';
+  // Two copies of this notebook were produced by the retired Gemini showcase
+  // flow. They are not user-authored content and must not survive hydration.
+  const retainedNotebooks = notebooks.filter(
+    (notebook) => normalizeLegacyTitle(notebook.title) !== 'self care tong hop',
+  );
+  const canonical = new Map(INITIAL_NOTEBOOKS.map((notebook) => [notebook.id, notebook]));
+  const present = new Set(retainedNotebooks.map((notebook) => notebook.id));
+  const normalized = retainedNotebooks.flatMap((notebook, index): Notebook[] => {
+    const fixture = typeof notebook.id === 'number' ? canonical.get(notebook.id) : undefined;
+    if (fixture) return [{ ...notebook, ...fixture }];
+
+    const sections = Array.isArray(notebook.sections) ? notebook.sections : [];
+    const outline = Array.isArray(notebook.outline)
+      ? notebook.outline
+      : sections.map((section, sectionIndex) => ({
+          number: `${sectionIndex + 1}.`,
+          title: section.title,
+          body: section.body,
+        }));
+    const description = typeof notebook.description === 'string'
+      ? notebook.description
+      : 'Sổ tay được lưu trên thiết bị.';
+
+    return [{
+      id: typeof notebook.id === 'number' ? notebook.id : Date.now() + index,
+      title: typeof notebook.title === 'string' ? notebook.title : 'Sổ tay',
+      meta: typeof notebook.meta === 'string'
+        ? notebook.meta
+        : `${typeof notebook.itemCount === 'number' ? notebook.itemCount : sections.length} nguồn - Tổng hợp bởi AI`,
+      summary: typeof notebook.summary === 'string' ? notebook.summary : description,
+      description,
+      image: typeof notebook.image === 'string'
+        ? notebook.image
+        : '/assets/images/figma_2159/2159_12771_category_study.jpg',
+      itemCount: typeof notebook.itemCount === 'number' ? notebook.itemCount : sections.length,
+      sections,
+      outline,
+      createdAt: notebook.createdAt,
+    }];
+  });
+  const missing = INITIAL_NOTEBOOKS.filter((notebook) => !present.has(notebook.id));
+  return [...normalized, ...missing];
+};
+
+/** Runtime-safe localStorage boundary: malformed or non-array JSON falls back
+ * to canonical seed data instead of taking down the entire React tree. */
+const readSavedArray = <T,>(
+  key: string,
+  fallback: T[],
+  migrate?: (items: T[]) => T[],
+): T[] => {
+  try {
+    const raw = localStorage.getItem(key);
+    if (!raw) return fallback;
+    const parsed: unknown = JSON.parse(raw);
+    if (!Array.isArray(parsed)) return fallback;
+    return migrate ? migrate(parsed as T[]) : parsed as T[];
+  } catch {
+    localStorage.removeItem(key);
+    return fallback;
+  }
+};
+
 export const MnemeProvider: React.FC<{ children: React.ReactNode }> = ({ children }) => {
-  const [categories, setCategories] = useState<MnemeCategory[]>(() => {
-    const saved = localStorage.getItem(STORAGE_KEYS.CATEGORIES);
-    return saved ? migrateSavedCategories(JSON.parse(saved)) : INITIAL_CATEGORIES;
-  });
+  const [categories, setCategories] = useState<MnemeCategory[]>(() =>
+    readSavedArray(STORAGE_KEYS.CATEGORIES, INITIAL_CATEGORIES, migrateSavedCategories));
 
-  const [folders, setFolders] = useState<string[]>(() => {
-    const saved = localStorage.getItem(STORAGE_KEYS.FOLDERS);
-    return saved ? JSON.parse(saved) : INITIAL_FOLDERS;
-  });
+  const [folders, setFolders] = useState<string[]>(() =>
+    readSavedArray(STORAGE_KEYS.FOLDERS, INITIAL_FOLDERS));
 
-  const [links, setLinks] = useState<SavedLink[]>(() => {
-    const saved = localStorage.getItem(STORAGE_KEYS.LINKS);
-    return saved ? migrateSavedLinks(JSON.parse(saved)) : INITIAL_LINKS;
-  });
+  const [links, setLinks] = useState<SavedLink[]>(() =>
+    readSavedArray(STORAGE_KEYS.LINKS, INITIAL_LINKS, migrateSavedLinks));
 
-  const [notebooks, setNotebooks] = useState<Notebook[]>(() => {
-    const saved = localStorage.getItem(STORAGE_KEYS.NOTEBOOKS);
-    return saved ? JSON.parse(saved) : INITIAL_NOTEBOOKS;
-  });
+  const [notebooks, setNotebooks] = useState<Notebook[]>(() =>
+    readSavedArray<Partial<Notebook>>(STORAGE_KEYS.NOTEBOOKS, INITIAL_NOTEBOOKS, migrateSavedNotebooks) as Notebook[]);
 
   // Sync to local storage
   useEffect(() => {
@@ -173,16 +243,15 @@ export const MnemeProvider: React.FC<{ children: React.ReactNode }> = ({ childre
     url,
     category = 'Design',
     folder = 'UI/UX',
-  }: {
-    url: string;
-    category?: string;
-    folder?: string;
-  }): Promise<AiExecutionResult<SavedLink>> => {
+    preset,
+  }: AddLinkParams): Promise<AiExecutionResult<SavedLink>> => {
     let usedGemini = false;
     let fallbackReason: string | undefined;
     let draftData: any = null;
 
-    try {
+    // A preview that has already been resolved in the showcase is saved as-is.
+    // Other entry points keep using the existing Gemini/fallback analysis path.
+    if (!preset) try {
       const res = await fetch('/api/gemini/analyze-url', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
@@ -214,14 +283,16 @@ export const MnemeProvider: React.FC<{ children: React.ReactNode }> = ({ childre
 
     const newLink: SavedLink = {
       id: Date.now(),
-      title: draftData?.title || (url.includes('design-system') ? 'How to build a design system' : 'Nội dung liên kết mới'),
+      title: preset?.title || draftData?.title || (url.includes('design-system') ? 'How to build a design system' : 'Nội dung liên kết mới'),
       url: url,
-      summary: draftData?.summary || 'Nội dung được Mneme phân tích và tự động sắp xếp để bạn xem lại nhanh chóng.',
+      summary: preset?.summary || draftData?.summary || 'Nội dung được Mneme phân tích và tự động sắp xếp để bạn xem lại nhanh chóng.',
       category: resolvedCategory,
       folder: resolvedFolder,
-      image: getImageForCategory(resolvedCategory),
-      source: draftData?.source || getSourceFromUrl(url),
-      tags: draftData?.tags || ['Design', 'AutoLayout'],
+      image: preset?.image || getImageForCategory(resolvedCategory),
+      source: preset?.source || draftData?.source || getSourceFromUrl(url),
+      author: preset?.author,
+      duration: preset?.duration,
+      tags: preset?.tags || draftData?.tags || ['Design', 'AutoLayout'],
       favorite: false,
       savedAt: 'Vừa xong',
     };
@@ -305,14 +376,26 @@ export const MnemeProvider: React.FC<{ children: React.ReactNode }> = ({ childre
       title: s.title,
       body: s.summary,
     }));
+    // No Figma node covers freshly AI-generated notebooks; derive a Mục lục
+    // outline from the same sections so NotebookDetailScreen has real content
+    // instead of falling back to another notebook's hardcoded outline.
+    const outline: NotebookOutlineItem[] = sections.map((s: { title: string; body: string }, index: number) => ({
+      number: `${index + 1}.`,
+      title: s.title,
+      body: s.body,
+    }));
+    const description = notebookDraft?.description || 'Sổ tay AI tổng hợp từ các nội dung đã chọn.';
 
     const newNotebook: Notebook = {
       id: Date.now(),
       title: notebookDraft?.title || `${selected[0]?.folder || 'Kiến thức'} · Tổng hợp`,
-      description: notebookDraft?.description || 'Sổ tay AI tổng hợp từ các nội dung đã chọn.',
+      meta: `${selected.length} nguồn - Tổng hợp bởi AI`,
+      summary: description,
+      description,
       image: selected[0]?.image || '/assets/images/figma_2159/2159_12771_category_study.jpg',
       itemCount: selected.length,
       sections,
+      outline,
       createdAt: 'Hôm nay',
     };
 

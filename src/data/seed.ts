@@ -1546,15 +1546,59 @@ export const INITIAL_LINKS: SavedLink[] = [
   },
 ];
 
+/**
+ * Notebook detail outlines, Figma nodes 2172:4487/4589 (Research), 2172:5069/5216
+ * (Món ăn), 2172:5118/5256 (AI Tips), 2172:5167/5296 (Travel). Each notebook has
+ * two node states: the Mục lục (TOC) screen — all four numbered items, item "2."
+ * expanded with its sub-items by default — and the "Xem sổ tay" reading screen,
+ * which is a SEPARATE screen (own header/back target), not a scrolled state of
+ * the TOC. The reading screen renders only items/sub-items that carry `body`
+ * here: item "1.", item "2.", and item "2."'s first two sub-items — items "3."
+ * and "4." and the third sub-item never get a `body` in any of the four nodes,
+ * so they show in the TOC only. Sub-item numbers show as "2.1" in the TOC and
+ * "2.1 ." (trailing space + dot) in the reading screen — both literal to their
+ * own node's text.
+ */
 export const INITIAL_NOTEBOOKS: Notebook[] = [
   {
     id: 1,
     title: 'Research với NotebookLM',
+    meta: '3 video - 12 phút đọc',
+    summary: 'Gợi ý cách đưa NotebookLM vào quy trình đọc, research và xử lý thông tin hằng ngày.',
     description: 'Tổng hợp kỹ thuật thiết kế Auto Layout, Design System và tối ưu component trong Figma.',
     // An 80px SVG rather than a cover photo, per node 2159:12905.
     image: '/assets/icons/figma_2159/2159_12891_notebooklm.svg',
     itemCount: 24,
-    createdAt: '2/2/2026',
+    createdAt: '2/2/2022',
+    outline: [
+      {
+        number: '1.',
+        title: 'Chuẩn bị nguồn research',
+        body: 'Trước khi bắt đầu, hãy gom các nguồn liên quan đến cùng một chủ đề vào một nơi. Nguồn có thể là video, bài viết, tài liệu hoặc ghi chú đã lưu trước đó. \nĐiểm quan trọng là không chọn quá nhiều nguồn rời rạc. Hãy ưu tiên những nội dung trả lời cùng một câu hỏi research, để AI có đủ ngữ cảnh và không bị phân tán khi tổng hợp.',
+      },
+      {
+        number: '2.',
+        title: 'Hỏi AI để rút insight',
+        body: 'Sau khi đã có nguồn, bước tiếp theo là dùng AI để đọc, tóm tắt và tìm ra các điểm đáng chú ý. Thay vì hỏi quá chung chung, nên đặt câu hỏi rõ ràng: mình muốn hiểu điều gì, cần so sánh gì, hoặc cần rút ra kết luận nào.',
+        defaultExpanded: true,
+        subItems: [
+          {
+            number: '2.1',
+            title: 'Tóm tắt từng nguồn',
+            body: 'Sau khi đã có nguồn, bước tiếp theo là dùng AI để đọc, tóm tắt và tìm ra các điểm đáng chú ý. Thay vì hỏi quá chung chung, nên đặt câu hỏi rõ ràng: mình muốn hiểu điều gì, cần so sánh gì, hoặc cần rút ra kết luận nào.',
+          },
+          {
+            number: '2.2',
+            title: 'So sánh các quan điểm',
+            body: 'Sau khi hiểu từng nguồn, hãy yêu cầu AI so sánh chúng với nhau. Nguồn nào có cùng quan điểm, nguồn nào bổ sung góc nhìn mới, và nguồn nào đưa ra thông tin khác biệt? \n\nBước này giúp research không chỉ dừng ở việc gom thông tin, mà bắt đầu tạo ra góc nhìn rõ hơn.',
+          },
+          // The node repeats "2.2" for the third sub-item rather than "2.3"; kept as-is.
+          { number: '2.2', title: 'Tìm pattern lặp lại' },
+        ],
+      },
+      { number: '3.', title: 'Biến kết quả thành ghi chú' },
+      { number: '4.', title: 'Ứng dụng vào công việc' },
+    ],
     sections: [
       {
         title: 'Auto Layout cơ bản và nâng cao',
@@ -1572,11 +1616,42 @@ export const INITIAL_NOTEBOOKS: Notebook[] = [
   },
   {
     id: 2,
-    title: 'Món ăn dễ nấu trong 15 phút',
+    // Node 2172:4536 abbreviates "phút" as "’" in the list row; kept as-is.
+    title: 'Món ăn dễ nấu trong 15’',
+    meta: '5 công thức - 8 phút đọc',
+    summary: 'Tổng hợp món ăn nấu nhanh kèm nguyên liệu và các bước thực hiện chi tiết.',
     description: 'Những công thức nhanh gọn cho bữa tối trong tuần.',
     image: `${IMG_NB}cover_food.jpg`,
     itemCount: 10,
-    createdAt: '15/1/2026',
+    createdAt: '2/2/2022',
+    outline: [
+      {
+        number: '1.',
+        title: 'Mì xào hải sản 10 phút',
+        body: 'Nguyên liệu: 1 gói mì trứng, 150g tôm hoặc mực, 1 quả trứng, hành lá, tỏi băm, dầu hào và nước tương.\nCách làm: Trụng mì qua nước sôi cho vừa chín tới rồi để ráo. Phi thơm tỏi, cho hải sản vào xào săn, thêm mì vào đảo đều cùng dầu hào và nước tương khoảng 3 phút, cuối cùng cho trứng và hành lá vào đảo nhanh tay trước khi tắt bếp.',
+      },
+      {
+        number: '2.',
+        title: 'Salad ức gà giảm cân',
+        body: 'Nguyên liệu: 150g ức gà, xà lách, cà chua bi, dưa leo, sốt mè rang hoặc dầu ô liu.\nCách làm: Áp chảo ức gà với chút dầu ô liu đến khi chín vàng hai mặt, để nguội rồi xé sợi. Trộn đều cùng rau củ đã rửa sạch, rưới sốt lên trên trước khi ăn.',
+        defaultExpanded: true,
+        subItems: [
+          {
+            number: '2.1',
+            title: 'Nguyên liệu cần chuẩn bị',
+            body: '150g ức gà, nửa quả dưa leo, vài quả cà chua bi, xà lách và sốt mè rang hoặc dầu ô liu tuỳ khẩu vị.',
+          },
+          {
+            number: '2.2',
+            title: 'Các bước thực hiện',
+            body: 'Áp chảo ức gà đến khi chín vàng hai mặt, để nguội rồi xé sợi. Trộn đều cùng rau củ, thêm sốt và có thể rắc thêm hạt óc chó hoặc hạt chia để tăng độ giòn.\n\nCó thể chuẩn bị trước tối hôm trước và để trong tủ lạnh, sáng hôm sau chỉ cần trộn sốt là dùng được ngay.',
+          },
+          { number: '2.3', title: 'Mẹo để salad không bị ra nước' },
+        ],
+      },
+      { number: '3.', title: 'Trứng cuộn phô mai kiểu Hàn' },
+      { number: '4.', title: 'Cơm chiên trứng nhanh gọn' },
+    ],
     sections: [
       {
         title: 'Bữa tối 15 phút',
@@ -1588,10 +1663,40 @@ export const INITIAL_NOTEBOOKS: Notebook[] = [
     // The design ships this title with a leading space; kept as-is.
     id: 3,
     title: ' AI Tips & Tricks',
+    meta: '5 mẹo - 6 phút đọc',
+    summary: 'Tổng hợp các mẹo dùng AI hiệu quả hơn trong công việc hằng ngày.',
     description: 'Mẹo dùng AI để tăng tốc công việc hằng ngày.',
     image: `${IMG_NB}cover_ai.jpg`,
     itemCount: 10,
-    createdAt: '10/1/2026',
+    createdAt: '2/2/2022',
+    outline: [
+      {
+        number: '1.',
+        title: 'Viết prompt rõ ràng, có ngữ cảnh',
+        body: 'Thay vì hỏi chung chung, hãy nêu rõ vai trò, mục tiêu và định dạng câu trả lời mong muốn. Ví dụ: thay vì hỏi “viết email”, hãy hỏi “viết email xin nghỉ phép 2 ngày, giọng lịch sự, gửi cho quản lý trực tiếp”. Prompt càng cụ thể, kết quả AI trả về càng sát với nhu cầu thực tế.',
+      },
+      {
+        number: '2.',
+        title: 'Dùng AI để tóm tắt tài liệu dài',
+        body: 'Dán nội dung tài liệu, bài báo hoặc ghi chú dài vào AI và yêu cầu tóm tắt theo gạch đầu dòng hoặc theo từng phần. Cách này giúp nắm ý chính trong vài giây thay vì phải đọc hết toàn bộ nội dung.',
+        defaultExpanded: true,
+        subItems: [
+          {
+            number: '2.1',
+            title: 'Yêu cầu AI trả lời theo từng bước',
+            body: 'Khi cần làm theo hướng dẫn, hãy yêu cầu AI liệt kê từng bước cụ thể thay vì viết một đoạn văn dài. Cách này giúp dễ theo dõi và không bỏ sót thao tác nào khi thực hiện.',
+          },
+          {
+            number: '2.2',
+            title: 'Giới hạn độ dài câu trả lời',
+            body: 'Thêm yêu cầu như “trả lời trong 3 câu” hoặc “tối đa 100 từ” để AI đi thẳng vào trọng tâm, tránh những đoạn giải thích dài dòng không cần thiết.\n\nMẹo này đặc biệt hữu ích khi cần câu trả lời nhanh để dùng ngay trong công việc.',
+          },
+          { number: '2.3', title: 'Kiểm tra lại thông tin AI đưa ra' },
+        ],
+      },
+      { number: '3.', title: 'Lưu và tái sử dụng prompt hay' },
+      { number: '4.', title: 'Nhờ AI đóng vai chuyên gia khi cần' },
+    ],
     sections: [
       {
         title: 'Prompt hiệu quả',
@@ -1602,10 +1707,40 @@ export const INITIAL_NOTEBOOKS: Notebook[] = [
   {
     id: 4,
     title: 'Đánh giá địa điểm du lịch',
+    meta: '4 địa điểm - 10 phút đọc',
+    summary: 'Tổng hợp đánh giá thực tế các địa điểm du lịch nổi bật tại Việt Nam.',
     description: 'Địa điểm và trải nghiệm đáng lưu lại cho kỳ nghỉ tiếp theo.',
     image: `${IMG_NB}cover_travel.jpg`,
     itemCount: 10,
-    createdAt: '5/1/2026',
+    createdAt: '2/2/2022',
+    outline: [
+      {
+        number: '1.',
+        title: 'Đà Lạt - thành phố ngàn hoa',
+        body: 'Đà Lạt phù hợp cho chuyến đi 2-3 ngày, khí hậu mát mẻ quanh năm. Các điểm nên ghé gồm Hồ Xuân Hương, đồi chè Cầu Đất, vườn hoa thành phố và các quán cà phê view đồi. Nên tránh cuối tuần và dịp lễ Tết vì giá phòng tăng cao và khá đông khách.',
+      },
+      {
+        number: '2.',
+        title: 'Phú Quốc - thiên đường biển đảo',
+        body: 'Phú Quốc có nhiều bãi biển đẹp như Bãi Sao, Bãi Dài, phù hợp cho các hoạt động lặn ngắm san hô và tắm biển. Nên thuê xe máy hoặc taxi để chủ động di chuyển giữa các bãi biển và khu vui chơi.',
+        defaultExpanded: true,
+        subItems: [
+          {
+            number: '2.1',
+            title: 'Thời điểm nên đi',
+            body: 'Từ tháng 11 đến tháng 4 là mùa khô, biển lặng và ít mưa, thích hợp nhất để tắm biển và tham gia các tour đảo.',
+          },
+          {
+            number: '2.2',
+            title: 'Chi phí tham khảo',
+            body: 'Chi phí trung bình cho 3 ngày 2 đêm dao động 3-5 triệu đồng/người, bao gồm vé máy bay, khách sạn tầm trung và các bữa ăn hải sản.\n\nNên đặt phòng trước ít nhất 2 tuần vào mùa cao điểm để có giá tốt hơn.',
+          },
+          { number: '2.3', title: 'Kinh nghiệm di chuyển giữa các bãi biển' },
+        ],
+      },
+      { number: '3.', title: 'Hội An - phố cổ về đêm' },
+      { number: '4.', title: 'Kinh nghiệm đặt homestay' },
+    ],
     sections: [
       {
         title: 'Lịch trình Đà Lạt 3N2Đ',

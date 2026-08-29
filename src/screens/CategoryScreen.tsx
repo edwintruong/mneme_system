@@ -14,6 +14,7 @@ interface CategoryScreenProps {
   onBack: () => void;
   onSelectFolder: (folderName: string) => void;
   onSelectLink: (link: SavedLink) => void;
+  onAddLink: (category: MnemeCategory) => void;
 }
 
 const FILTERS = ['Tất cả', 'Bài viết', 'Video', 'Ảnh'] as const;
@@ -94,16 +95,16 @@ const CategoryLinkRow: React.FC<{ link: SavedLink; onClick: () => void; exactMet
         <span className="line-clamp-2 min-h-[40px] w-full min-w-0 flex-1 text-[14px] leading-[20px] font-normal text-black underline [text-underline-position:from-font]">
           {link.title}
         </span>
-        <span className="flex w-full shrink-0 items-center gap-[4px] text-[12px] leading-[16px] font-normal tracking-[0.4px] whitespace-nowrap text-[#9490a2]">
-          <span>{exactMetadata ? link.source : 'TikTok'}</span>
+        <span className="flex w-full shrink-0 items-center gap-[4px] overflow-hidden text-[12px] leading-[16px] font-normal tracking-[0.4px] whitespace-nowrap text-[#9490a2]">
+          <span className="shrink-0">{exactMetadata ? link.source : 'TikTok'}</span>
           <FigmaIcon name="category-dot" />
-          <span>{exactMetadata ? link.author : '@abcdef'}</span>
+          <span className="min-w-0 truncate">{exactMetadata ? link.author : '@abcdef'}</span>
         </span>
-        <span className="flex shrink-0 items-start gap-[8px]">
-          <span className="flex shrink-0 items-center justify-center rounded-[24px] bg-[#f2f2f3] px-[12px] py-[4px] text-[12px] leading-[16px] font-normal whitespace-nowrap text-[#0e0727]">
+        <span className="flex w-full shrink-0 items-start gap-[8px] overflow-hidden">
+          <span className="flex min-w-0 items-center justify-center truncate rounded-[24px] bg-[#f2f2f3] px-[12px] py-[4px] text-[12px] leading-[16px] font-normal whitespace-nowrap text-[#0e0727]">
             {link.tags[0]}
           </span>
-          <span className="flex shrink-0 items-center justify-center rounded-[24px] bg-[#f1eefc] px-[12px] py-[4px] text-[12px] leading-[16px] font-normal whitespace-nowrap text-[#7758e2]">
+          <span className="flex min-w-0 items-center justify-center truncate rounded-[24px] bg-[#f1eefc] px-[12px] py-[4px] text-[12px] leading-[16px] font-normal whitespace-nowrap text-[#7758e2]">
             {link.tags[1]}
           </span>
         </span>
@@ -121,6 +122,7 @@ export const CategoryScreen: React.FC<CategoryScreenProps> = ({
   onBack,
   onSelectFolder,
   onSelectLink,
+  onAddLink,
 }) => {
   const { links, addFolder } = useMneme();
   const [filter, setFilter] = useState<string>(FILTERS[0]);
@@ -155,10 +157,12 @@ export const CategoryScreen: React.FC<CategoryScreenProps> = ({
 
   const handleCreateFolder = (event: React.FormEvent) => {
     event.preventDefault();
-    if (!newFolderName.trim()) return;
-    addFolder(newFolderName.trim(), category.name);
+    const folderName = newFolderName.trim();
+    if (!folderName) return;
+    addFolder(folderName, category.name);
     setNewFolderName('');
     setShowAddModal(false);
+    onSelectFolder(folderName);
   };
 
   return (
@@ -168,7 +172,7 @@ export const CategoryScreen: React.FC<CategoryScreenProps> = ({
           <FigmaIcon name="category-back" style={{ transform: 'rotate(180deg)' }} />
         </button>
         <div className="flex h-full min-w-0 flex-1 items-center justify-center">
-          <h1 className="flex h-full w-[166px] items-center justify-center text-center text-[18px] leading-[28px] font-medium text-[#0e0727]">
+          <h1 className="flex h-full w-[166px] items-center justify-center overflow-hidden text-ellipsis whitespace-nowrap text-center text-[18px] leading-[28px] font-medium text-[#0e0727]">
             {category.name}
           </h1>
         </div>
@@ -258,7 +262,7 @@ export const CategoryScreen: React.FC<CategoryScreenProps> = ({
           <section className="flex h-[512px] w-full shrink-0 flex-col items-start gap-[10px]">
             <div className="flex h-[24px] w-full items-center gap-[10px]">
               <h2 className="min-w-0 flex-1 text-[14px] leading-[20px] font-medium tracking-[0.4px] text-[#0e0727]">Tất cả links</h2>
-              <button type="button" aria-label="Thêm link" className="flex size-[24px] shrink-0 items-center justify-center rounded-full bg-[#7758e2]">
+              <button type="button" onClick={() => onAddLink(category)} aria-label="Thêm link" className="flex size-[24px] shrink-0 items-center justify-center rounded-full bg-[#7758e2]">
                 <FigmaIcon name="category-plus" />
               </button>
             </div>
@@ -270,7 +274,7 @@ export const CategoryScreen: React.FC<CategoryScreenProps> = ({
       </div>
 
       {showAddModal && (
-        // Create-folder sheet, Figma node 2159:13091.
+        // Create-folder sheet, Figma nodes 2159:13091 / 2172:7830.
         <div className="fixed top-0 left-1/2 z-60 h-[858px] w-[390px] -translate-x-1/2 overflow-hidden bg-black/40">
           <form onSubmit={handleCreateFolder} className="absolute top-[548px] left-0 flex h-[310px] w-[390px] flex-col items-start gap-[16px] rounded-[20px] bg-white px-[20px] pt-[20px] pb-[40px]">
             <div className="flex h-[24px] w-full items-start justify-center gap-[16px]">
@@ -288,7 +292,7 @@ export const CategoryScreen: React.FC<CategoryScreenProps> = ({
                   value={newFolderName}
                   onChange={(event) => setNewFolderName(event.target.value)}
                   placeholder="Nhập tên folder"
-                  className="block h-[46px] w-full rounded-[11px] border-0 bg-[#f5f5f7] px-[8px] py-[12px] text-[16px] leading-[22px] font-normal tracking-[-0.18px] text-[#0e0727] outline-none placeholder:text-[#9490a2]"
+                  className="block h-[46px] w-full overflow-hidden text-ellipsis whitespace-nowrap rounded-[11px] border-0 bg-[#f5f5f7] px-[8px] py-[12px] text-[16px] leading-[22px] font-normal tracking-[-0.18px] text-[#0e0727] outline-none placeholder:text-[#9490a2]"
                 />
               </label>
 

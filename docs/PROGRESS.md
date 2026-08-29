@@ -553,12 +553,278 @@ each first title, returned to the category, and found zero broken images. `tsc -
 production build are clean. The full 36-row comparison suite still exits non-zero only because
 Activity's previously documented text-antialiasing residual exceeds the global 8.0 threshold.
 
+## Create-folder and add-link-to-category flow matched (2026-08-29)
+
+Verified the uncommitted working-tree changes to `App.tsx`, `AddLinkScreen.tsx`,
+`CategoryScreen.tsx`, `FolderDetailScreen.tsx`, `HomeScreen.tsx`, `mnemeContext.tsx`, and
+`types.ts` against four nodes the user pointed at directly:
+
+- `2172:7830` (create-folder sheet, restaged over the `Phim ảnh` category): the existing
+  `2159:13091` sheet already carries the right copy (`Tạo folder mới`, `Tên folder`,
+  `Nhập tên folder`, `Lưu`/`Hủy`); submitting now also calls `onSelectFolder(folderName)` so the
+  new folder opens immediately instead of leaving the user on the category screen.
+- `2172:5821` (`Phim tài liệu` folder, 5 links): already fully seeded in `src/data/seed.ts`
+  (ids 20–24) with exact titles/sources/authors/tags, reachable from `Phim ảnh` → "Xem tất cả
+  folder". No changes needed; confirmed by screenshot.
+- `2172:8010` (add-link-to-category): `AddLinkScreen` now takes `initialCategory`, and when it is
+  `Du lịch` (opened via `CategoryScreen`'s new `onAddLink`), the screen swaps in the exact
+  Kyoto-itinerary preset (title, summary, domain, preview image, category art, AI-suggested badge)
+  instead of the generic `2159:13180` skincare fixture. Saving calls the new
+  `onSaveToCategory`/`addLink({ preset })` path, which skips the Gemini/fallback analysis step and
+  writes the link with deterministic showcase metadata.
+- `2172:8057` (Home add-link toast): `HomeScreen` replaced the old dismissable green toast with
+  the node's grey card, `Đã thêm vào category "…"` copy (category name interpolated), and a
+  purple `Mở` action that opens that category. `App.tsx` tracks `successCategory` instead of a
+  boolean `showToast` to drive this.
+
+Also swept text-overflow protection across the touched screens per explicit user requirement (no
+text may spill outside its card/row): `line-clamp-2` on the add-link preview title/summary,
+`truncate`/`text-ellipsis` + `min-w-0`/`overflow-hidden` on category/folder header titles, tag
+chips, source/author rows, and the create-folder input and folder-name header. Confirmed with a
+Playwright stress test using an intentionally oversized folder name — the create-folder input and
+the resulting `FolderDetailScreen` header both ellipsis-truncate inside their fixed-width
+containers with no overflow.
+
+Verification performed: `tsc --noEmit` clean, `npm run build` clean, and a full Playwright
+walkthrough (`npm start` on port 8080, `localStorage` cleared) driving Home → `Phim ảnh` →
+create-folder sheet, Home → `Phim ảnh` → "Xem tất cả folder" → `Phim tài liệu`, Home → `Du lịch` →
+add-link → save, and the resulting Home toast. Screenshots visually match all four Figma exports
+(`kit/figma-refs/2172_7830_create_folder.png`, `2172_5821_folder_documentary.png`,
+`2172_8010_add_link_category.png`, `2172_8057_home_add_toast.png`) in layout, copy, and spacing;
+no `figma_compare.py` numeric score was computed for these four (they are not yet rows in
+`SCREENS`) — visual screenshot comparison only. None of this work is committed yet.
+
+## Create-notebook flow matched against Section 9 (2026-08-29)
+
+Implemented and pixel-verified the three nodes the user pointed at for the "tạo sổ tay" (create
+notebook) flow, using `figma-design-to-code` (`get_design_context`) on each node rather than
+inferring from screenshots alone, per the user's "chuẩn từng pixel, từng icon" instruction:
+
+- `2172:4536` (notebook list, restaged): `NotebookScreen.tsx` and its `INITIAL_NOTEBOOKS` fixture
+  (`src/data/seed.ts`) already matched this node almost exactly — same header, AI banner, and all
+  four notebook rows/covers, confirmed by downloading and comparing each cover image's bytes
+  against the currently-committed ones. The one real diff: the node abbreviates "phút" as "’" in
+  "Món ăn dễ nấu trong 15’", where the seed had the full word. Fixed in `INITIAL_NOTEBOOKS`. This
+  title is shared with that notebook's detail-screen header (no separate design reference exists
+  for that detail screen), so the abbreviated form now shows there too — an accepted, documented
+  trade-off since there is only one field and one route to it, not a dual-context case.
+- `2172:4631` (select-content step, restaged): `SelectSourcesScreen.tsx` previously rendered
+  static lorem-ipsum rows (`Morem ipsum dolor sit amet...`) — the literal content of legacy node
+  `2159:13570`, its own already-verified design. This node instead specifies four rows with real
+  research/AI-workflow copy. Added a `SHOWCASE_SOURCES` fixture with each row's title/source/
+  author/tags, and swapped in each row's own photo — downloaded via `download_assets` and mapped
+  to its row by cropping and screenshotting each row's own node id (`2172:4655/4672/4689/4706`)
+  individually rather than assuming the download's list order, which caught what would otherwise
+  have been a wrong image-to-row assignment (row 2's "hanging info cube" and row 4's "Rome tourist"
+  photo are not in visual top-to-bottom order in the raw asset list). `sourceIds` passed to
+  `onSynthesize`/`addNotebook` still resolves through the real `links` array by position — changing
+  that would require either minting new persisted `SavedLink` records (risking the pixel-verified
+  Category/Folder counts elsewhere) or accepting `addNotebook` throwing on an all-fake-id selection
+  (it does `links.filter(l => sourceIds.includes(l.id))` and throws if nothing matches) — so this
+  is a deliberate display-only fixture, not a new persisted link.
+  Two rows in the node's own layer tree (5 and 6, reusing its default lorem-ipsum/Figma-dock
+  placeholder) sit below the node's clipped 844px frame height and are not visible in the reference
+  export; they were intentionally not rendered, matching what the export actually shows rather than
+  the full off-screen layer tree.
+  The node's floating button reads "Bỏ chọn 3 mục" but only 2 of the 4 visible rows show a checked
+  radio in the reference screenshot — kept the existing dynamic `selectedCount` behavior (recomputed
+  from real toggle state, matching this codebase's pattern everywhere else) rather than hardcoding
+  "3" to match static mockup text that disagrees with its own visible checkboxes; default state is
+  `[true, false, true, false]` so two rows render checked, matching the screenshot exactly.
+- `2172:7907` (notebook detail, "Research với NotebookLM"): already fully implemented — verified
+  byte-for-byte equivalent content to already-shipped `NotebookDetailScreen.tsx`/node `2159:12842`
+  (same title, cover, description, "3 video - 12 phút đọc", and all four TOC items with the 2.1–2.3
+  sub-items). No code change; this is a genuine pixel-duplicate restaging, not an oversight.
+
+Added `public/assets/images/figma_2172/2172_4631_source_{1..4}_*.jpg` (the four real row photos)
+and `..._source_generic_figma_dock.jpg` (downloaded but unused, kept for provenance/future rows).
+Saved full-frame references `kit/figma-refs/2172_{4536,4631,7907}_*.png` and added all three as
+rows in `kit/scripts/figma_compare.py`'s `SCREENS`, replacing `2159:13570`'s now-unreachable row
+with `2172:4631`'s.
+
+Fresh production comparison (Figma / app, no broken images or structural blocks):
+
+- `2172:4536`: 4.26 / 4.44 / 3.13, 4.69% of pixels over 28 (legacy `2159:12891` unaffected at
+  4.37 / 4.55 / 3.23 — the one-word text fix did not regress it).
+- `2172:4631`: 5.55 / 5.88 / 5.20, 6.22%; diff mask shows only glyph/photo-recompression residual
+  and the documented "3" vs "2" counter text, no structural blocks.
+- `2172:7907`: 5.44 / 5.16 / 4.51, 6.02% — identical to legacy `2159:12842`, confirming the
+  pixel-duplicate finding above.
+
+`tsc --noEmit` and `npm run build` are clean. The full `figma_compare.py` suite (39 rows) shows no
+regression elsewhere; it still exits non-zero only because Activity's previously documented
+text-antialiasing residual exceeds the global 8.0 threshold. None of this work is committed yet.
+
+## Notebook detail fully data-driven across all four notebooks (2026-08-29)
+
+The user pointed at 8 nodes for "chi tiết sổ tay" (notebook detail) and explicitly asked to
+determine which were scroll-states of one screen versus genuinely separate screens before coding.
+Investigated via `get_metadata` (cheap orientation) then full `get_design_context` (exact text/
+structure) rather than assuming from screenshots alone:
+
+- `2172:4487`/`5069`/`5118`/`5167` are each notebook's **Mục lục (TOC)** screen — the same
+  screen/component as the already-shipped `2159:12842`/`2172:7907` (cover card, tabs, collapsed
+  outline), just restaged with each notebook's own outline. `2172:4487` (Research) is a confirmed
+  pixel-duplicate of what already shipped.
+- `2172:4589`/`5216`/`5256`/`5296` are a **separate screen** reached via "Xem sổ tay" (previously a
+  dead button with no `onClick`), confirmed by: their own header (compact title bar replacing the
+  cover card, with its own back target), their own footer ("Add Section" + share, not "Chia sẻ"/
+  "Xem sổ tay"), and a `get_metadata` structural diff against the TOC screen. This is genuinely new
+  UI, not a scrolled state — built as `src/screens/NotebookReadingScreen.tsx`.
+
+**Data model**: added `NotebookOutlineItem`/`NotebookOutlineSubItem` (`number`, `title`, optional
+`body`, optional `subItems`, optional `defaultExpanded`) and an `outline: NotebookOutlineItem[]`
+field to `Notebook`, plus `meta`/`summary` (the cover's two text lines, previously hardcoded to
+Research's copy for every notebook). Populated exactly for all four notebooks in
+`INITIAL_NOTEBOOKS`. The reading screen renders only outline items/sub-items that carry a `body`
+— for every notebook this is item 1, item 2, and item 2's first two sub-items; item 2's third
+sub-item and items 3/4 never carry a `body` in any of the four nodes, so they only ever appear in
+the TOC. `mnemeContext.tsx`'s `addNotebook` (freshly AI-generated notebooks, no Figma node) now
+derives a matching `outline` from its `sections` instead of leaving the field unset.
+
+**`NotebookDetailScreen.tsx` refactor**: the TOC content and footer were absolutely-positioned at
+fixed pixel offsets tuned for one notebook's content length. With real per-notebook outlines this
+broke immediately — AI Tips & Tricks (the longest) rendered its footer buttons overlapping rows 3
+and 4. Fixed by measuring each of the four nodes' own Button y-offset against its own TOC content
+block height: the gap from tabs+content-block-end to the footer is a **constant 49px across all
+four**, and the header+cover+tabs block's own height is **constant 411px** (matching the original
+single-notebook pixel-verified offset). So that first block stays absolutely positioned exactly as
+before, unchanged in height; the TOC/Thông tin content and the footer switched to normal flow
+below it, with the footer's `mt-[49px]` reproducing every notebook's correct position without any
+per-notebook conditional. Also removed a redundant screen-local home-indicator `<div>` — `App.tsx`
+already draws one globally for `usesWhiteCanvas` screens (confirmed by reading `App.tsx`, not
+assumed) and the screen-local copy would have floated at the wrong position once the layout went
+dynamic-height.
+
+**Getting exact paragraph breaks right** (the most time spent on this pass): several outline
+items' `body` text is split across multiple Figma text nodes rather than one paragraph, and the
+split matters visually — but two different splits exist, indistinguishable from `get_metadata`'s
+flattened text (had to re-fetch full `get_design_context` per reading screen to see the actual
+`<p>` boundaries):
+1. A plain two-paragraph split (`<p mb-0>chunk1</p><p>chunk2</p>`, no third node) — this measures
+   flush, zero extra gap, confirmed via the node's own Frame-height arithmetic (a 228px-tall block
+   = title 24 + gap 12 + exactly 8 lines of 24px body, not 9). Encoded as a single `\n`.
+2. A three-paragraph split with an explicit empty middle paragraph (a lone zero-width space or
+   plain space, `<p mb-0>chunk1</p><p mb-0> </p><p>chunk2</p>`) — this one is a real blank line.
+   Encoded as `\n\n`. Every notebook's "2.2" sub-item body uses this pattern; Research's item 1 and
+   Món ăn's items 1 and 2 use the flush two-paragraph pattern instead.
+Getting this wrong first (over-adding blank lines, then removing breaks entirely and letting text
+reflow) is what produced two badly wrong intermediate states before landing on the correct
+per-case reading, visible in this file's edit history — worth remembering that `get_metadata`
+alone cannot distinguish these two cases.
+
+Also corrected the outer block gap from the node's declared (but not actually reproduced) 24px
+auto-layout gap to the observed 18px between top-level blocks (confirmed via bounding-box deltas
+across three different notebooks' metadata — the same "declared gap ≠ rendered gap" quirk already
+documented for `AddLinkScreen`'s card), with a nested 12px gap specifically between a "2." item's
+own sub-items, and added a 15px flow spacer before the sticky header that the original TOC
+screen's `top-[15px]` back-button offset already implied but the reading screen was missing
+entirely (this alone accounted for roughly half of an initial ~40-point score error).
+
+**On the remaining elevated score**: after all of the above, the four reading screens still score
+~20–28 instead of the usual ~5–7 (see `kit/docs/FIGMA_MAP.md`'s "known elevated score" note for
+the full investigation). This was not left unexamined — Playwright-measured title positions match
+the node's own derived formula to the pixel on every checkpoint tried (Research's titles at 113,
+359, 533, 701 all match hand-derived expected values from the node's own block-height arithmetic
+exactly), and a brute-force vertical-shift search confirms 0px shift is already optimal. The
+elevated score is attributable to text density — these are the only screens in the app with
+multiple full paragraphs of body copy, so ordinary cross-renderer glyph antialiasing (present at a
+low, accepted baseline on every other screen) accumulates over far more character edges here.
+
+Verification: `tsc --noEmit` and `npm run build` clean. Full `figma_compare.py` re-run after every
+fix; confirmed zero regression on all previously-verified rows including `2159:12842`/`2172:7907`
+(unchanged at 5.44/5.16/4.51 → 5.45/5.17/4.51, noise-level). Playwright walked all 4 notebooks ×
+both screens through the real UI (Sổ tay tab → notebook → Xem sổ tay → back → back) each run.
+`kit/scripts/figma_compare.py`'s `SCREENS` gained 8 rows; `kit/figma-refs/` gained the 8
+corresponding reference exports plus `out/compare_*` diff masks for all 8. None of this is
+committed yet.
+
+## Create-notebook route and phone scrolling corrected (2026-08-29)
+
+The three supplied nodes had already been implemented and pixel-compared separately, but the
+runtime storyboard between them was wrong. `App.tsx` still inserted legacy source-choice node
+`2159:13626` after the Notebook list, then sent “Tiếp tục” through the unrelated legacy analysis
+screen. The active route now follows the supplied frames directly:
+
+`2172:4536` Notebook list → “Tạo sổ tay” → `2172:4631` source selection → “Tiếp tục” →
+`2172:7907` Research notebook detail.
+
+The legacy `CreateNotebookScreen.tsx` and `NotebookAnalysisScreen.tsx` files remain available for
+historical/reference work but are intentionally unreachable from this showcase flow. Their stale
+`2159:13626` row was removed from `figma_compare.py`; the `2172:4631` capture path now uses the real
+direct navigation above.
+
+Fixed the phone-scroll behavior rather than treating the Figma export as a clipped poster:
+
+- the shared `<main>` explicitly enables vertical touch panning, momentum scrolling and contained
+  overscroll;
+- `SelectSourcesScreen` no longer uses a fixed 800px `overflow-hidden` root;
+- the two additional source rows present below `2172:4631`'s static frame are rendered and reachable
+  by scrolling;
+- the purple “Bỏ chọn / Tiếp tục” action remains sticky at the same viewport Y while the source list
+  moves beneath it.
+
+Playwright verified the complete path against the production bundle (`npm run build` + `npm start`).
+On 390×856, source selection reports `clientHeight=812`,
+`scrollHeight=1090`, reaches `scrollTop=278`, and the CTA remains at Y=748 before and after the
+scroll. Notebook list also scrolls (`847 > 812`, 35px reachable); back from detail returns to source
+selection, with zero broken images and zero page errors. An overflow audit found no visible
+text element with uncontained horizontal overflow on either source selection or notebook detail.
+The initial `2172:4631` viewport remains pixel-stable at 5.57 / 5.90 / 5.21 (6.23% over 28), within
+noise of its earlier 5.55 / 5.88 / 5.20 score.
+
+## Blank screen after “Tiếp tục” — root cause and permanent guard (2026-08-29)
+
+Reproduced the user-reported blank screen without clearing browser storage. The direct route itself
+was correct; the crash came from a persisted schema mismatch:
+
+- older `mneme_notebooks_v1` records were written before `Notebook` gained required `meta`,
+  `summary`, and `outline` fields;
+- `MnemeProvider` previously returned `JSON.parse(saved)` directly and TypeScript could not validate
+  that runtime object;
+- `NotebookDetailScreen` immediately called `notebook.outline.find(...)`, producing the exact browser
+  error `Cannot read properties of undefined (reading 'find')`;
+- the exception escaped the React tree, leaving only the empty white app canvas.
+
+Permanent prevention added:
+
+1. `migrateSavedNotebooks` refreshes canonical ids 1–4 from `INITIAL_NOTEBOOKS`, adds missing fixtures,
+   and derives `meta`/`summary`/`outline` for unrelated old user-created notebooks without deleting
+   their sections.
+2. All persisted arrays now cross a `readSavedArray` runtime boundary that catches malformed JSON
+   and non-array values instead of allowing hydration to crash.
+3. `NotebookDetailScreen` and `NotebookReadingScreen` defensively normalize `outline` before calling
+   collection methods.
+4. `AppErrorBoundary` wraps the provider and displays a contained “Khôi phục dữ liệu demo” action if
+   an unknown future render error gets past migrations, so the app never silently becomes white.
+5. Added `kit/scripts/notebook_flow_smoke.py` as a regression test. It injects the exact old schema
+   and malformed JSON, walks `4536 → 4631 → 7907`, and records requests to Gemini.
+
+The active create-notebook path is deliberately fake/local: “Tiếp tục” opens canonical Research
+fixture id 1 synchronously and never calls `addNotebook` or `/api/gemini/create-notebook`. Production
+smoke result: stale schema migrated, malformed JSON recovered, detail rendered with zero page errors,
+and `gemini_requests_in_showcase_flow: 0`. `tsc --noEmit` and `npm run build` remain clean.
+
+## Remove duplicate “Self-care · Tổng hợp” notebooks (2026-08-29)
+
+The two duplicate notebooks were not part of `INITIAL_NOTEBOOKS`; they were stale records created by
+the retired Gemini showcase flow and persisted in `mneme_notebooks_v1`. Notebook hydration now removes
+that exact legacy title (including punctuation/diacritic variants) while preserving every unrelated
+user-created notebook. The notebook smoke test injects both historical variants and verifies that the
+two duplicates are deleted, an unrelated local notebook survives, and the four canonical fixtures are
+still restored.
+
 ## Next work
 
-1. Continue the remaining Notebook analysis/content states against their own nodes, starting with
-   `2159:13602`.
-2. Implement the Home toast state `2159:13227` against its node; it currently uses the exact
-   success vector but its layout has not been node-verified.
+1. Add `2172:7830`, `2172:5821`, `2172:8010`, and `2172:8057` as rows in
+   `kit/scripts/figma_compare.py`'s `SCREENS` table so they get a numeric pixel-diff score like
+   every other rebuilt screen, instead of only a manual screenshot check.
+2. The create-folder-then-open-folder flow (`onSelectFolder(folderName)` after submit) only
+   resolves to a populated demo folder for names that already exist in `CATEGORY_FOLDERS`/seed
+   data (e.g. `Phim tài liệu`); a freshly typed arbitrary name correctly opens its own new empty
+   folder (verified), which is the existing `FolderDetailScreen` empty state, not a new one.
+3. `NotebookReadingScreen.tsx`'s "Add Section" and share buttons are visual-only (no `onClick`
+   yet, matching the node — neither button has an obvious target screen in the current node set).
 
 ## Important context
 

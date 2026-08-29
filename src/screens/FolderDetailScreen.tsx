@@ -25,17 +25,17 @@ const FolderLinkRow: React.FC<{ link: SavedLink; onClick: () => void }> = ({ lin
         <span className="line-clamp-2 min-h-[40px] w-full min-w-0 flex-1 text-[14px] leading-[20px] font-normal text-black underline [text-underline-position:from-font]">
           {link.title}
         </span>
-        <span className="flex w-full shrink-0 items-center gap-[4px] text-[12px] leading-[16px] font-normal tracking-[0.4px] whitespace-nowrap text-[#9490a2]">
-          <span>{link.source}</span>
+        <span className="flex w-full shrink-0 items-center gap-[4px] overflow-hidden text-[12px] leading-[16px] font-normal tracking-[0.4px] whitespace-nowrap text-[#9490a2]">
+          <span className="shrink-0">{link.source}</span>
           <FigmaIcon name="folder-dot" />
-          <span>{link.author}</span>
+          <span className="min-w-0 truncate">{link.author}</span>
         </span>
-        <span className="flex shrink-0 items-start gap-[8px]">
+        <span className="flex w-full shrink-0 items-start gap-[8px] overflow-hidden">
           {link.tags[0] && (
-            <span className="flex items-center justify-center rounded-[24px] bg-[#f2f2f3] px-[12px] py-[4px] text-[12px] leading-[16px] font-normal whitespace-nowrap text-[#0e0727]">{link.tags[0]}</span>
+            <span className="flex min-w-0 items-center justify-center truncate rounded-[24px] bg-[#f2f2f3] px-[12px] py-[4px] text-[12px] leading-[16px] font-normal whitespace-nowrap text-[#0e0727]">{link.tags[0]}</span>
           )}
           {link.tags[1] && (
-            <span className="flex items-center justify-center rounded-[24px] bg-[#f1eefc] px-[12px] py-[4px] text-[12px] leading-[16px] font-normal whitespace-nowrap text-[#7758e2]">{link.tags[1]}</span>
+            <span className="flex min-w-0 items-center justify-center truncate rounded-[24px] bg-[#f1eefc] px-[12px] py-[4px] text-[12px] leading-[16px] font-normal whitespace-nowrap text-[#7758e2]">{link.tags[1]}</span>
           )}
         </span>
       </span>
@@ -65,7 +65,7 @@ export const FolderDetailScreen: React.FC<FolderDetailScreenProps> = ({
           <FigmaIcon name={isEmpty ? 'folder-empty-back' : 'folder-back'} style={{ transform: 'rotate(180deg)' }} />
         </button>
         <div className="flex h-full min-w-0 flex-1 items-center justify-center">
-          <h1 className="flex h-full min-w-0 flex-1 items-center justify-center text-center text-[18px] leading-[28px] font-medium whitespace-nowrap text-[#0e0727]">{folderName}</h1>
+          <h1 className="block h-full min-w-0 flex-1 overflow-hidden text-ellipsis whitespace-nowrap text-center text-[18px] leading-[30px] font-medium text-[#0e0727]">{folderName}</h1>
         </div>
         <span className="h-[30px] w-[24px] shrink-0" />
         <button type="button" aria-label="Thêm tùy chọn" className="flex size-[24px] shrink-0 items-center justify-center">

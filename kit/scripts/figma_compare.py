@@ -55,8 +55,19 @@ SCREENS = [
     ('2159:13158', 'Empty folder',  '2159_13158_empty_folder.png', 856, 'Empty folder'),
     ('2159:13174', 'Folder detail', '2159_13174_folder_detail.png', 843, 'Folder detail'),
     ('2159:12842', 'Notebook detail', '2159_12842_notebook_detail.png', 844, 'Notebook detail'),
-    ('2159:13626', 'Create notebook', '2159_13626_create_notebook.png', 844, 'Create notebook'),
-    ('2159:13570', 'Select sources', '2159_13570_select_sources.png', 844, 'Select sources'),
+    ('2172:7907', 'Notebook detail (showcase)', '2172_7907_notebook_detail.png', 844, 'Notebook detail'),
+    ('2172:4487', 'Notebook TOC (Research)', '2172_4487_notebook_toc_research.png', 844, 'Notebook detail'),
+    ('2172:4589', 'Notebook reading (Research)', '2172_4589_notebook_reading_research.png', 844, 'Notebook reading (Research)'),
+    ('2172:5069', 'Notebook TOC (Món ăn)', '2172_5069_notebook_toc_food.png', 844, 'Notebook TOC (Món ăn)'),
+    ('2172:5216', 'Notebook reading (Món ăn)', '2172_5216_notebook_reading_food.png', 844, 'Notebook reading (Món ăn)'),
+    ('2172:5118', 'Notebook TOC (AI Tips)', '2172_5118_notebook_toc_aitips.png', 844, 'Notebook TOC (AI Tips)'),
+    ('2172:5256', 'Notebook reading (AI Tips)', '2172_5256_notebook_reading_aitips.png', 844, 'Notebook reading (AI Tips)'),
+    ('2172:5167', 'Notebook TOC (Travel)', '2172_5167_notebook_toc_travel.png', 844, 'Notebook TOC (Travel)'),
+    ('2172:5296', 'Notebook reading (Travel)', '2172_5296_notebook_reading_travel.png', 844, 'Notebook reading (Travel)'),
+    # Nodes 2159:13626 and 2159:13570 are no longer reachable in the active
+    # storyboard. "Tạo sổ tay" now opens showcase node 2172:4631 directly.
+    ('2172:4631', 'Select sources (showcase)', '2172_4631_select_sources.png', 844, 'Select sources'),
+    ('2172:4536', 'Notebook list (showcase)', '2172_4536_notebook_list.png', 844, 'Sổ tay'),
     ('2172:5877', 'Folder detail (Phim Hàn, showcase)', '2172_5877_folder_detail_phimhan.png', 843, 'Folder Phim Hàn'),
     ('2172:5991', 'Folder detail (Phim kinh dị, showcase)', '2172_5991_folder_detail_phimkinhdi.png', 843, 'Folder Phim kinh dị'),
     ('2172:6105', 'Folder detail (Phim ngắn, showcase)', '2172_6105_folder_detail_phimngan.png', 843, 'Folder Phim ngắn'),
@@ -154,13 +165,34 @@ def capture(page, tab, height, dest):
         elif tab == 'Notebook detail':
             page.get_by_role('button', name='Sổ tay').click()
             page.get_by_role('button', name='Research với NotebookLM').click()
-        elif tab == 'Create notebook':
+        elif tab == 'Notebook reading (Research)':
             page.get_by_role('button', name='Sổ tay').click()
-            page.get_by_role('button', name='Tạo sổ tay').click()
+            page.get_by_role('button', name='Research với NotebookLM').click()
+            page.get_by_role('button', name='Xem sổ tay').click()
+        elif tab == 'Notebook TOC (Món ăn)':
+            page.get_by_role('button', name='Sổ tay').click()
+            page.get_by_role('button', name='Món ăn dễ nấu trong 15’').click()
+        elif tab == 'Notebook reading (Món ăn)':
+            page.get_by_role('button', name='Sổ tay').click()
+            page.get_by_role('button', name='Món ăn dễ nấu trong 15’').click()
+            page.get_by_role('button', name='Xem sổ tay').click()
+        elif tab == 'Notebook TOC (AI Tips)':
+            page.get_by_role('button', name='Sổ tay').click()
+            page.get_by_role('button', name='AI Tips & Tricks').click()
+        elif tab == 'Notebook reading (AI Tips)':
+            page.get_by_role('button', name='Sổ tay').click()
+            page.get_by_role('button', name='AI Tips & Tricks').click()
+            page.get_by_role('button', name='Xem sổ tay').click()
+        elif tab == 'Notebook TOC (Travel)':
+            page.get_by_role('button', name='Sổ tay').click()
+            page.get_by_role('button', name='Đánh giá địa điểm du lịch').click()
+        elif tab == 'Notebook reading (Travel)':
+            page.get_by_role('button', name='Sổ tay').click()
+            page.get_by_role('button', name='Đánh giá địa điểm du lịch').click()
+            page.get_by_role('button', name='Xem sổ tay').click()
         elif tab == 'Select sources':
             page.get_by_role('button', name='Sổ tay').click()
             page.get_by_role('button', name='Tạo sổ tay').click()
-            page.get_by_role('button', name='Tạo từ các nội dung đã chọn').click()
         elif tab == 'Folder Phim Hàn':
             page.get_by_role('button', name='Phim ảnh').click()
             page.get_by_role('button', name='Phim Hàn 24 links').click()

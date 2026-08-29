@@ -18,9 +18,9 @@ Active source-of-truth section: `2159:12770`. Section `2143:4235` is legacy refe
 | Folder detail list | `2159:13174` | `src/screens/FolderDetailScreen.tsx` | Rebuilt from node; pixel-compared |
 | Notebook detail | `2159:12842` | `src/screens/NotebookDetailScreen.tsx` | Rebuilt from node; pixel-compared |
 | Notebook list | `2159:12891` | `src/screens/NotebookScreen.tsx` | Rebuilt from node; pixel-compared |
-| Create notebook source choice | `2159:13626` | `src/screens/CreateNotebookScreen.tsx` | Rebuilt from node; pixel-compared |
-| Source selection | `2159:13570` | `src/screens/SelectSourcesScreen.tsx` | Rebuilt from node; pixel-compared |
-| AI analysis | `2159:13602` | `src/screens/NotebookAnalysisScreen.tsx` | Legacy UI pending rebuild |
+| Create notebook source choice | `2159:13626` | `src/screens/CreateNotebookScreen.tsx` | Legacy, intentionally unreachable — active `2172:4536` “Tạo sổ tay” opens `2172:4631` directly |
+| Source selection | `2159:13570` | `src/screens/SelectSourcesScreen.tsx` | Superseded — the screen's only reachable path now renders showcase node `2172:4631`'s content instead of this node's lorem-ipsum rows; see Section 9 table |
+| AI analysis | `2159:13602` | `src/screens/NotebookAnalysisScreen.tsx` | Legacy, intentionally unreachable in the direct `4536 → 4631 → 7907` showcase route |
 | Notebook content | `2159:13374` | `src/screens/NotebookDetailScreen.tsx` | Pending state |
 | AI suggestions list | `2159:13407` | `src/screens/AiSuggestionsScreen.tsx` | Legacy UI pending rebuild |
 | AI suggestion detail | `2159:13479` | pending | Pending |
@@ -100,7 +100,37 @@ Detail); `id:152/153/154` are the Folder Detail-only item-1 records. See
 | Du lịch category | `2172:6846` | `src/screens/CategoryScreen.tsx` | Complete — 4.76 / 4.50 / 4.31; exact folders/counts and four overview links |
 | Folder detail — Việt Nam | `2172:6901` | `src/screens/FolderDetailScreen.tsx` | Complete — 4.94 / 4.68 / 4.61; five exact links |
 | Công thức bánh category | `2172:7359` | `src/screens/CategoryScreen.tsx` | Complete — 4.68 / 4.54 / 4.41; exact counts, overview metadata, tags, and category-specific image crop |
+| Create-folder sheet (restaged) | `2172:7830` | `src/screens/CategoryScreen.tsx` | Complete — reuses `2159:13091` sheet; submit now opens the created folder. Screenshot-verified, not yet in `figma_compare.py` |
+| Folder detail — Phim tài liệu | `2172:5821` | `src/screens/FolderDetailScreen.tsx` | Complete — 5 exact links seeded (ids 20–24), reachable via `Phim ảnh` → "Xem tất cả folder". Screenshot-verified, not yet in `figma_compare.py` |
+| Add link to category (Du lịch/Kyoto preset) | `2172:8010` | `src/screens/AddLinkScreen.tsx` | Complete — `initialCategory` prop swaps in the exact Kyoto preset and skips Gemini analysis via `addLink({ preset })`. Screenshot-verified, not yet in `figma_compare.py` |
+| Home add-link toast (category variant) | `2172:8057` | `src/screens/HomeScreen.tsx` | Complete — replaces old dismissable toast with `Đã thêm vào category "…"` + `Mở` action. Screenshot-verified, not yet in `figma_compare.py` |
+| Notebook list (showcase) | `2172:4536` | `src/screens/NotebookScreen.tsx` | Complete — 4.26 / 4.44 / 3.13, 4.69% over 28. Pixel-duplicate of `2159:12891` except one word ("15’" vs "15 phút"); fixed in `INITIAL_NOTEBOOKS`, see `docs/PROGRESS.md` |
+| Select sources for notebook (showcase) | `2172:4631` | `src/screens/SelectSourcesScreen.tsx` | Complete — active direct route from `2172:4536`; static viewport remains 5.57 / 5.90 / 5.21, while rows 5–6 are now reachable by touch scroll and the CTA stays sticky |
+| Notebook detail (showcase) | `2172:7907` | `src/screens/NotebookDetailScreen.tsx` | Complete — direct local/fake-AI transition from `2172:4631`, no Gemini request. Persisted pre-outline notebooks are migrated before render to prevent the former blank-screen crash |
+| Notebook Mục lục — Research | `2172:4487` | `src/screens/NotebookDetailScreen.tsx` | Complete — 5.45 / 5.17 / 4.51, 6.02% over 28. Pixel-duplicate of `2159:12842`/`2172:7907` |
+| Notebook Mục lục — Món ăn | `2172:5069` | `src/screens/NotebookDetailScreen.tsx` | Complete — 5.41 / 5.04 / 4.30, 6.04% over 28. `NotebookDetailScreen` is now fully data-driven off `notebook.outline` (was previously hardcoded to the Research notebook's content for every notebook) |
+| Notebook Mục lục — AI Tips & Tricks | `2172:5118` | `src/screens/NotebookDetailScreen.tsx` | Complete — 5.29 / 5.07 / 4.41, 5.90% over 28 |
+| Notebook Mục lục — Đánh giá địa điểm du lịch | `2172:5167` | `src/screens/NotebookDetailScreen.tsx` | Complete — 5.71 / 5.65 / 4.98, 6.30% over 28 |
+| Notebook reading — Research | `2172:4589` | `src/screens/NotebookReadingScreen.tsx` (new) | Complete but scores 21.25 / 21.49 / 14.66, 19.74% over 28 — see "known elevated score" note below; no structural defect found after exhaustive verification |
+| Notebook reading — Món ăn | `2172:5216` | `src/screens/NotebookReadingScreen.tsx` | Complete, same known elevated-score profile: 20.35 / 21.07 / 14.10, 19.50% |
+| Notebook reading — AI Tips & Tricks | `2172:5256` | `src/screens/NotebookReadingScreen.tsx` | Complete, same known elevated-score profile: 27.78 / 28.53 / 20.86, 22.47% (highest of the four — this notebook has the most body text) |
+| Notebook reading — Đánh giá địa điểm du lịch | `2172:5296` | `src/screens/NotebookReadingScreen.tsx` | Complete, same known elevated-score profile: 21.86 / 21.93 / 13.90, 19.38% |
 | Notebook-detail demo variants | many (see `Section 9` root) | existing screens | Not audited |
+
+### Notebook reading screens — known elevated `figma_compare.py` score
+
+All four `NotebookReadingScreen` rows score ~20–28 instead of the usual ~5–7, well past the
+documented "~8 = structurally wrong" guidance. This was investigated exhaustively (not left as an
+assumption): Playwright-measured bounding boxes of every title in the Research and AI Tips
+screens match the node's own metadata-derived Y-offset formula to the pixel (e.g. Research's
+`2.2` title lands at 701px against a hand-derived 701px from the node's own block heights and
+gaps), and a brute-force vertical-shift search over the two images confirms 0px shift already
+minimizes the diff — i.e. there is no residual misalignment to fix. The elevated score is text
+density: these are the only screens in the app with multiple full paragraphs of body copy, so
+ordinary Chrome-vs-Figma glyph antialiasing (present at a low, accepted level on every other
+screen) accumulates over far more character edges than anywhere else. The diff masks (see
+`kit/figma-refs/out/compare_2172_{4589,5216,5256,5296}_*.png`) show line-by-line antialiasing
+ghosting, not solid structural blocks.
 
 ## Legacy implementation reference
 

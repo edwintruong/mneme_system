@@ -1,5 +1,5 @@
 import React, { useEffect, useRef, useState } from 'react';
-import { MnemeProvider } from './state/mnemeContext';
+import { MnemeProvider, useMneme } from './state/mnemeContext';
 import { BottomNavigation, TabType } from './components/navigation/BottomNavigation';
 import { HomeScreen } from './screens/HomeScreen';
 import { CategoryScreen } from './screens/CategoryScreen';
@@ -9,16 +9,16 @@ import { EditLinkScreen } from './screens/EditLinkScreen';
 import { AddLinkScreen } from './screens/AddLinkScreen';
 import { LinkAnalysisScreen } from './screens/LinkAnalysisScreen';
 import { NotebookScreen } from './screens/NotebookScreen';
-import { CreateNotebookScreen } from './screens/CreateNotebookScreen';
 import { SelectSourcesScreen } from './screens/SelectSourcesScreen';
-import { NotebookAnalysisScreen } from './screens/NotebookAnalysisScreen';
 import { NotebookDetailScreen } from './screens/NotebookDetailScreen';
+import { NotebookReadingScreen } from './screens/NotebookReadingScreen';
 import { AiSuggestionsScreen } from './screens/AiSuggestionsScreen';
 import { SearchScreen } from './screens/SearchScreen';
 import { ActivityScreen } from './screens/ActivityScreen';
 import { ProfileScreen } from './screens/ProfileScreen';
 import { FigmaIcon } from './components/common/FigmaIcon';
-import { MnemeCategory, SavedLink, Notebook } from './types';
+import { AppErrorBoundary } from './components/common/AppErrorBoundary';
+import { AddLinkParams, MnemeCategory, SavedLink, Notebook } from './types';
 
 type ScreenView =
   | { type: 'tabs' }
@@ -26,12 +26,11 @@ type ScreenView =
   | { type: 'folder'; folderName: string }
   | { type: 'link_detail'; link: SavedLink }
   | { type: 'edit_link'; link: SavedLink }
-  | { type: 'add_link'; initialFolder?: string }
+  | { type: 'add_link'; initialFolder?: string; initialCategory?: string }
   | { type: 'link_analysis'; url: string; folder: string; category: string }
-  | { type: 'create_notebook' }
   | { type: 'select_sources'; fromFolder: boolean }
-  | { type: 'notebook_analysis'; sourceIds: number[] }
   | { type: 'notebook_detail'; notebook: Notebook }
+  | { type: 'notebook_reading'; notebook: Notebook }
   | { type: 'ai_suggestions'; notebook: Notebook }
   | { type: 'search' };
 
@@ -64,9 +63,10 @@ function useStatusBarClock(): string {
 }
 
 const MnemeApp: React.FC = () => {
+  const { addLink, categories, notebooks } = useMneme();
   const [currentTab, setCurrentTab] = useState<TabType>('home');
   const [viewStack, setViewStack] = useState<ScreenView[]>([{ type: 'tabs' }]);
-  const [showToast, setShowToast] = useState(false);
+  const [successCategory, setSuccessCategory] = useState<string | null>(null);
   const statusBarTime = useStatusBarClock();
 
   const currentView = viewStack[viewStack.length - 1];
@@ -78,8 +78,10 @@ const MnemeApp: React.FC = () => {
     mainRef.current?.scrollTo(0, 0);
   }, [currentView, currentTab]);
 
-  const usesWhiteCanvas = currentView.type === 'notebook_detail' || currentView.type === 'select_sources';
-  const usesPurpleStatusBar = currentView.type === 'create_notebook';
+  const usesWhiteCanvas =
+    currentView.type === 'notebook_detail' ||
+    currentView.type === 'notebook_reading' ||
+    currentView.type === 'select_sources';
 
   const pushView = (view: ScreenView) => {
     setViewStack((prev) => [...prev, view]);
@@ -96,6 +98,19 @@ const MnemeApp: React.FC = () => {
     setViewStack([{ type: 'tabs' }]);
   };
 
+  const saveResolvedCategoryLink = async (params: AddLinkParams) => {
+    const result = await addLink(params);
+    setSuccessCategory(result.value.category);
+    resetToTabs('home');
+  };
+
+  const openSuccessCategory = () => {
+    if (!successCategory) return;
+    const category = categories.find((item) => item.name === successCategory);
+    setSuccessCategory(null);
+    if (category) pushView({ type: 'category', category });
+  };
+
   const renderActiveScreen = () => {
     switch (currentView.type) {
       case 'category':
@@ -105,6 +120,7 @@ const MnemeApp: React.FC = () => {
             onBack={popView}
             onSelectFolder={(folderName) => pushView({ type: 'folder', folderName })}
             onSelectLink={(link) => pushView({ type: 'link_detail', link })}
+            onAddLink={(category) => pushView({ type: 'add_link', initialCategory: category.name })}
           />
         );
 
@@ -142,7 +158,9 @@ const MnemeApp: React.FC = () => {
         return (
           <AddLinkScreen
             initialFolder={currentView.initialFolder}
+            initialCategory={currentView.initialCategory}
             onBack={popView}
+            onSaveToCategory={saveResolvedCategoryLink}
             onStartAnalysis={(params) =>
               pushView({
                 type: 'link_analysis',
@@ -161,19 +179,11 @@ const MnemeApp: React.FC = () => {
             folder={currentView.folder}
             category={currentView.category}
             onFinished={(createdLink) => {
-              setShowToast(true);
+              setSuccessCategory(createdLink.category);
               resetToTabs('home');
               pushView({ type: 'link_detail', link: createdLink });
             }}
             onCancel={popView}
-          />
-        );
-
-      case 'create_notebook':
-        return (
-          <CreateNotebookScreen
-            onBack={popView}
-            onSelectFlow={(fromFolder) => pushView({ type: 'select_sources', fromFolder })}
           />
         );
 
@@ -182,28 +192,32 @@ const MnemeApp: React.FC = () => {
           <SelectSourcesScreen
             fromFolder={currentView.fromFolder}
             onBack={popView}
-            onSynthesize={(sourceIds) => pushView({ type: 'notebook_analysis', sourceIds })}
-          />
-        );
-
-      case 'notebook_analysis':
-        return (
-          <NotebookAnalysisScreen
-            sourceIds={currentView.sourceIds}
-            onFinished={(createdNotebook) => {
-              resetToTabs('notebook');
-              pushView({ type: 'notebook_detail', notebook: createdNotebook });
+            onSynthesize={() => {
+              // Showcase-only deterministic transition: the selected-source
+              // frame resolves to the canonical Research notebook locally.
+              // No Gemini endpoint is called on this route.
+              const researchNotebook = notebooks.find((notebook) => notebook.id === 1);
+              if (researchNotebook) pushView({ type: 'notebook_detail', notebook: researchNotebook });
             }}
-            onCancel={popView}
           />
         );
 
       case 'notebook_detail':
         return (
           <NotebookDetailScreen
+            key={currentView.notebook.id}
             notebook={currentView.notebook}
             onBack={popView}
             onOpenSuggestions={(nb) => pushView({ type: 'ai_suggestions', notebook: nb })}
+            onOpenReading={(nb) => pushView({ type: 'notebook_reading', notebook: nb })}
+          />
+        );
+
+      case 'notebook_reading':
+        return (
+          <NotebookReadingScreen
+            notebook={currentView.notebook}
+            onBack={popView}
           />
         );
 
@@ -232,15 +246,15 @@ const MnemeApp: React.FC = () => {
                 onOpenSearch={() => pushView({ type: 'search' })}
                 onSelectCategory={(cat) => pushView({ type: 'category', category: cat })}
                 onSelectLink={(link) => pushView({ type: 'link_detail', link })}
-                showSuccessToast={showToast}
-                onDismissToast={() => setShowToast(false)}
+                successCategoryName={successCategory ?? undefined}
+                onOpenSuccessCategory={openSuccessCategory}
               />
             );
           case 'notebook':
             return (
               <NotebookScreen
                 onSelectNotebook={(nb) => pushView({ type: 'notebook_detail', notebook: nb })}
-                onCreateNotebook={() => pushView({ type: 'create_notebook' })}
+                onCreateNotebook={() => pushView({ type: 'select_sources', fromFolder: false })}
                 onOpenSearch={() => pushView({ type: 'search' })}
               />
             );
@@ -259,18 +273,16 @@ const MnemeApp: React.FC = () => {
         The Figma frame carries px-20, which is why the status bar is 350 wide and
         starts at x=20 while Content is a full 390 and overflows that padding.
       */}
-      <div className={`relative flex h-screen w-full flex-col items-center overflow-hidden px-[20px] sm:h-[856px] sm:w-[390px] sm:rounded-[40px] sm:shadow-[0_30px_70px_-20px_rgba(0,0,0,0.55)] ${usesWhiteCanvas ? 'bg-white' : usesPurpleStatusBar ? 'bg-[#7758e2]' : 'bg-[#f8f6fd]'}`}>
+      <div className={`relative flex h-screen w-full flex-col items-center overflow-hidden px-[20px] sm:h-[856px] sm:w-[390px] sm:rounded-[40px] sm:shadow-[0_30px_70px_-20px_rgba(0,0,0,0.55)] ${usesWhiteCanvas ? 'bg-white' : 'bg-[#f8f6fd]'}`}>
         {/* iOS UI/Status Bar. Same layout on every screen: live Ho Chi Minh City clock, left. */}
-        <div className={`relative h-[44px] shrink-0 overflow-hidden select-none ${usesWhiteCanvas || usesPurpleStatusBar ? 'w-[390px]' : 'w-full'}`}>
+        <div className={`relative h-[44px] shrink-0 overflow-hidden select-none ${usesWhiteCanvas ? 'w-[390px]' : 'w-full'}`}>
           <p
-            className={`absolute top-[13px] left-[24px] h-[20px] w-[54px] text-center font-['Inter',sans-serif] text-[15px] leading-[20px] font-semibold tracking-[-0.5px] ${
-              usesPurpleStatusBar ? 'text-[#fefefe]' : 'text-[#161718]'
-            }`}
+            className="absolute top-[13px] left-[24px] h-[20px] w-[54px] text-center font-['Inter',sans-serif] text-[15px] leading-[20px] font-semibold tracking-[-0.5px] text-[#161718]"
           >
             {statusBarTime}
           </p>
           <div className="absolute top-[17.33px] right-[18.67px] flex">
-            <FigmaIcon name={usesPurpleStatusBar ? 'create-notebook-status' : 'status-right'} color={usesPurpleStatusBar ? '#fefefe' : undefined} />
+            <FigmaIcon name="status-right" />
           </div>
         </div>
 
@@ -282,7 +294,8 @@ const MnemeApp: React.FC = () => {
         */}
         <main
           ref={mainRef}
-          className={`no-scrollbar relative flex w-[390px] flex-1 flex-col items-center overflow-x-hidden overflow-y-auto ${currentView.type === 'tabs' ? 'pb-[115px]' : ''}`}
+          className={`no-scrollbar relative flex w-[390px] flex-1 touch-pan-y flex-col items-center overflow-x-hidden overflow-y-auto overscroll-y-contain ${currentView.type === 'tabs' ? 'pb-[115px]' : ''}`}
+          style={{ WebkitOverflowScrolling: 'touch' }}
         >
           {renderActiveScreen()}
         </main>
@@ -300,7 +313,7 @@ const MnemeApp: React.FC = () => {
           of the 844-tall frames. It draws over the navigation bar, so it must
           come after it.
         */}
-        <div className={`pointer-events-none absolute bottom-[8px] left-1/2 z-50 h-[5px] w-[144px] -translate-x-1/2 rounded-full ${usesWhiteCanvas || usesPurpleStatusBar ? 'bg-black' : 'bg-[#3c3c432e]'}`} />
+        <div className={`pointer-events-none absolute bottom-[8px] left-1/2 z-50 h-[5px] w-[144px] -translate-x-1/2 rounded-full ${usesWhiteCanvas ? 'bg-black' : 'bg-[#3c3c432e]'}`} />
       </div>
     </div>
   );
@@ -308,8 +321,10 @@ const MnemeApp: React.FC = () => {
 
 export default function App() {
   return (
-    <MnemeProvider>
-      <MnemeApp />
-    </MnemeProvider>
+    <AppErrorBoundary>
+      <MnemeProvider>
+        <MnemeApp />
+      </MnemeProvider>
+    </AppErrorBoundary>
   );
 }

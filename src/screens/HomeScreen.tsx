@@ -15,16 +15,16 @@ interface HomeScreenProps {
   onOpenSearch: () => void;
   onSelectCategory: (category: MnemeCategory) => void;
   onSelectLink: (link: SavedLink) => void;
-  showSuccessToast?: boolean;
-  onDismissToast?: () => void;
+  successCategoryName?: string;
+  onOpenSuccessCategory?: () => void;
 }
 
 export const HomeScreen: React.FC<HomeScreenProps> = ({
   onOpenSearch,
   onSelectCategory,
   onSelectLink,
-  showSuccessToast = false,
-  onDismissToast,
+  successCategoryName,
+  onOpenSuccessCategory,
 }) => {
   const { categories, links } = useMneme();
   const [filter, setFilter] = useState<string>(FILTERS[0]);
@@ -41,18 +41,26 @@ export const HomeScreen: React.FC<HomeScreenProps> = ({
 
   return (
     // Content, node 2172:4418
-    <div className="flex w-[390px] flex-1 flex-col items-start gap-[12px] px-[20px] py-[16px]">
-      {showSuccessToast && (
-        // Add-link toast, node 2159:13227
-        <div className="flex w-[350px] items-center justify-between rounded-[16px] border border-[#31cf37]/30 bg-[#31cf37]/15 p-[12px]">
-          <div className="flex items-center gap-[10px]">
+    <div className="relative flex w-[390px] flex-1 flex-col items-start gap-[12px] px-[20px] py-[16px]">
+      {successCategoryName && (
+        // Add-link toast, Figma node 2172:8126 (frame 2172:8057).
+        <div
+          className="absolute top-[558px] left-[20px] z-40 flex h-[85px] w-[351px] items-center justify-center gap-[10px] overflow-hidden rounded-[16px] bg-[#f7f7f8] p-[20px]"
+          style={{ boxShadow: '0 187px 26px rgba(0,0,0,0), 0 120px 24px rgba(0,0,0,0.01), 0 67px 20px rgba(0,0,0,0.04), 0 30px 15px rgba(0,0,0,0.06), 0 7px 8px rgba(0,0,0,0.07)' }}
+          role="status"
+        >
+          <div className="flex min-w-0 flex-1 items-start justify-center gap-[10px] overflow-hidden">
             <FigmaIcon name="check-circle" size={24} />
-            <span className="text-[12px] leading-[16px] font-medium tracking-[0.4px] text-[#0e0727]">
-              Đã thêm liên kết vào Mneme thành công!
+            <span className="min-w-0 flex-1 truncate whitespace-nowrap text-center text-[16px] leading-[22px] font-normal tracking-[-0.18px] text-[#0e0727]">
+              Đã thêm vào category “{successCategoryName}”
             </span>
           </div>
-          <button type="button" onClick={onDismissToast} aria-label="Đóng thông báo" className="p-[4px]">
-            <FigmaIcon name="close-small" size={16} color="#9490a2" />
+          <button
+            type="button"
+            onClick={onOpenSuccessCategory}
+            className="shrink-0 whitespace-nowrap text-center text-[16px] leading-[22px] font-normal tracking-[-0.18px] text-[#7758e2]"
+          >
+            Mở
           </button>
         </div>
       )}
@@ -162,7 +170,7 @@ export const HomeScreen: React.FC<HomeScreenProps> = ({
                   <img src={category.image} alt="" className="size-full rounded-[15px] object-cover" />
                 </div>
                 <div className="flex min-w-px flex-1 flex-col items-start justify-center gap-[8px]">
-                  <p className="w-full text-[16px] leading-[24px] font-medium tracking-[0px] text-[#0e0727]">
+                  <p className="w-full truncate text-[16px] leading-[24px] font-medium tracking-[0px] text-[#0e0727]">
                     {category.name}
                   </p>
                   <div className="flex w-full items-center gap-[4px]">

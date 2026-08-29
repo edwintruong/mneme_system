@@ -152,6 +152,11 @@ export const FIGMA_ICONS: Record<string, IconAsset> = {
 
   // Add-link toast, node 2159:13227
   'check-circle': { src: `${N2159}/2159_13227_success.svg`, w: 24, h: 24 },
+
+  // Notebook reading screen, node 2172:4589 (and its three sibling notebooks).
+  // Distinct from `notebook-detail-edit` (a solid pencil glyph for the dark
+  // cover) — this is an outline edit-in-rectangle glyph for the white header.
+  'notebook-reading-edit': { src: `${N2172}/2172_4589_edit_rectangle.svg`, w: 24, h: 24 },
 };
 
 export interface FigmaIconProps {
