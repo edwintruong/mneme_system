@@ -10,26 +10,34 @@ import { AddLinkParams } from '../types';
  * resolved, and an AI-suggested category. The fields below start on those
  * values so the screen opens in the state the design specifies, and stay
  * editable.
+ *
+ * When opened from a specific folder (`initialFolder`), the preview instead
+ * auto-fills from that folder's held-back seed link (see
+ * `getFolderAutofillLink` / `FolderDetailScreen`) so it looks like Mneme
+ * already found this content for you. These generic constants are only the
+ * fallback for folder-less flows (Home, or "add link" from a category with
+ * no folder selected).
  */
 const DESIGN_URL = 'https://mimimi.vn/skincare/routine-toi-gian-da-nhay-cam';
 const DESIGN_CATEGORY = 'Lifestyle';
 const DESIGN_FOLDER = 'Self-care';
+const DESIGN_TITLE = 'Routine skincare tối giản';
+const DESIGN_SUMMARY = 'Routine đơn giản cho làn da khỏe và ít kích ứng.';
+const DESIGN_IMAGE = '/assets/images/figma_2159/2159_13180_preview.jpg';
+const DESIGN_DOMAIN = 'mimimi.com';
+const DESIGN_CATEGORY_IMAGE = '/assets/images/figma_2159/2159_13180_cat_thumb.jpg';
 
-const TRAVEL_DESIGN = {
-  url: 'https://mimimi.vn/travelguide/routine-toi-gian-da-nhay-cam',
-  category: 'Du lịch',
-  folder: 'Mẹo du lịch tiết kiệm',
-  title: 'Lịch trình khám phá Kyoto tự túc trong 5 ngày',
-  summary: 'Mẹo du lịch cho người mới bắt đầu',
-  domain: 'mimimi.com',
-  previewImage: '/assets/images/figma_2172/2172_8010_preview.png',
-  categoryImage: '/assets/images/figma_2159/2159_12771_category_travel.jpg',
-} as const;
+const getDomainLabel = (url: string): string => {
+  try {
+    return new URL(url).hostname.replace(/^www\./, '');
+  } catch {
+    return DESIGN_DOMAIN;
+  }
+};
 
 interface AddLinkScreenProps {
   initialFolder?: string;
   initialCategory?: string;
-  originFolder?: string;
   onBack: () => void;
   onSaveToCategory: (params: AddLinkParams) => Promise<void>;
 }
@@ -58,33 +66,21 @@ const OverlaySelect: React.FC<{
 export const AddLinkScreen: React.FC<AddLinkScreenProps> = ({
   initialFolder,
   initialCategory,
-  originFolder,
   onBack,
   onSaveToCategory,
 }) => {
-  const { folders, categories } = useMneme();
-  const isTravelCategoryFlow = initialCategory === TRAVEL_DESIGN.category;
-  const isTravelFolderFlow = Boolean(originFolder) && isTravelCategoryFlow;
-  const designUrl = isTravelCategoryFlow ? TRAVEL_DESIGN.url : DESIGN_URL;
-  const designFolder = isTravelCategoryFlow ? TRAVEL_DESIGN.folder : DESIGN_FOLDER;
+  const { folders, categories, getFolderAutofillLink } = useMneme();
+  const autofillLink = initialFolder ? getFolderAutofillLink(initialFolder) : undefined;
+  const designUrl = autofillLink?.url ?? DESIGN_URL;
+  const designFolder = initialFolder || DESIGN_FOLDER;
   const designCategory = initialCategory || DESIGN_CATEGORY;
-  const previewTitle = isTravelCategoryFlow ? TRAVEL_DESIGN.title : 'Routine skincare tối giản';
-  const previewSummary = isTravelCategoryFlow
-    ? TRAVEL_DESIGN.summary
-    : 'Routine đơn giản cho làn da khỏe và ít kích ứng.';
-  const previewImage = isTravelCategoryFlow
-    ? isTravelFolderFlow
-      ? '/assets/images/figma_2172/2172_7015_link1.jpg'
-      : TRAVEL_DESIGN.previewImage
-    : '/assets/images/figma_2159/2159_13180_preview.jpg';
-  const categoryImage = isTravelCategoryFlow
-    ? TRAVEL_DESIGN.categoryImage
-    : '/assets/images/figma_2159/2159_13180_cat_thumb.jpg';
+  const previewTitle = autofillLink?.title ?? DESIGN_TITLE;
+  const previewSummary = autofillLink?.summary ?? DESIGN_SUMMARY;
+  const previewImage = autofillLink?.image ?? DESIGN_IMAGE;
+  const previewDomain = autofillLink ? getDomainLabel(autofillLink.url) : DESIGN_DOMAIN;
+  const categoryImage = categories.find((c) => c.name === designCategory)?.image ?? DESIGN_CATEGORY_IMAGE;
   const [url, setUrl] = useState(designUrl);
-  // The folder-entry storyboard (`2217:7777`) is intentionally restaged with
-  // Figma's AI-suggested destination, while `originFolder` remembers where to
-  // return for the success state (`2217:7825`).
-  const [folder, setFolder] = useState(isTravelFolderFlow ? designFolder : initialFolder || designFolder);
+  const [folder, setFolder] = useState(designFolder);
   const [category, setCategory] = useState(designCategory);
 
   const folderOptions = Array.from(new Set([designFolder, ...folders]));
@@ -99,13 +95,15 @@ export const AddLinkScreen: React.FC<AddLinkScreenProps> = ({
         url,
         folder,
         category,
-        preset: isTravelCategoryFlow
+        preset: autofillLink
           ? {
-              title: TRAVEL_DESIGN.title,
-              summary: TRAVEL_DESIGN.summary,
-              image: TRAVEL_DESIGN.previewImage,
-              source: 'Website',
-              tags: ['Du lịch', 'Kyoto'],
+              title: autofillLink.title,
+              summary: autofillLink.summary,
+              image: autofillLink.image,
+              source: autofillLink.source,
+              author: autofillLink.author,
+              duration: autofillLink.duration,
+              tags: autofillLink.tags,
             }
           : undefined,
       });
@@ -143,7 +141,7 @@ export const AddLinkScreen: React.FC<AddLinkScreenProps> = ({
         box 364, folder label 466).
       */}
       <div
-        className={`flex h-[706px] w-[356px] shrink-0 flex-col items-center overflow-hidden rounded-[20px] bg-white px-[16px] py-[20px] ${isTravelCategoryFlow ? 'gap-[20px]' : 'gap-[18px]'}`}
+        className="flex h-[706px] w-[356px] shrink-0 flex-col items-center gap-[18px] overflow-hidden rounded-[20px] bg-white px-[16px] py-[20px]"
         style={{ boxShadow: 'var(--shadow-card)' }}
       >
         {/* Liên kết, node 2159:13191 */}
@@ -172,7 +170,7 @@ export const AddLinkScreen: React.FC<AddLinkScreenProps> = ({
               className="flex w-[316px] items-center gap-[10px] overflow-hidden rounded-[16px] bg-white p-[8px]"
               style={{ boxShadow: 'var(--shadow-card)' }}
             >
-              <div className={`${isTravelFolderFlow ? 'h-[80px]' : 'h-[84px]'} w-[80px] shrink-0 overflow-hidden rounded-[15px]`}>
+              <div className="h-[84px] w-[80px] shrink-0 overflow-hidden rounded-[15px]">
                 <img
                   src={previewImage}
                   alt=""
@@ -188,7 +186,7 @@ export const AddLinkScreen: React.FC<AddLinkScreenProps> = ({
                 </p>
                 <div className="flex w-full min-w-0 items-center overflow-hidden">
                   <p className="w-full truncate whitespace-nowrap text-[12px] leading-[16px] font-normal tracking-[0.4px] text-[#9490a2]">
-                    {isTravelCategoryFlow ? TRAVEL_DESIGN.domain : 'mimimi.com'}
+                    {previewDomain}
                   </p>
                 </div>
               </div>
@@ -207,13 +205,13 @@ export const AddLinkScreen: React.FC<AddLinkScreenProps> = ({
             </span>
           </div>
           <div className="relative flex w-full items-center gap-[20px] overflow-hidden rounded-[11px] border-2 border-solid border-[#f1eefc] bg-[#fefefe] p-[8px]">
-            <div className={`relative size-[60px] shrink-0 overflow-hidden ${isTravelCategoryFlow ? 'rounded-[15px]' : 'rounded-[11.25px]'}`}>
+            <div className="relative size-[60px] shrink-0 overflow-hidden rounded-[11.25px]">
               <img
                 src={categoryImage}
                 alt=""
-                className={`size-full object-cover ${isTravelCategoryFlow ? 'rounded-[15px]' : 'rounded-[11.25px]'}`}
+                className="size-full rounded-[11.25px] object-cover"
               />
-              <span className={`absolute flex items-center rounded-[10.765px] border-[0.487px] border-solid border-[#d9d9d9] bg-white p-[2.691px] ${isTravelCategoryFlow ? 'top-[39px] left-[5px]' : 'top-[40.5px] left-[3.75px]'}`}>
+              <span className="absolute top-[40.5px] left-[3.75px] flex items-center rounded-[10.765px] border-[0.487px] border-solid border-[#d9d9d9] bg-white p-[2.691px]">
                 <FigmaIcon name="img-badge" size={10.144} />
               </span>
             </div>

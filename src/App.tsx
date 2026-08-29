@@ -29,7 +29,7 @@ type ScreenView =
   | { type: 'folder'; folderName: string }
   | { type: 'link_detail'; link: SavedLink }
   | { type: 'edit_link'; link: SavedLink }
-  | { type: 'add_link'; initialFolder?: string; initialCategory?: string; returnFolder?: string }
+  | { type: 'add_link'; initialFolder?: string; initialCategory?: string; returnFolder?: string; returnCategory?: string }
   | { type: 'create_notebook' }
   | { type: 'select_sources'; fromFolder: boolean }
   | { type: 'notebook_synthesis'; sourceIds: number[] }
@@ -73,6 +73,7 @@ const MnemeApp: React.FC = () => {
   const [viewStack, setViewStack] = useState<ScreenView[]>([{ type: 'tabs' }]);
   const [successCategory, setSuccessCategory] = useState<string | null>(null);
   const [successFolder, setSuccessFolder] = useState<string | null>(null);
+  const [successCategoryScreen, setSuccessCategoryScreen] = useState<string | null>(null);
   const [ignoredSuggestionIds, setIgnoredSuggestionIds] = useState<AiSuggestionId[]>([]);
   const statusBarTime = useStatusBarClock();
 
@@ -118,12 +119,22 @@ const MnemeApp: React.FC = () => {
 
     if (currentView.type === 'add_link' && currentView.returnFolder) {
       setSuccessCategory(null);
+      setSuccessCategoryScreen(null);
       setSuccessFolder(currentView.returnFolder);
       setViewStack((prev) => prev.slice(0, -1));
       return;
     }
 
+    if (currentView.type === 'add_link' && currentView.returnCategory) {
+      setSuccessCategory(null);
+      setSuccessFolder(null);
+      setSuccessCategoryScreen(currentView.returnCategory);
+      setViewStack((prev) => prev.slice(0, -1));
+      return;
+    }
+
     setSuccessFolder(null);
+    setSuccessCategoryScreen(null);
     setSuccessCategory(result.value.category);
     resetToTabs('home');
   };
@@ -141,10 +152,23 @@ const MnemeApp: React.FC = () => {
         return (
           <CategoryScreen
             category={currentView.category}
-            onBack={popView}
-            onSelectFolder={(folderName) => pushView({ type: 'folder', folderName })}
-            onSelectLink={(link) => pushView({ type: 'link_detail', link })}
-            onAddLink={(category) => pushView({ type: 'add_link', initialCategory: category.name })}
+            showAddSuccess={successCategoryScreen === currentView.category.name}
+            onBack={() => {
+              setSuccessCategoryScreen(null);
+              popView();
+            }}
+            onSelectFolder={(folderName) => {
+              setSuccessCategoryScreen(null);
+              pushView({ type: 'folder', folderName });
+            }}
+            onSelectLink={(link) => {
+              setSuccessCategoryScreen(null);
+              pushView({ type: 'link_detail', link });
+            }}
+            onAddLink={(category) => {
+              setSuccessCategoryScreen(null);
+              pushView({ type: 'add_link', initialCategory: category.name, returnCategory: category.name });
+            }}
           />
         );
 
@@ -198,7 +222,6 @@ const MnemeApp: React.FC = () => {
           <AddLinkScreen
             initialFolder={currentView.initialFolder}
             initialCategory={currentView.initialCategory}
-            originFolder={currentView.returnFolder}
             onBack={popView}
             onSaveToCategory={saveResolvedCategoryLink}
           />

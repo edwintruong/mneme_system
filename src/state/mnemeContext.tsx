@@ -1,17 +1,11 @@
 import React, { createContext, useContext, useState, useEffect } from 'react';
 import { MnemeCategory, SavedLink, Notebook, NotebookOutlineItem, AiExecutionResult, AddLinkParams } from '../types';
 import {
-  CAKE_SHOWCASE_LINK_IDS,
   HOME_CATEGORY_IDS,
-  HOME_CREPE_IMAGE,
-  HOME_RECENT_LINK_IDS,
   INITIAL_CATEGORIES,
   INITIAL_FOLDERS,
   INITIAL_LINKS,
   INITIAL_NOTEBOOKS,
-  MOVIE_SHOWCASE_LINK_IDS,
-  STUDY_SHOWCASE_LINK_IDS,
-  TRAVEL_SHOWCASE_LINK_IDS,
 } from '../data/seed';
 
 interface MnemeContextType {
@@ -26,6 +20,8 @@ interface MnemeContextType {
   moveLinks: (ids: number[], newFolder: string) => void;
   toggleFavorite: (id: number) => void;
   addFolder: (name: string, category?: string) => void;
+  getFolderCategory: (folderName: string) => string | undefined;
+  getFolderAutofillLink: (folderName: string) => SavedLink | undefined;
   addNotebook: (sourceIds: number[]) => Promise<AiExecutionResult<Notebook>>;
   searchLinks: (query: string) => SavedLink[];
   resetDemoData: () => void;
@@ -40,14 +36,7 @@ const STORAGE_KEYS = {
 
 const MnemeContext = createContext<MnemeContextType | undefined>(undefined);
 
-const LEGACY_HOME_CREPE_IMAGE = '/assets/images/figma_2159/2159_12771_recent_crepe.jpg';
-
 const HOME_CATEGORY_ID_SET = new Set<number>(HOME_CATEGORY_IDS);
-const HOME_RECENT_LINK_ID_SET = new Set<number>(HOME_RECENT_LINK_IDS);
-const MOVIE_SHOWCASE_LINK_ID_SET = new Set<number>(MOVIE_SHOWCASE_LINK_IDS);
-const STUDY_SHOWCASE_LINK_ID_SET = new Set<number>(STUDY_SHOWCASE_LINK_IDS);
-const TRAVEL_SHOWCASE_LINK_ID_SET = new Set<number>(TRAVEL_SHOWCASE_LINK_IDS);
-const CAKE_SHOWCASE_LINK_ID_SET = new Set<number>(CAKE_SHOWCASE_LINK_IDS);
 
 /**
  * Restore Figma's Home fixtures while preserving every unrelated local-first record.
@@ -69,42 +58,6 @@ const migrateSavedCategories = (categories: MnemeCategory[]): MnemeCategory[] =>
     .filter((id) => !present.has(id))
     .map((id) => canonical.get(id))
     .filter((category): category is MnemeCategory => Boolean(category));
-  return [...normalized, ...missing];
-};
-
-const migrateSavedLinks = (links: SavedLink[]): SavedLink[] => {
-  const canonical = new Map(
-    INITIAL_LINKS
-      .filter((link) =>
-        HOME_RECENT_LINK_ID_SET.has(link.id)
-        || MOVIE_SHOWCASE_LINK_ID_SET.has(link.id)
-        || STUDY_SHOWCASE_LINK_ID_SET.has(link.id)
-        || TRAVEL_SHOWCASE_LINK_ID_SET.has(link.id)
-        || CAKE_SHOWCASE_LINK_ID_SET.has(link.id)
-      )
-      .map((link) => [link.id, link])
-  );
-  const present = new Set(links.map((link) => link.id));
-  const normalized = links.map((link) => {
-    const fixture = canonical.get(link.id);
-    if (!fixture) return link;
-
-    // HOME_CREPE_IMAGE supersedes the old 2159 asset for id:5. Keeping this
-    // explicit makes the persisted-data migration traceable to node 2172:4416.
-    const image = link.image === LEGACY_HOME_CREPE_IMAGE ? HOME_CREPE_IMAGE : fixture.image;
-    return { ...link, ...fixture, image };
-  });
-  const canonicalIds = [
-    ...HOME_RECENT_LINK_IDS,
-    ...MOVIE_SHOWCASE_LINK_IDS,
-    ...STUDY_SHOWCASE_LINK_IDS,
-    ...TRAVEL_SHOWCASE_LINK_IDS,
-    ...CAKE_SHOWCASE_LINK_IDS,
-  ];
-  const missing = canonicalIds
-    .filter((id) => !present.has(id))
-    .map((id) => canonical.get(id))
-    .filter((link): link is SavedLink => Boolean(link));
   return [...normalized, ...missing];
 };
 
@@ -190,11 +143,15 @@ export const MnemeProvider: React.FC<{ children: React.ReactNode }> = ({ childre
   const [categories, setCategories] = useState<MnemeCategory[]>(() =>
     readSavedArray(STORAGE_KEYS.CATEGORIES, INITIAL_CATEGORIES, migrateSavedCategories));
 
-  const [folders, setFolders] = useState<string[]>(() =>
-    readSavedArray(STORAGE_KEYS.FOLDERS, INITIAL_FOLDERS));
+  // Folders created in the "Tạo folder" sheet are demo-only: they stay live for
+  // the rest of this session but are never written to localStorage, so a reload
+  // always comes back to the showcase's default folder set.
+  const [folders, setFolders] = useState<string[]>(INITIAL_FOLDERS);
 
-  const [links, setLinks] = useState<SavedLink[]>(() =>
-    readSavedArray(STORAGE_KEYS.LINKS, INITIAL_LINKS, migrateSavedLinks));
+  // Links added (or auto-filled) during a session are demo-only too, for the
+  // same reason as folders: a reload always comes back to the showcase's
+  // default set instead of accumulating test data across sessions.
+  const [links, setLinks] = useState<SavedLink[]>(INITIAL_LINKS);
 
   const [notebooks, setNotebooks] = useState<Notebook[]>(() =>
     readSavedArray<Partial<Notebook>>(STORAGE_KEYS.NOTEBOOKS, INITIAL_NOTEBOOKS, migrateSavedNotebooks) as Notebook[]);
@@ -205,21 +162,33 @@ export const MnemeProvider: React.FC<{ children: React.ReactNode }> = ({ childre
   }, [categories]);
 
   useEffect(() => {
-    localStorage.setItem(STORAGE_KEYS.FOLDERS, JSON.stringify(folders));
-  }, [folders]);
-
-  useEffect(() => {
-    localStorage.setItem(STORAGE_KEYS.LINKS, JSON.stringify(links));
-  }, [links]);
-
-  useEffect(() => {
     localStorage.setItem(STORAGE_KEYS.NOTEBOOKS, JSON.stringify(notebooks));
   }, [notebooks]);
+
+  // A brand-new folder has no links yet, so its category can't be read back
+  // off `links`. Remember it here until the first link lands, so a folder
+  // created from within a category (e.g. the "Tạo folder" sheet) keeps that
+  // category through the add-link flow instead of falling back to the
+  // AddLinkScreen's hardcoded design default.
+  const [emptyFolderCategories, setEmptyFolderCategories] = useState<Record<string, string>>({});
 
   const addFolder = (name: string, category = 'Design') => {
     const trimmed = name.trim();
     if (!trimmed || folders.includes(trimmed)) return;
     setFolders((prev) => [...prev, trimmed]);
+    setEmptyFolderCategories((prev) => ({ ...prev, [trimmed]: category }));
+  };
+
+  const getFolderCategory = (folderName: string): string | undefined =>
+    links.find((link) => link.folder === folderName)?.category ?? emptyFolderCategories[folderName];
+
+  // The last link in a folder (by seed/array order — new links are unshifted to
+  // the front, so this stays the same seed record) is held back from the
+  // folder's visible list and reused as the "AI already found this" preview
+  // when adding a new link from inside that folder.
+  const getFolderAutofillLink = (folderName: string): SavedLink | undefined => {
+    const folderLinks = links.filter((link) => link.folder === folderName);
+    return folderLinks[folderLinks.length - 1];
   };
 
   const getSourceFromUrl = (url: string): string => {
@@ -471,6 +440,8 @@ export const MnemeProvider: React.FC<{ children: React.ReactNode }> = ({ childre
         moveLinks,
         toggleFavorite,
         addFolder,
+        getFolderCategory,
+        getFolderAutofillLink,
         addNotebook,
         searchLinks,
         resetDemoData,

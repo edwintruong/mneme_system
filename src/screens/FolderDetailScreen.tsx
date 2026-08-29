@@ -55,10 +55,16 @@ export const FolderDetailScreen: React.FC<FolderDetailScreenProps> = ({
   onSelectLink,
   onAddNewLink,
 }) => {
-  const { links } = useMneme();
+  const { links, getFolderCategory, getFolderAutofillLink } = useMneme();
   const [filter, setFilter] = useState<string>(FILTERS[0]);
-  const folderLinks = links.filter((link) => link.folder === folderName).slice(0, 5);
-  const folderCategory = folderLinks[0]?.category;
+  // The last link in this folder is held back and reused as the auto-fill
+  // preview when adding a new link here (see AddLinkScreen), so it never
+  // shows up in this list — otherwise the same content would appear twice.
+  const autofillLink = getFolderAutofillLink(folderName);
+  const folderLinks = links
+    .filter((link) => link.folder === folderName && link.id !== autofillLink?.id)
+    .slice(0, 5);
+  const folderCategory = folderLinks[0]?.category ?? getFolderCategory(folderName);
   const isEmpty = folderLinks.length === 0;
 
   return (

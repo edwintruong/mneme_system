@@ -11,6 +11,7 @@ import {
 
 interface CategoryScreenProps {
   category: MnemeCategory;
+  showAddSuccess?: boolean;
   onBack: () => void;
   onSelectFolder: (folderName: string) => void;
   onSelectLink: (link: SavedLink) => void;
@@ -92,12 +93,13 @@ const CategoryLinkRow: React.FC<{ link: SavedLink; onClick: () => void; exactMet
 /** Shared category list, including Figma nodes 2159:13036 and 2172:5822. */
 export const CategoryScreen: React.FC<CategoryScreenProps> = ({
   category,
+  showAddSuccess = false,
   onBack,
   onSelectFolder,
   onSelectLink,
   onAddLink,
 }) => {
-  const { links, addFolder } = useMneme();
+  const { links, folders, addFolder, getFolderCategory, getFolderAutofillLink } = useMneme();
   const [filter, setFilter] = useState<string>(FILTERS[0]);
   const [showAddModal, setShowAddModal] = useState(false);
   const [newFolderName, setNewFolderName] = useState('');
@@ -121,11 +123,22 @@ export const CategoryScreen: React.FC<CategoryScreenProps> = ({
         .map((id) => links.find((link) => link.id === id))
         .filter((link): link is SavedLink => Boolean(link))
     : links.filter((link) => link.category === category.name).slice(0, 4);
-  const categoryFolders = CATEGORY_FOLDERS[category.name] ?? [];
+  const showcaseFolders = CATEGORY_FOLDERS[category.name] ?? [];
+  // User-created folders (from the "Tạo folder" sheet below) aren't part of the
+  // pixel-verified showcase fixtures, so they're appended after them instead of
+  // replacing that list — new folders must still show up as tiles right away.
+  const createdFolders = folders.filter(
+    (folder) => !showcaseFolders.includes(folder) && getFolderCategory(folder) === category.name
+  );
+  const categoryFolders = [...showcaseFolders, ...createdFolders];
   const categoryLinksForCounts = links.filter((link) => link.category === category.name);
-  const folderLabel = `Folders (${new Set(categoryLinksForCounts.map((link) => link.folder)).size})`;
-  const folderLinkCount = (folder: string) =>
-    categoryLinksForCounts.filter((link) => link.folder === folder).length;
+  const folderLabel = `Folders (${categoryFolders.length})`;
+  const folderLinkCount = (folder: string) => {
+    // Match FolderDetailScreen's visible count: the folder's held-back
+    // auto-fill link doesn't count until the user actually saves it.
+    const autofillLink = getFolderAutofillLink(folder);
+    return categoryLinksForCounts.filter((link) => link.folder === folder && link.id !== autofillLink?.id).length;
+  };
   const viewAllFolder = CATEGORY_VIEW_ALL_FOLDER[category.name];
   const folderThumbnail = isStudyShowcase
     ? '/assets/images/figma_2172/2172_6335_folder.png'
@@ -138,11 +151,28 @@ export const CategoryScreen: React.FC<CategoryScreenProps> = ({
     addFolder(folderName, category.name);
     setNewFolderName('');
     setShowAddModal(false);
-    onSelectFolder(folderName);
+    // Stay on this screen — the new folder tile (purple folder icon, "0 links")
+    // appears immediately below, same as any other folder in this category.
   };
 
   return (
-    <div className="flex w-[390px] shrink-0 flex-col items-start gap-[12px] overflow-visible bg-[#f8f6fd] px-[20px] py-[16px] font-['Roboto',sans-serif]">
+    <div className="relative flex w-[390px] shrink-0 flex-col items-start gap-[12px] overflow-visible bg-[#f8f6fd] px-[20px] py-[16px] font-['Roboto',sans-serif]">
+      {showAddSuccess && (
+        // Success state mirrors the folder-detail popup (2217:7825): same sheet,
+        // same icon, scoped to "category" copy since this screen is a category.
+        <div
+          className="absolute top-[667px] left-[20px] z-40 flex w-[351px] items-center justify-center rounded-[16px] bg-[#f7f7f8] p-[20px]"
+          style={{ boxShadow: '0 187px 26px rgba(0,0,0,0), 0 120px 24px rgba(0,0,0,0.01), 0 67px 20px rgba(0,0,0,0.04), 0 30px 15px rgba(0,0,0,0.06), 0 7px 8px rgba(0,0,0,0.07)' }}
+          role="status"
+        >
+          <div className="flex min-w-0 flex-1 items-start justify-center gap-[10px]">
+            <FigmaIcon name="check-circle" size={24} />
+            <p className="shrink-0 whitespace-nowrap text-center text-[16px] leading-[22px] font-normal tracking-[-0.18px] text-[#0e0727]">
+              Đã thêm vào category
+            </p>
+          </div>
+        </div>
+      )}
       <header className="flex h-[30px] w-[350px] items-end justify-center gap-[8px] px-[20px]">
         <button type="button" onClick={onBack} aria-label="Quay lại" className="flex h-[30px] w-[30px] shrink-0 items-center">
           <FigmaIcon name="category-back" style={{ transform: 'rotate(180deg)' }} />
@@ -169,7 +199,7 @@ export const CategoryScreen: React.FC<CategoryScreenProps> = ({
         </div>
       </div>
 
-      <div className="flex h-[840px] w-[350px] shrink-0 flex-col items-start gap-[20px] rounded-[20px] bg-white px-[16px] py-[20px] shadow-[0_0_2px_rgba(0,0,0,0.04),0_4px_4px_rgba(0,0,0,0.06)]">
+      <div className="flex min-h-[840px] w-[350px] shrink-0 flex-col items-start gap-[20px] rounded-[20px] bg-white px-[16px] py-[20px] shadow-[0_0_2px_rgba(0,0,0,0.04),0_4px_4px_rgba(0,0,0,0.06)]">
         <div className="flex h-[28px] shrink-0 items-start gap-[10px] overflow-hidden">
           {FILTERS.map((label) => {
             const selected = filter === label;
@@ -188,8 +218,8 @@ export const CategoryScreen: React.FC<CategoryScreenProps> = ({
           })}
         </div>
 
-        <div className="flex h-[752px] w-[318px] shrink-0 flex-col items-start gap-[20px]">
-          <section className="flex h-[220px] w-full shrink-0 flex-col items-start gap-[10px]">
+        <div className="flex min-h-[752px] w-[318px] shrink-0 flex-col items-start gap-[20px]">
+          <section className="flex min-h-[220px] w-full shrink-0 flex-col items-start gap-[10px]">
             <div className="flex h-[30px] w-full items-center gap-[10px]">
               <h2 className="min-w-0 flex-1 text-[14px] leading-[20px] font-medium tracking-[0.4px] text-[#0e0727]">{folderLabel}</h2>
               <button
@@ -202,9 +232,12 @@ export const CategoryScreen: React.FC<CategoryScreenProps> = ({
               </button>
             </div>
 
-            {categoryFolders.slice(0, 2).length > 0 && (
-              <div className="flex h-[72px] w-full items-center gap-[10px]">
-                {categoryFolders.slice(0, 2).map((folder) => (
+            {/* Two tiles per row, same geometry as the pixel-verified showcase rows.
+                Rows beyond the first two only appear once folders are created
+                past the showcase's four, so the default case renders unchanged. */}
+            {Array.from({ length: Math.ceil(categoryFolders.length / 2) }).map((_, rowIndex) => (
+              <div key={rowIndex} className="flex h-[72px] w-full items-center gap-[10px]">
+                {categoryFolders.slice(rowIndex * 2, rowIndex * 2 + 2).map((folder) => (
                   <button key={folder} type="button" onClick={() => onSelectFolder(folder)} className="flex h-[72px] min-w-0 flex-1 items-center justify-center gap-[10px] rounded-[12px] bg-[#f7f7f8] px-[8px] py-[12px] text-left">
                     <FolderThumbnail source={folderThumbnail} />
                     <span className="flex min-w-0 flex-1 flex-col items-start justify-center gap-[4px] whitespace-nowrap">
@@ -214,21 +247,7 @@ export const CategoryScreen: React.FC<CategoryScreenProps> = ({
                   </button>
                 ))}
               </div>
-            )}
-
-            {categoryFolders.slice(2, 4).length > 0 && (
-              <div className="flex h-[72px] w-full items-center gap-[10px]">
-                {categoryFolders.slice(2, 4).map((folder) => (
-                  <button key={folder} type="button" onClick={() => onSelectFolder(folder)} className="flex h-[72px] min-w-0 flex-1 items-center justify-center gap-[10px] rounded-[12px] bg-[#f7f7f8] px-[8px] py-[12px] text-left">
-                    <FolderThumbnail source={folderThumbnail} />
-                    <span className="flex min-w-0 flex-1 flex-col items-start justify-center gap-[4px] whitespace-nowrap">
-                      <span className={`${truncatesFolderNames ? 'w-full truncate' : ''} text-[16px] leading-[24px] font-medium text-[#0e0727]`}>{folder}</span>
-                      <span className="text-[14px] leading-[20px] font-normal tracking-[0.4px] text-[#9490a2]">{folderLinkCount(folder)} links</span>
-                    </span>
-                  </button>
-                ))}
-              </div>
-            )}
+            ))}
 
             {viewAllFolder && (
               <button type="button" onClick={() => onSelectFolder(viewAllFolder)} className="h-[16px] w-full text-center text-[12px] leading-[16px] font-medium tracking-[0.4px] text-[#0098fd]">Xem tất cả folder</button>
