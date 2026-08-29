@@ -850,6 +850,18 @@ small text lines and JPEG edges accumulate Chrome-vs-Figma raster residuals. Sid
 masks show aligned headers/cards/images/buttons rather than displaced structural blocks; the
 Research reason wrap was explicitly corrected to remain inside its lavender area.
 
+## Docker deployment on port 1300 (2026-08-29)
+
+Added a multi-stage `Dockerfile` and `.dockerignore`. The runtime image installs production
+dependencies only, runs as the unprivileged `node` user, listens on configurable `PORT` (default
+1300), and checks `/api/health`. `server.ts` now imports Vite only inside the development branch;
+the former top-level import made a production-only image require a package that correctly exists
+only in `devDependencies`.
+
+Built `mneme-system:port-1300`, started `mneme-port-1300` on
+`127.0.0.1:1300`, and verified Docker health, `/api/health`, the built index, and SPA fallback all
+return successfully. Gemini remains optional (`geminiConfigured: false` without a runtime secret).
+
 ## Next work
 
 1. Add `2172:7830`, `2172:5821`, `2172:8010`, and `2172:8057` as rows in

@@ -1,7 +1,6 @@
 import express from 'express';
 import cors from 'cors';
 import path from 'path';
-import { createServer as createViteServer } from 'vite';
 import { GoogleGenAI } from '@google/genai';
 
 async function startServer() {
@@ -179,6 +178,9 @@ Yêu cầu trả về JSON có dạng:
 
   // Development vs Production serving
   if (process.env.NODE_ENV !== 'production') {
+    // Keep Vite out of the production server's dependency graph. Docker and
+    // Cloud Run install production dependencies only in the runtime stage.
+    const { createServer: createViteServer } = await import('vite');
     const vite = await createViteServer({
       server: { middlewareMode: true },
       appType: 'spa',

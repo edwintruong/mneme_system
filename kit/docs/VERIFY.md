@@ -29,6 +29,24 @@ curl -o /dev/null -w '%{http_code}\n' \
 `geminiConfigured` is `false` until `GEMINI_API_KEY` is set. AI Studio sets it
 as a server-side secret; locally, copy `.env.example` to `.env` and fill it in.
 
+### Docker on port 1300
+
+The checked-in image uses a build stage with all Vite tooling and a smaller
+runtime stage with production dependencies only:
+
+```bash
+docker build -t mneme-system:port-1300 .
+docker run --rm --name mneme-port-1300 \
+  -p 127.0.0.1:1300:1300 -e PORT=1300 \
+  mneme-system:port-1300
+curl -fsS http://127.0.0.1:1300/api/health
+```
+
+The localhost bind deliberately avoids exposing the showcase to the network.
+Pass `-e GEMINI_API_KEY` at runtime only when real Gemini calls are required;
+never copy a local `.env` into the image. The built-in Docker health check uses
+`/api/health` and should report `healthy` after startup.
+
 ## 2. Compare each screen against its Figma export
 
 ```bash

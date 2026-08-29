@@ -1,0 +1,14 @@
+.git
+.gitignore
+node_modules
+dist
+docs
+kit
+.agents
+.codex
+*.log
+.env
+.env.*
+Dockerfile*
+compose*.yml
+compose*.yaml

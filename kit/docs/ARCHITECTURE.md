@@ -5,6 +5,10 @@
 - React 18 + TypeScript + Vite render the local-first mobile showcase.
 - `server.ts` serves the production bundle and server-side Gemini endpoints. Cloud Run supplies
   `PORT`; AI Studio supplies `GEMINI_API_KEY` as a server-side secret.
+- `Dockerfile` builds the Vite/Express bundle in a Node build stage, then runs it as the unprivileged
+  `node` user from a production-only runtime stage. Vite is dynamically imported only in development,
+  so it is not required by that runtime image. The image defaults to port 1300 but still honors
+  `PORT` supplied by Cloud Run or `docker run`.
 - The app shell in `src/App.tsx` owns the fixed 390px frame, shared status bar, view stack, bottom
   navigation, and home indicator.
 
