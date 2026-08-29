@@ -8,6 +8,7 @@ import { LinkDetailScreen } from './screens/LinkDetailScreen';
 import { EditLinkScreen } from './screens/EditLinkScreen';
 import { AddLinkScreen } from './screens/AddLinkScreen';
 import { NotebookScreen } from './screens/NotebookScreen';
+import { CreateNotebookScreen } from './screens/CreateNotebookScreen';
 import { SelectSourcesScreen } from './screens/SelectSourcesScreen';
 import { NotebookAnalysisScreen } from './screens/NotebookAnalysisScreen';
 import { NotebookDetailScreen } from './screens/NotebookDetailScreen';
@@ -29,6 +30,7 @@ type ScreenView =
   | { type: 'link_detail'; link: SavedLink }
   | { type: 'edit_link'; link: SavedLink }
   | { type: 'add_link'; initialFolder?: string; initialCategory?: string }
+  | { type: 'create_notebook' }
   | { type: 'select_sources'; fromFolder: boolean }
   | { type: 'notebook_synthesis'; sourceIds: number[] }
   | { type: 'notebook_detail'; notebook: Notebook }
@@ -170,6 +172,14 @@ const MnemeApp: React.FC = () => {
           />
         );
 
+      case 'create_notebook':
+        return (
+          <CreateNotebookScreen
+            onBack={popView}
+            onSelectFlow={(fromFolder) => pushView({ type: 'select_sources', fromFolder })}
+          />
+        );
+
       case 'select_sources':
         return (
           <SelectSourcesScreen
@@ -264,7 +274,7 @@ const MnemeApp: React.FC = () => {
             return (
               <NotebookScreen
                 onSelectNotebook={(nb) => pushView({ type: 'notebook_detail', notebook: nb })}
-                onCreateNotebook={() => pushView({ type: 'select_sources', fromFolder: false })}
+                onCreateNotebook={() => pushView({ type: 'create_notebook' })}
                 onOpenSearch={() => pushView({ type: 'search' })}
                 onOpenSuggestions={() => pushView({ type: 'ai_suggestions' })}
               />
