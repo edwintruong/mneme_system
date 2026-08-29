@@ -93,7 +93,7 @@ export const AI_SUGGESTIONS: AiSuggestion[] = [
         title: 'Bánh trứng phô mai',
         image: `${IMG}/2172_5409_video_egg.jpg`,
         source: 'TikTok',
-        author: '@abcdef',
+        author: '@easy.cooking',
         url: 'https://tiktok.com/',
         score: 95,
         reasons: [
@@ -107,7 +107,7 @@ export const AI_SUGGESTIONS: AiSuggestion[] = [
         title: 'Đậu phụ sốt mè',
         image: `${IMG}/2172_5409_video_tofu.jpg`,
         source: 'TikTok',
-        author: '@abcdef',
+        author: '@homecook.tips',
         url: 'https://tiktok.com/',
         score: 95,
         reasons: [

@@ -41,7 +41,7 @@ export const LinkTile: React.FC<LinkTileProps> = ({
           {link.title}
         </h4>
         <div className="text-xs text-[#9490A2] mt-1 truncate">
-          {link.source} · @abcdef
+          {link.author ? `${link.source} · ${link.author}` : link.source}
         </div>
         <div className="flex items-center gap-1.5 flex-wrap mt-1.5">
           <Tag label={link.folder} />

@@ -56,9 +56,7 @@ export const SearchScreen: React.FC<SearchScreenProps> = ({ onBack, onSelectLink
         {/* Semantic Helper Banner */}
         {query.trim() !== '' ? (
           <div className="px-1 text-xs text-[#9490A2]">
-            {results.length === 0
-              ? 'Không tìm thấy nội dung phù hợp'
-              : `Mneme hiểu ý bạn và tìm thấy ${results.length} kết quả`}
+            {results.length === 0 && 'Không tìm thấy nội dung phù hợp'}
           </div>
         ) : (
           <div className="bg-white rounded-3xl p-5 shadow-xs space-y-3">

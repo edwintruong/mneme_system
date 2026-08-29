@@ -98,7 +98,7 @@ const CategoryLinkRow: React.FC<{ link: SavedLink; onClick: () => void; exactMet
         <span className="flex w-full shrink-0 items-center gap-[4px] overflow-hidden text-[12px] leading-[16px] font-normal tracking-[0.4px] whitespace-nowrap text-[#9490a2]">
           <span className="shrink-0">{exactMetadata ? link.source : 'TikTok'}</span>
           <FigmaIcon name="category-dot" />
-          <span className="min-w-0 truncate">{exactMetadata ? link.author : '@abcdef'}</span>
+          <span className="min-w-0 truncate">{link.author}</span>
         </span>
         <span className="flex w-full shrink-0 items-start gap-[8px] overflow-hidden">
           <span className="flex min-w-0 items-center justify-center truncate rounded-[24px] bg-[#f2f2f3] px-[12px] py-[4px] text-[12px] leading-[16px] font-normal whitespace-nowrap text-[#0e0727]">

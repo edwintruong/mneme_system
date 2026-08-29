@@ -37,7 +37,7 @@ const SHOWCASE_SOURCES: readonly ShowcaseSource[] = [
     image: `${N2172}/2172_4631_source_2_info_sign.jpg`,
     title: 'Research nhiều nguồn mà không bị loạn thông tin',
     source: 'X',
-    author: '@abcdef',
+    author: '@research.notes',
     tags: ['AI Workflow', 'Research'],
   },
   {
@@ -51,21 +51,21 @@ const SHOWCASE_SOURCES: readonly ShowcaseSource[] = [
     image: `${N2172}/2172_4631_source_4_travel_rome.jpg`,
     title: 'Những lỗi dễ gặp khi research địa điểm du lịch',
     source: 'X',
-    author: '@abcdef',
+    author: '@travel.smart',
     tags: ['Du lịch', 'Lập kế hoạch'],
   },
   {
     image: `${N2172}/2172_4631_source_generic_figma_dock.jpg`,
     title: 'Morem ipsum dolor sit amet, consectetur adipiscing elit.',
     source: 'TikTok',
-    author: '@abcdef',
+    author: '@demo.creator',
     tags: ['AI Workflow', 'Research'],
   },
   {
     image: `${N2172}/2172_4631_source_generic_figma_dock.jpg`,
     title: 'Morem ipsum dolor sit amet, consectetur adipiscing elit.',
     source: 'TikTok',
-    author: '@abcdef',
+    author: '@demo.creator',
     tags: ['AI Workflow', 'Research'],
   },
 ] as const;

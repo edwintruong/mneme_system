@@ -126,7 +126,7 @@ export const INITIAL_LINKS: SavedLink[] = [
   {
     id: 10,
     title: 'Mỗi manh mối mới khiến vụ mất tích rẽ sang một hướng khác',
-    url: 'https://www.tiktok.com/@abcdef/video/movie-clue',
+    url: 'https://www.tiktok.com/@drama.review/video/movie-clue',
     summary: 'Một vụ mất tích thay đổi hướng điều tra sau mỗi manh mối mới.',
     category: 'Phim ảnh',
     folder: 'Phim Hàn',
@@ -145,7 +145,7 @@ export const INITIAL_LINKS: SavedLink[] = [
     // then double-list it alongside id:154.
     id: 11,
     title: 'Một nhóm học sinh lập kế hoạch tận hưởng mùa hè trước khi mọi thứ thay đổi',
-    url: 'https://www.tiktok.com/@abcdef/video/summer-school',
+    url: 'https://www.tiktok.com/@anime.schoollife/video/summer-school',
     summary: 'Một nhóm học sinh tận hưởng mùa hè trước bước ngoặt lớn.',
     category: 'Phim ảnh',
     folder: 'Phim ảnh',
@@ -162,7 +162,7 @@ export const INITIAL_LINKS: SavedLink[] = [
     // folder-detail copy for the same photo (see id:152).
     id: 12,
     title: 'Gia đình chuyển vào căn nhà mới và phát hiện những đoạn băng bị giấu trong tường',
-    url: 'https://www.tiktok.com/@abcdef/video/hidden-tapes',
+    url: 'https://www.tiktok.com/@taiwan.horror/video/hidden-tapes',
     summary: 'Những đoạn băng bí ẩn được tìm thấy trong căn nhà mới.',
     category: 'Phim ảnh',
     folder: 'Phim ảnh',
@@ -180,7 +180,7 @@ export const INITIAL_LINKS: SavedLink[] = [
     // for the same photo (see id:153).
     id: 13,
     title: 'Thành phố  bán ký ức để đổi lấy thời gian',
-    url: 'https://www.tiktok.com/@abcdef/video/memory-city',
+    url: 'https://www.tiktok.com/@short.fantasy/video/memory-city',
     summary: 'Một thành phố nơi ký ức được trao đổi để lấy thêm thời gian.',
     category: 'Phim ảnh',
     folder: 'Phim ảnh',
