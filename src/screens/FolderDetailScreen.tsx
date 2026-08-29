@@ -5,9 +5,10 @@ import { FigmaIcon } from '../components/common/FigmaIcon';
 
 interface FolderDetailScreenProps {
   folderName: string;
+  showAddSuccess?: boolean;
   onBack: () => void;
   onSelectLink: (link: SavedLink) => void;
-  onAddNewLink: (folderName: string) => void;
+  onAddNewLink: (folderName: string, categoryName?: string) => void;
 }
 
 const FILTERS = ['Tất cả', 'Bài viết', 'Video', 'Ảnh'] as const;
@@ -49,6 +50,7 @@ const FolderLinkRow: React.FC<{ link: SavedLink; onClick: () => void }> = ({ lin
 /** Empty `2159:13158` and populated `2159:13174` folder-detail states. */
 export const FolderDetailScreen: React.FC<FolderDetailScreenProps> = ({
   folderName,
+  showAddSuccess = false,
   onBack,
   onSelectLink,
   onAddNewLink,
@@ -56,10 +58,25 @@ export const FolderDetailScreen: React.FC<FolderDetailScreenProps> = ({
   const { links } = useMneme();
   const [filter, setFilter] = useState<string>(FILTERS[0]);
   const folderLinks = links.filter((link) => link.folder === folderName).slice(0, 5);
+  const folderCategory = folderLinks[0]?.category;
   const isEmpty = folderLinks.length === 0;
 
   return (
-    <div className="flex w-[390px] shrink-0 flex-col items-start gap-[12px] overflow-visible bg-[#f8f6fd] px-[20px] py-[16px] font-['Roboto',sans-serif]">
+    <div className="relative flex w-[390px] shrink-0 flex-col items-start gap-[12px] overflow-visible bg-[#f8f6fd] px-[20px] py-[16px] font-['Roboto',sans-serif]">
+      {showAddSuccess && (
+        <div
+          className="absolute top-[667px] left-[20px] z-40 flex w-[351px] items-center justify-center rounded-[16px] bg-[#f7f7f8] p-[20px]"
+          style={{ boxShadow: '0 187px 26px rgba(0,0,0,0), 0 120px 24px rgba(0,0,0,0.01), 0 67px 20px rgba(0,0,0,0.04), 0 30px 15px rgba(0,0,0,0.06), 0 7px 8px rgba(0,0,0,0.07)' }}
+          role="status"
+        >
+          <div className="flex min-w-0 flex-1 items-start justify-center gap-[10px]">
+            <FigmaIcon name="check-circle" size={24} />
+            <p className="shrink-0 whitespace-nowrap text-center text-[16px] leading-[22px] font-normal tracking-[-0.18px] text-[#0e0727]">
+              Đã thêm vào folder
+            </p>
+          </div>
+        </div>
+      )}
       <header className="flex h-[30px] w-[350px] items-center justify-center gap-[8px] px-[20px]">
         <button type="button" onClick={onBack} aria-label="Quay lại" className="flex h-[30px] w-[30px] shrink-0 items-center">
           <FigmaIcon name={isEmpty ? 'folder-empty-back' : 'folder-back'} style={{ transform: 'rotate(180deg)' }} />
@@ -80,7 +97,7 @@ export const FolderDetailScreen: React.FC<FolderDetailScreenProps> = ({
             <p className="w-full text-center text-[14px] leading-[20px] font-normal tracking-[0.4px] text-[#9490a2]">Chưa có liên kết nào trong thư mục này</p>
             <button
               type="button"
-              onClick={() => onAddNewLink(folderName)}
+              onClick={() => onAddNewLink(folderName, folderCategory)}
               className="flex h-[46px] w-full items-center justify-center gap-[10px] rounded-[16px] bg-[#7758e2] px-[16px] py-[12px] text-[16px] leading-[22px] font-medium tracking-[-0.18px] text-white"
             >
               <span>Thêm liên kết</span>
@@ -120,7 +137,7 @@ export const FolderDetailScreen: React.FC<FolderDetailScreenProps> = ({
             <section className="flex h-[634px] w-[318px] shrink-0 flex-col items-start gap-[10px]">
               <div className="flex h-[24px] w-full items-center gap-[10px]">
                 <h2 className="min-w-0 flex-1 text-[14px] leading-[20px] font-medium tracking-[0.4px] text-[#0e0727]">Tất cả links</h2>
-                <button type="button" onClick={() => onAddNewLink(folderName)} aria-label="Thêm link" className="flex size-[24px] shrink-0 items-center justify-center rounded-full bg-[#7758e2]">
+                <button type="button" onClick={() => onAddNewLink(folderName, folderCategory)} aria-label="Thêm link" className="flex size-[24px] shrink-0 items-center justify-center rounded-full bg-[#7758e2]">
                   <FigmaIcon name="folder-detail-plus" />
                 </button>
               </div>

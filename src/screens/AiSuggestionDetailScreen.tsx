@@ -103,8 +103,15 @@ export const AiSuggestionDetailScreen: React.FC<AiSuggestionDetailScreenProps> =
   return (
     <div className="flex w-[390px] flex-col bg-[#f8f6fd] text-[#0e0727]">
       <header
-        className="relative w-full shrink-0 overflow-hidden rounded-b-[12px] bg-gradient-to-b from-[#2e1442] to-[#18122b] text-[#f4f1fd]"
-        style={{ height: headerBodyHeight, marginBottom: -36 }}
+        className="relative w-full shrink-0 overflow-hidden rounded-b-[12px] text-[var(--color-text-on-primary)]"
+        style={{
+          height: headerBodyHeight,
+          marginBottom: -36,
+          backgroundImage: 'var(--gradient-ai-detail-header)',
+          backgroundSize: `100% ${suggestion.headerHeight}px`,
+          backgroundPosition: '0 -44px',
+          backgroundRepeat: 'no-repeat',
+        }}
       >
         <div className="absolute top-[2px] left-[24px] flex h-[30px] w-[342px] items-center justify-between">
           <button type="button" aria-label="Quay lại" onClick={onBack} className="flex size-[30px] items-center justify-center">

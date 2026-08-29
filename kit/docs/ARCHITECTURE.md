@@ -9,8 +9,9 @@
   `node` user from a production-only runtime stage. Vite is dynamically imported only in development,
   so it is not required by that runtime image. The image defaults to port 1300 but still honors
   `PORT` supplied by Cloud Run or `docker run`.
-- The app shell in `src/App.tsx` owns the fixed 390px frame, shared status bar, view stack, bottom
-  navigation, and home indicator.
+- The app shell in `src/App.tsx` owns the fixed 390px frame, full-width 390px shared status bar,
+  view stack, bottom navigation, and home indicator. Clock and system-glyph coordinates are route-
+  invariant; routes may change only their colors/background treatment.
 
 ## Layers
 
@@ -21,7 +22,7 @@
 - `src/state/mnemeContext.tsx`: the single React state layer and localStorage persistence.
 - `src/data/seed.ts`: exact showcase content required by the Figma frames.
 - `src/index.css`: shared design tokens and global mobile rendering rules.
-- `public/assets/**/figma_2159/`: exact raster/vector bytes exported from the active Figma section.
+- `public/assets/**/figma_<section>/`: exact raster/vector bytes exported from each active Figma node.
 
 ## Data flow
 
@@ -51,11 +52,11 @@ existing local fallback keeps the showcase functional without a configured key.
 - `App.tsx` owns one persistent view stack and one persistent `<main>` scroll container. Pushing or
   popping a screen resets that container to scroll position 0; vertical touch panning and momentum
   scrolling stay enabled for every screen.
-- The active create-notebook storyboard is direct: Notebook tab (`2172:4536`) → “Tạo sổ tay” →
-  source selection (`2172:4631`) → “Tiếp tục” → Research notebook detail (`2172:7907`). The older
-  source-choice and analysis screens remain as legacy files but are intentionally not inserted into
-  this showcase route. This transition is a deterministic local fixture: it intentionally does not
-  call Gemini, which keeps the no-login showcase reliable offline.
+- The active create-notebook route starts at Notebook tab (`2172:4536`) → “Tạo sổ tay” → source
+  choice (`2159:13626`) → source selection (`2172:4631`). The app shell owns the 44px status bar,
+  so route-level status colors must be declared there: source choice uses solid primary purple;
+  AI suggestion details split one continuous dark gradient across the shell status bar and their
+  screen header using the shared `--gradient-ai-detail-header` token.
 - The notebook AI-update storyboard is also deterministic/local: Notebook tab (`2172:7956`) →
   “Cập nhật ngay” → suggestion list (`2172:5336`) → one data-driven review detail
   (`2172:5510`, `5409`, `5614`, or `5717`). `AiSuggestionDetailScreen` owns the shared review
@@ -63,6 +64,15 @@ existing local fallback keeps the showcase functional without a configured key.
   Review/add/ignore state never calls Gemini. Run `kit/scripts/ai_suggestions_smoke.py` after edits
   to this route; it walks all four variants and audits scroll, image loading, text containment, and
   `/api/gemini/*` traffic.
+- The Profile tab is node `2221:8269` rendered by `ProfileScreen`. Like create-notebook, it uses the
+  shell-owned solid-primary status bar; unlike the other tab frames, its Figma instance disables the
+  home indicator, so `App.tsx` suppresses that shared overlay only while Profile is active. The
+  bottom navigation remains the shared `BottomNavigation` component.
+- Folder-originated add-link navigation retains both the form's selected destination and the folder
+  screen to return to in the existing view stack. This reproduces
+  `2172:7015 → 2217:7777 → 2217:7825` without a second state layer: `MnemeProvider.addLink`
+  persists the link, `App.tsx` pops the add-link view, and `FolderDetailScreen` renders the local
+  success state.
 - A screen must not use `overflow-hidden` to discard Figma layers below the static frame. Off-screen
   rows remain in normal scroll reach; floating actions use sticky positioning inside the phone
   viewport.

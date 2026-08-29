@@ -17,7 +17,7 @@
     /* Text */
     --color-text-default: #0e0727;
     --color-text-subtle: #9490a2;
-    --color-text-on-primary: #7758e2;
+    --color-text-on-primary: #f4f1fd;
 
     /* Icon */
     --color-icon-default: #28303f;
@@ -27,6 +27,7 @@
     --color-dark: #28303f;
     --color-success: #31cf37;
     --color-labels-quaternary: #3c3c432e;
+    --gradient-ai-detail-header: linear-gradient(to bottom, #2e1442 0%, #18122b 100%);
 
     /* Type ramp: font-size / line-height / letter-spacing */
     --heading-h3-24: 24px;

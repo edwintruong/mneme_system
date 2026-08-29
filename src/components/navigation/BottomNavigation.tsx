@@ -31,6 +31,8 @@ interface TabSpec {
    * primary-600 #6c50ce. Reproduced per tab rather than normalised.
    */
   activeColor: string;
+  activeLabelColor?: string;
+  activeLabelWeight?: 'medium' | 'normal';
 }
 
 const LEFT_TABS: TabSpec[] = [
@@ -40,7 +42,15 @@ const LEFT_TABS: TabSpec[] = [
 
 const RIGHT_TABS: TabSpec[] = [
   { tab: 'activity', label: 'Hoạt động', icon: 'activity', labelWidth: 74, activeColor: '#7758e2' },
-  { tab: 'profile', label: 'Cá nhân', icon: 'profile', labelWidth: 47, activeColor: '#7758e2' },
+  {
+    tab: 'profile',
+    label: 'Cá nhân',
+    icon: 'profile',
+    labelWidth: 47,
+    activeColor: '#7758e2',
+    activeLabelColor: '#9490a2',
+    activeLabelWeight: 'normal',
+  },
 ];
 
 export const BottomNavigation: React.FC<BottomNavigationProps> = ({
@@ -48,7 +58,16 @@ export const BottomNavigation: React.FC<BottomNavigationProps> = ({
   onTabChange,
   onAddClick,
 }) => {
-  const renderTab = ({ tab, label, icon, activeIcon, labelWidth, activeColor }: TabSpec) => {
+  const renderTab = ({
+    tab,
+    label,
+    icon,
+    activeIcon,
+    labelWidth,
+    activeColor,
+    activeLabelColor,
+    activeLabelWeight,
+  }: TabSpec) => {
     const isActive = currentTab === tab;
     return (
       <button
@@ -65,9 +84,9 @@ export const BottomNavigation: React.FC<BottomNavigationProps> = ({
           className="shrink-0"
         />
         <span
-          style={{ width: labelWidth, color: isActive ? activeColor : '#9490a2' }}
+          style={{ width: labelWidth, color: isActive ? activeLabelColor ?? activeColor : '#9490a2' }}
           className={`whitespace-nowrap text-center text-[12px] leading-[16px] tracking-[0.4px] ${
-            isActive ? 'font-medium' : 'font-normal'
+            isActive && activeLabelWeight !== 'normal' ? 'font-medium' : 'font-normal'
           }`}
         >
           {label}

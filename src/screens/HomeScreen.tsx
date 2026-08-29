@@ -45,7 +45,7 @@ export const HomeScreen: React.FC<HomeScreenProps> = ({
       {successCategoryName && (
         // Add-link toast, Figma node 2172:8126 (frame 2172:8057).
         <div
-          className="absolute top-[558px] left-[20px] z-40 flex h-[85px] w-[351px] items-center justify-center gap-[10px] overflow-hidden rounded-[16px] bg-[#f7f7f8] p-[20px]"
+          className="absolute top-[602px] left-[20px] z-40 flex h-[85px] w-[351px] items-center justify-center gap-[10px] overflow-hidden rounded-[16px] bg-[#f7f7f8] p-[20px]"
           style={{ boxShadow: '0 187px 26px rgba(0,0,0,0), 0 120px 24px rgba(0,0,0,0.01), 0 67px 20px rgba(0,0,0,0.04), 0 30px 15px rgba(0,0,0,0.06), 0 7px 8px rgba(0,0,0,0.07)' }}
           role="status"
         >

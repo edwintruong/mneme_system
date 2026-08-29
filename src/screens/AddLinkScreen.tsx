@@ -29,6 +29,7 @@ const TRAVEL_DESIGN = {
 interface AddLinkScreenProps {
   initialFolder?: string;
   initialCategory?: string;
+  originFolder?: string;
   onBack: () => void;
   onSaveToCategory: (params: AddLinkParams) => Promise<void>;
 }
@@ -57,11 +58,13 @@ const OverlaySelect: React.FC<{
 export const AddLinkScreen: React.FC<AddLinkScreenProps> = ({
   initialFolder,
   initialCategory,
+  originFolder,
   onBack,
   onSaveToCategory,
 }) => {
   const { folders, categories } = useMneme();
   const isTravelCategoryFlow = initialCategory === TRAVEL_DESIGN.category;
+  const isTravelFolderFlow = Boolean(originFolder) && isTravelCategoryFlow;
   const designUrl = isTravelCategoryFlow ? TRAVEL_DESIGN.url : DESIGN_URL;
   const designFolder = isTravelCategoryFlow ? TRAVEL_DESIGN.folder : DESIGN_FOLDER;
   const designCategory = initialCategory || DESIGN_CATEGORY;
@@ -70,13 +73,18 @@ export const AddLinkScreen: React.FC<AddLinkScreenProps> = ({
     ? TRAVEL_DESIGN.summary
     : 'Routine đơn giản cho làn da khỏe và ít kích ứng.';
   const previewImage = isTravelCategoryFlow
-    ? TRAVEL_DESIGN.previewImage
+    ? isTravelFolderFlow
+      ? '/assets/images/figma_2172/2172_7015_link1.jpg'
+      : TRAVEL_DESIGN.previewImage
     : '/assets/images/figma_2159/2159_13180_preview.jpg';
   const categoryImage = isTravelCategoryFlow
     ? TRAVEL_DESIGN.categoryImage
     : '/assets/images/figma_2159/2159_13180_cat_thumb.jpg';
   const [url, setUrl] = useState(designUrl);
-  const [folder, setFolder] = useState(initialFolder || designFolder);
+  // The folder-entry storyboard (`2217:7777`) is intentionally restaged with
+  // Figma's AI-suggested destination, while `originFolder` remembers where to
+  // return for the success state (`2217:7825`).
+  const [folder, setFolder] = useState(isTravelFolderFlow ? designFolder : initialFolder || designFolder);
   const [category, setCategory] = useState(designCategory);
 
   const folderOptions = Array.from(new Set([designFolder, ...folders]));
@@ -164,7 +172,7 @@ export const AddLinkScreen: React.FC<AddLinkScreenProps> = ({
               className="flex w-[316px] items-center gap-[10px] overflow-hidden rounded-[16px] bg-white p-[8px]"
               style={{ boxShadow: 'var(--shadow-card)' }}
             >
-              <div className="h-[84px] w-[80px] shrink-0 overflow-hidden rounded-[15px]">
+              <div className={`${isTravelFolderFlow ? 'h-[80px]' : 'h-[84px]'} w-[80px] shrink-0 overflow-hidden rounded-[15px]`}>
                 <img
                   src={previewImage}
                   alt=""

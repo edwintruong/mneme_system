@@ -19,6 +19,7 @@ interface IconAsset {
 const FIGMA = '/assets/icons/figma';
 const N2159 = '/assets/icons/figma_2159';
 const N2172 = '/assets/icons/figma_2172';
+const N2221 = '/assets/icons/figma_2221';
 
 export const FIGMA_ICONS: Record<string, IconAsset> = {
   // Navigation chrome
@@ -179,6 +180,12 @@ export const FIGMA_ICONS: Record<string, IconAsset> = {
   'ai-suggestions-back': { src: `${FIGMA}/ai_suggestions_dropdown_close.svg`, w: 30, h: 30 },
   'ai-suggestions-more': { src: `${FIGMA}/ai_suggestions_more_vertical.svg`, w: 2.5, h: 12.5 },
   'ai-suggestions-check': { src: `${FIGMA}/ai_suggestions_radio.svg`, w: 18.6667, h: 18.6667 },
+
+  // Profile tab, node 2221:8269
+  'profile-theme': { src: `${N2221}/2221_8269_profile_theme.svg`, w: 19.8511, h: 17.9854 },
+  'profile-chevron': { src: `${N2221}/2221_8269_profile_chevron.svg`, w: 4.58336, h: 9.58338 },
+  'profile-local': { src: `${N2221}/2221_8269_profile_local.svg`, w: 19.5004, h: 20.0752 },
+  'profile-showcase': { src: `${N2221}/2221_8269_profile_showcase.svg`, w: 20, h: 20.75 },
 };
 
 export interface FigmaIconProps {

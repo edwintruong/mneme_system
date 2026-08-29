@@ -10,6 +10,7 @@ Active source-of-truth section: `2159:12770`. Section `2143:4235` is legacy refe
 | Home, add-link toast | `2159:13227` | `src/screens/HomeScreen.tsx` | Uses the exact success vector; layout not yet node-verified |
 | Home variant | `2159:13303` | pending | Pending |
 | Home variant | `2159:13676` | pending | Pending |
+| Profile tab | `2221:8269` | `src/screens/ProfileScreen.tsx` | Complete — exact avatar/menu SVG exports, shared nav, primary status chrome; 1.89 / 1.90 / 1.18 |
 | Link detail | `2159:12980` | `src/screens/LinkDetailScreen.tsx` | Rebuilt from node; pixel-compared |
 | Add link | `2159:13180` | `src/screens/AddLinkScreen.tsx` | Rebuilt from node; pixel-compared |
 | Category list | `2159:13036` | `src/screens/CategoryScreen.tsx` | Rebuilt from node; pixel-compared |
@@ -18,7 +19,7 @@ Active source-of-truth section: `2159:12770`. Section `2143:4235` is legacy refe
 | Folder detail list | `2159:13174` | `src/screens/FolderDetailScreen.tsx` | Rebuilt from node; pixel-compared |
 | Notebook detail | `2159:12842` | `src/screens/NotebookDetailScreen.tsx` | Rebuilt from node; pixel-compared |
 | Notebook list | `2159:12891` | `src/screens/NotebookScreen.tsx` | Rebuilt from node; pixel-compared |
-| Create notebook source choice | `2159:13626` | `src/screens/CreateNotebookScreen.tsx` | Legacy, intentionally unreachable — active `2172:4536` “Tạo sổ tay” opens `2172:4631` directly |
+| Create notebook source choice | `2159:13626` | `src/screens/CreateNotebookScreen.tsx` | Active from `2172:4536`; shell status bar corrected to primary purple; 3.31 / 3.32 / 2.35 |
 | Source selection | `2159:13570` | `src/screens/SelectSourcesScreen.tsx` | Superseded — the screen's only reachable path now renders showcase node `2172:4631`'s content instead of this node's lorem-ipsum rows; see Section 9 table |
 | AI analysis | `2159:13602` | `src/screens/NotebookAnalysisScreen.tsx` | Legacy, intentionally unreachable in the direct `4536 → 4631 → 7907` showcase route |
 | Notebook content | `2159:13374` | `src/screens/NotebookDetailScreen.tsx` | Pending state |
@@ -103,14 +104,16 @@ Detail); `id:152/153/154` are the Folder Detail-only item-1 records. See
 | Create-folder sheet (restaged) | `2172:7830` | `src/screens/CategoryScreen.tsx` | Complete — reuses `2159:13091` sheet; submit now opens the created folder. Screenshot-verified, not yet in `figma_compare.py` |
 | Folder detail — Phim tài liệu | `2172:5821` | `src/screens/FolderDetailScreen.tsx` | Complete — 5 exact links seeded (ids 20–24), reachable via `Phim ảnh` → "Xem tất cả folder". Screenshot-verified, not yet in `figma_compare.py` |
 | Add link to category (Du lịch/Kyoto preset) | `2172:8010` | `src/screens/AddLinkScreen.tsx` | Complete — `initialCategory` prop swaps in the exact Kyoto preset and skips Gemini analysis via `addLink({ preset })`. Screenshot-verified, not yet in `figma_compare.py` |
-| Home add-link toast (category variant) | `2172:8057` | `src/screens/HomeScreen.tsx` | Complete — replaces old dismissable toast with `Đã thêm vào category "…"` + `Mở` action. Screenshot-verified, not yet in `figma_compare.py` |
+| Add link from Nhật Bản folder | `2217:7777` | `src/screens/AddLinkScreen.tsx` | Complete — real folder-origin route, exact Kyoto preview/AI destination; 6.89 / 6.98 / 5.40 |
+| Nhật Bản folder add success | `2217:7825` | `src/screens/FolderDetailScreen.tsx` | Complete — returns to origin with exact success toast; 5.33 / 5.13 / 5.08 |
+| Home add-link toast (category variant) | `2172:8057` | `src/screens/HomeScreen.tsx` | Complete — bottom-positioned `Đã thêm vào category "…"` + `Mở` action; 5.00 / 5.00 / 5.35 |
 | Notebook list (showcase) | `2172:4536` | `src/screens/NotebookScreen.tsx` | Complete — 4.26 / 4.44 / 3.13, 4.69% over 28. Pixel-duplicate of `2159:12891` except one word ("15’" vs "15 phút"); fixed in `INITIAL_NOTEBOOKS`, see `docs/PROGRESS.md` |
 | Notebook list with AI update banner | `2172:7956` | `src/screens/NotebookScreen.tsx` | Complete — “Cập nhật ngay” now opens the live Suggestions route; 4.26 / 4.44 / 3.13, 4.69% over 28 |
 | AI Suggestions list | `2172:5336` | `src/screens/AiSuggestionsScreen.tsx` | Complete — grouped cards, live All/New/Ignored tabs, and Review navigation; 11.31 / 11.71 / 8.75, 8.90% over 28 |
-| AI Suggestion Review — Research | `2172:5510` | `src/screens/AiSuggestionDetailScreen.tsx` | Complete — 16.37 / 15.94 / 15.02, 11.49% over 28; text/JPEG-heavy residual without displaced layout blocks |
-| AI Suggestion Review — Món ăn | `2172:5409` | `src/screens/AiSuggestionDetailScreen.tsx` | Complete — 15.62 / 15.24 / 14.32, 10.25% over 28 |
-| AI Suggestion Review — AI Tips & Tricks | `2172:5614` | `src/screens/AiSuggestionDetailScreen.tsx` | Complete — 15.61 / 15.27 / 14.62, 10.74% over 28 |
-| AI Suggestion Review — Figma Tips & Tricks | `2172:5717` | `src/screens/AiSuggestionDetailScreen.tsx` | Complete — 14.87 / 14.43 / 13.72, 10.26% over 28 |
+| AI Suggestion Review — Research | `2172:5510` | `src/screens/AiSuggestionDetailScreen.tsx` | Complete — continuous shell/header gradient fixed; 15.91 / 15.86 / 14.56, 11.49% over 28 |
+| AI Suggestion Review — Món ăn | `2172:5409` | `src/screens/AiSuggestionDetailScreen.tsx` | Complete — continuous shell/header gradient fixed; 15.25 / 15.27 / 13.94, 10.38% over 28 |
+| AI Suggestion Review — AI Tips & Tricks | `2172:5614` | `src/screens/AiSuggestionDetailScreen.tsx` | Complete — continuous shell/header gradient fixed; 15.13 / 15.19 / 14.14, 10.73% over 28 |
+| AI Suggestion Review — Figma Tips & Tricks | `2172:5717` | `src/screens/AiSuggestionDetailScreen.tsx` | Complete — continuous shell/header gradient fixed; 14.40 / 14.35 / 13.24, 10.25% over 28 |
 | Select sources for notebook (showcase) | `2172:4631` | `src/screens/SelectSourcesScreen.tsx` | Complete — active direct route from `2172:4536`; static viewport remains 5.57 / 5.90 / 5.21, while rows 5–6 are now reachable by touch scroll and the CTA stays sticky |
 | Notebook detail (showcase) | `2172:7907` | `src/screens/NotebookDetailScreen.tsx` | Complete — direct local/fake-AI transition from `2172:4631`, no Gemini request. Persisted pre-outline notebooks are migrated before render to prevent the former blank-screen crash |
 | Notebook Mục lục — Research | `2172:4487` | `src/screens/NotebookDetailScreen.tsx` | Complete — 5.45 / 5.17 / 4.51, 6.02% over 28. Pixel-duplicate of `2159:12842`/`2172:7907` |
@@ -175,8 +178,10 @@ Two exports need care, both verified against the Figma render:
 - `2159_12771_nav_bg.svg` is 390x75 while the node declares 428 wide. The notch measures at
   x=194.5 in the 390 render, so the vector is drawn at 390, not stretched.
 
-The frame itself carries `px-20`. That is why the status bar is 350 wide starting at x=20 while
-Content is a full 390 that overflows the padding — reproducing this is what aligns the status bar.
+The frame itself carries `px-20` for Home content. The app shell intentionally excludes the shared
+status bar from that inset and keeps it at the full 390px device width, because the user requires
+the live clock and signal/Wi-Fi/battery group to remain at identical coordinates across every
+screen. This route-invariant OS chrome supersedes Home's legacy 350px status instance.
 
 ### Remaining screens
 

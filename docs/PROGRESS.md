@@ -268,8 +268,8 @@ the same image asset. Inserted at the front of each folder's existing items 2–
 
 Icon audit: grepped the whole `src/` tree for `lucide-react` imports, raw `<svg>` outside
 `FigmaIcon.tsx`, and leftover unicode glyphs — none found in any Section 9 / Folder Detail
-code path. The `✓`/`✕` unicode glyphs that do exist (`EditLinkScreen`, `ProfileScreen`,
-`AiSuggestionsScreen`, `SearchScreen`) are all in screens already flagged "Legacy UI
+code path. The `✓`/`✕` unicode glyphs that do exist (`EditLinkScreen`, `AiSuggestionsScreen`,
+`SearchScreen`) are all in screens already flagged "Legacy UI
 pending rebuild" in `kit/docs/FIGMA_MAP.md`, outside this goal's Folder Detail scope —
 left as-is, not a new finding.
 
@@ -843,9 +843,10 @@ broken images/page errors/visible text overflow, and recorded `gemini_requests: 
 and `npm run build` are clean.
 
 All six nodes were added to `figma_compare.py`, together with an optional `MNEME_FIGMA_NODES`
-filter for targeted reruns. Final scores are banner 4.26/4.44/3.13, list 11.31/11.71/8.75,
-Research 16.37/15.94/15.02, Food 15.62/15.24/14.32, AI Tips 15.61/15.27/14.62, and Figma
-14.87/14.43/13.72. The detail values are elevated for the same reason as Notebook Reading: many
+filter for targeted reruns. After the shell/header gradient continuity fix, final scores are banner
+4.26/4.44/3.13, list 11.31/11.71/8.75, Research 15.91/15.86/14.56, Food
+15.25/15.27/13.94, AI Tips 15.13/15.19/14.14, and Figma 14.40/14.35/13.24. The detail values
+are elevated for the same reason as Notebook Reading: many
 small text lines and JPEG edges accumulate Chrome-vs-Figma raster residuals. Side-by-side and diff
 masks show aligned headers/cards/images/buttons rather than displaced structural blocks; the
 Research reason wrap was explicitly corrected to remain inside its lavender area.
@@ -862,9 +863,101 @@ Built `mneme-system:port-1300`, started `mneme-port-1300` on
 `127.0.0.1:1300`, and verified Docker health, `/api/health`, the built index, and SPA fallback all
 return successfully. Gemini remains optional (`geminiConfigured: false` without a runtime secret).
 
+## Add-link-from-folder flow matched (2026-08-29)
+
+Implemented the user's `2172:7015 → 2217:7777 → 2217:7825` storyboard through the real
+Home → Du lịch → Nhật Bản route.
+
+- A folder add action now carries both its category context and its origin folder into
+  `AddLinkScreen`. The Nhật Bản variant renders the node's exact Kyoto preview and AI-suggested
+  `Mẹo du lịch tiết kiệm` destination while retaining Nhật Bản as the return route.
+- Saving still uses `MnemeProvider.addLink({ preset })`, remains local-first, and makes no Gemini
+  request. The add-link view is popped back to the originating Nhật Bản folder instead of resetting
+  to Home.
+- `FolderDetailScreen` now owns the exact `Đã thêm vào folder` success toast at the node's global
+  y=711 position. Its green success vector is byte-identical to the already-registered
+  `check-circle` export, and the Kyoto preview is byte-identical to the committed first Nhật Bản
+  thumbnail, so no duplicate glyph or image asset was added.
+- Added both reference exports and executable rows to `kit/scripts/figma_compare.py`. The production
+  walkthrough clicks the real category/folder/add/save controls and scores `2217:7777` at
+  6.89 / 6.98 / 5.40 (6.32% over 28) and `2217:7825` at 5.33 / 5.13 / 5.08
+  (6.17% over 28), with zero broken images and no structural blocks in either diff mask.
+
+`npm run build` is clean.
+
+## Notebook header/status colors corrected (2026-08-29)
+
+Fixed the two app-shell color discontinuities reported against `2159:13626` and `2172:5510`:
+
+- `CreateNotebookScreen` starts below the shared 44px status bar, so its own purple header could
+  never color the top strip. `App.tsx` now gives the active `create_notebook` route the exact
+  primary `#7758E2` status background, white clock/status glyphs, full 390px width, and black home
+  indicator required by the node.
+- AI suggestion details previously rendered a flat dark status bar and then restarted the
+  `#2E1442 → #18122B` gradient at y=44. The result was measurably lighter than Figma throughout the
+  header. The shell and `AiSuggestionDetailScreen` now render two correctly positioned slices of
+  one shared `--gradient-ai-detail-header`, sized to each node's full header height.
+- Corrected the shared `--color-text-on-primary` token from primary purple to Figma's actual
+  `#F4F1FD` value.
+- Restored `2159:13626` to the executable comparison suite through the real Notebook → Tạo sổ tay
+  route. It scores 3.31 / 3.32 / 2.35. All four “Thêm vào sổ tay” variants were re-run; their header
+  background samples now match Figma to within 0–1 RGB level across the entire gradient, with zero
+  broken images.
+
+`npm run build` is clean.
+
+## Profile tab rebuilt from node 2221:8269 (2026-08-29)
+
+- Replaced the legacy Profile dashboard with the exact `2221:8269` composition: continuous purple
+  status/header chrome, overlapping 356×268 identity card, the node's 100px avatar, `echs` name,
+  fixed showcase counters (`17 / 4 / 4`), and the 350×206 three-row menu.
+- Removed content absent from the node (legacy subtitles, status glyph, reset-data button, shadows,
+  and extra borders). The tab continues to use the shared `BottomNavigation`; only Profile's active
+  label treatment is specialized to the node while all other tab styles remain unchanged.
+- Exported the avatar plus theme/local/showcase/chevron vectors from the exact node into
+  `public/assets/**/figma_2221/` and registered every glyph through `FigmaIcon`. No icon library,
+  inline SVG, or temporary Figma URL is used at runtime.
+- `App.tsx` now gives the active Profile tab the node's solid `#7758E2` shared status bar and hides
+  the global home indicator only for this frame, matching the Figma instance's disabled indicator.
+- Added `2221:8269` to `figma_compare.py` and committed its 390×844 reference export. Production
+  comparison is 1.89 / 1.90 / 1.18 with 1.84% of pixels over 28, no broken images, and no structural
+  residual. Focused rechecks of Home, Notebook, and Activity confirm the shared navigation change
+  caused no regression (Activity retains its previously documented text-antialiasing score).
+
+`tsc --noEmit` and `npm run build` are clean.
+
+## Home add-link success toast moved to the bottom (2026-08-29)
+
+- Corrected only Home's `Đã thêm vào category “…”` success toast; folder success notifications and
+  other screens are unchanged.
+- Moved the 351×85 toast from Home-local `top: 558px` to `top: 602px`, placing it at global
+  y=646..731 immediately above the bottom-navigation FAB, matching reference node `2172:8057`
+  instead of leaving it floating around the middle of the content.
+- Added `2172:8057` to the executable `figma_compare.py` suite through the real Home → Du lịch →
+  Thêm link → Lưu liên kết path.
+- Docker production comparison at `localhost:1300` is 5.00 / 5.00 / 5.35 with 5.97% of pixels
+  over 28; the toast geometry matches the reference and the remaining residual comes from Home's
+  newer showcase fixtures/text rasterization outside the notification.
+
+## Status-bar coordinates unified across every screen (2026-08-29)
+
+- Fixed a remaining shell inconsistency: the shared status bar changed between a 350px content
+  width on ordinary screens and a 390px device width on white, purple, and dark screens. Because
+  the clock and system glyphs are edge-anchored, switching screens moved both groups horizontally
+  by 20px even though they came from the same component.
+- `App.tsx` now keeps the status bar at the full 390px device width on every route. The live clock
+  stays at device x=24 and the combined signal/Wi-Fi/battery export stays at device x=304.67,
+  independent of the active screen. Route-specific status colors and the AI-detail gradient are
+  unchanged.
+- Browser bounding-box checks against Docker `localhost:1300` confirm identical geometry on Home,
+  Notebook, Activity, Profile, and Add link: bar `(0,0,390,44)`, clock `(24,13,54,20)`, and system
+  group `(304.69,17.33,66.66,11.33)`. Targeted production comparisons remain under the structural
+  threshold: Home showcase 3.45 / 3.50 / 3.43, create notebook 3.30 / 3.32 / 2.35, Add link
+  4.97 / 5.12 / 4.22, and Profile 1.89 / 1.90 / 1.18, with no broken images.
+
 ## Next work
 
-1. Add `2172:7830`, `2172:5821`, `2172:8010`, and `2172:8057` as rows in
+1. Add `2172:7830`, `2172:5821`, and `2172:8010` as rows in
    `kit/scripts/figma_compare.py`'s `SCREENS` table so they get a numeric pixel-diff score like
    every other rebuilt screen, instead of only a manual screenshot check.
 2. The create-folder-then-open-folder flow (`onSelectFolder(folderName)` after submit) only

@@ -29,7 +29,7 @@ type ScreenView =
   | { type: 'folder'; folderName: string }
   | { type: 'link_detail'; link: SavedLink }
   | { type: 'edit_link'; link: SavedLink }
-  | { type: 'add_link'; initialFolder?: string; initialCategory?: string }
+  | { type: 'add_link'; initialFolder?: string; initialCategory?: string; returnFolder?: string }
   | { type: 'create_notebook' }
   | { type: 'select_sources'; fromFolder: boolean }
   | { type: 'notebook_synthesis'; sourceIds: number[] }
@@ -72,6 +72,7 @@ const MnemeApp: React.FC = () => {
   const [currentTab, setCurrentTab] = useState<TabType>('home');
   const [viewStack, setViewStack] = useState<ScreenView[]>([{ type: 'tabs' }]);
   const [successCategory, setSuccessCategory] = useState<string | null>(null);
+  const [successFolder, setSuccessFolder] = useState<string | null>(null);
   const [ignoredSuggestionIds, setIgnoredSuggestionIds] = useState<AiSuggestionId[]>([]);
   const statusBarTime = useStatusBarClock();
 
@@ -90,6 +91,12 @@ const MnemeApp: React.FC = () => {
     currentView.type === 'select_sources' ||
     currentView.type === 'notebook_synthesis';
   const usesDarkCanvas = currentView.type === 'ai_suggestion_detail';
+  const isProfileTab = currentView.type === 'tabs' && currentTab === 'profile';
+  const usesPrimaryStatus = currentView.type === 'create_notebook' || isProfileTab;
+  const usesLightStatus = usesDarkCanvas || usesPrimaryStatus;
+  const darkHeaderHeight = currentView.type === 'ai_suggestion_detail'
+    ? getAiSuggestion(currentView.suggestionId)?.headerHeight ?? 263
+    : 263;
 
   const pushView = (view: ScreenView) => {
     setViewStack((prev) => [...prev, view]);
@@ -108,6 +115,15 @@ const MnemeApp: React.FC = () => {
 
   const saveResolvedCategoryLink = async (params: AddLinkParams) => {
     const result = await addLink(params);
+
+    if (currentView.type === 'add_link' && currentView.returnFolder) {
+      setSuccessCategory(null);
+      setSuccessFolder(currentView.returnFolder);
+      setViewStack((prev) => prev.slice(0, -1));
+      return;
+    }
+
+    setSuccessFolder(null);
     setSuccessCategory(result.value.category);
     resetToTabs('home');
   };
@@ -136,9 +152,24 @@ const MnemeApp: React.FC = () => {
         return (
           <FolderDetailScreen
             folderName={currentView.folderName}
-            onBack={popView}
-            onSelectLink={(link) => pushView({ type: 'link_detail', link })}
-            onAddNewLink={(folderName) => pushView({ type: 'add_link', initialFolder: folderName })}
+            showAddSuccess={successFolder === currentView.folderName}
+            onBack={() => {
+              setSuccessFolder(null);
+              popView();
+            }}
+            onSelectLink={(link) => {
+              setSuccessFolder(null);
+              pushView({ type: 'link_detail', link });
+            }}
+            onAddNewLink={(folderName, categoryName) => {
+              setSuccessFolder(null);
+              pushView({
+                type: 'add_link',
+                initialFolder: folderName,
+                initialCategory: categoryName,
+                returnFolder: folderName,
+              });
+            }}
           />
         );
 
@@ -167,6 +198,7 @@ const MnemeApp: React.FC = () => {
           <AddLinkScreen
             initialFolder={currentView.initialFolder}
             initialCategory={currentView.initialCategory}
+            originFolder={currentView.returnFolder}
             onBack={popView}
             onSaveToCategory={saveResolvedCategoryLink}
           />
@@ -291,8 +323,9 @@ const MnemeApp: React.FC = () => {
     <div className="flex min-h-screen items-center justify-center bg-[#1b1533] p-0 sm:p-6">
       {/* Figma frame 2159:12771 is 390x856. */}
       {/*
-        The Figma frame carries px-20, which is why the status bar is 350 wide and
-        starts at x=20 while Content is a full 390 and overflows that padding.
+        Screen content keeps the Figma frame's 20px horizontal inset. The status bar
+        deliberately spans the full 390px device width so its clock and system glyphs
+        never shift when a route changes canvas or header color.
       */}
       {/*
         transform-gpu makes this frame the containing block for any `fixed`
@@ -302,14 +335,22 @@ const MnemeApp: React.FC = () => {
       */}
       <div className={`relative flex h-screen w-full transform-gpu flex-col items-center overflow-hidden px-[20px] sm:h-[856px] sm:w-[390px] sm:rounded-[40px] sm:shadow-[0_30px_70px_-20px_rgba(0,0,0,0.55)] ${usesDarkCanvas ? 'bg-[#2e1442]' : usesWhiteCanvas ? 'bg-white' : 'bg-[#f8f6fd]'}`}>
         {/* iOS UI/Status Bar. Same layout on every screen: live Ho Chi Minh City clock, left. */}
-        <div className={`relative h-[44px] shrink-0 overflow-hidden select-none ${usesWhiteCanvas || usesDarkCanvas ? 'w-[390px]' : 'w-full'} ${usesDarkCanvas ? 'bg-[#2e1442]' : ''}`}>
+        <div
+          className={`relative h-[44px] w-[390px] shrink-0 overflow-hidden select-none ${usesPrimaryStatus ? 'bg-[var(--color-primary-500)]' : ''}`}
+          style={usesDarkCanvas ? {
+            backgroundImage: 'var(--gradient-ai-detail-header)',
+            backgroundSize: `100% ${darkHeaderHeight}px`,
+            backgroundPosition: '0 0',
+            backgroundRepeat: 'no-repeat',
+          } : undefined}
+        >
           <p
-            className={`absolute top-[13px] left-[24px] h-[20px] w-[54px] text-center font-['Inter',sans-serif] text-[15px] leading-[20px] font-semibold tracking-[-0.5px] ${usesDarkCanvas ? 'text-white' : 'text-[#161718]'}`}
+            className={`absolute top-[13px] left-[24px] h-[20px] w-[54px] text-center font-['Inter',sans-serif] text-[15px] leading-[20px] font-semibold tracking-[-0.5px] ${usesLightStatus ? 'text-white' : 'text-[#161718]'}`}
           >
             {statusBarTime}
           </p>
           <div className="absolute top-[17.33px] right-[18.67px] flex">
-            <FigmaIcon name="status-right" color={usesDarkCanvas ? '#ffffff' : undefined} />
+            <FigmaIcon name="status-right" color={usesLightStatus ? '#ffffff' : undefined} />
           </div>
         </div>
 
@@ -340,7 +381,9 @@ const MnemeApp: React.FC = () => {
           of the 844-tall frames. It draws over the navigation bar, so it must
           come after it.
         */}
-        <div className={`pointer-events-none absolute bottom-[8px] left-1/2 z-50 h-[5px] w-[144px] -translate-x-1/2 rounded-full ${usesWhiteCanvas || usesDarkCanvas ? 'bg-black' : 'bg-[#3c3c432e]'}`} />
+        {!isProfileTab && (
+          <div className={`pointer-events-none absolute bottom-[8px] left-1/2 z-50 h-[5px] w-[144px] -translate-x-1/2 rounded-full ${usesWhiteCanvas || usesLightStatus ? 'bg-black' : 'bg-[#3c3c432e]'}`} />
+        )}
       </div>
     </div>
   );

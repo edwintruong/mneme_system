@@ -55,6 +55,7 @@ def main() -> int:
         page.reload(wait_until='networkidle')
         page.get_by_role('button', name='Sổ tay', exact=True).click()
         page.get_by_role('button', name='Tạo sổ tay', exact=True).click()
+        page.get_by_role('button', name='Tạo từ các nội dung đã chọn').click()
         page.get_by_role('button', name='Tiếp tục', exact=True).click()
         page.get_by_role('heading', name='Research với NotebookLM').wait_for()
         migrated = page.evaluate(f'JSON.parse(localStorage.getItem("{NOTEBOOK_KEY}"))')

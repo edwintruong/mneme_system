@@ -36,6 +36,7 @@ CORNER_RADIUS = 40
 SCREENS = [
     ('2159:12771', 'Home',          '2159_12771_home.png',     856, None),
     ('2172:4416', 'Home (showcase)', '2172_4416_home.png',      856, None),
+    ('2172:8057', 'Home add-link success', '2172_8057_home_add_toast.png', 856, 'Home add-link success'),
     ('2172:4258', 'Link detail (crepe)', '2172_4258_link_detail_crepe.png', 845, 'Recent crepe'),
     ('2172:4313', 'Link detail (prompt)', '2172_4313_link_detail_prompt.png', 845, 'Recent prompt'),
     ('2172:4365', 'Link detail (movie)', '2172_4365_link_detail_movie.png', 845, 'Recent movie'),
@@ -49,6 +50,7 @@ SCREENS = [
     ('2172:6901', 'Folder (Vietnam)', '2172_6901_folder_vietnam.png', 843, 'Folder Việt Nam'),
     ('2172:7359', 'Category (cake)', '2172_7359_category_cake.png', 856, 'Category Cake'),
     ('2159:12891', 'Notebook list', '2159_12891_notebook.png', 844, 'Sổ tay'),
+    ('2159:13626', 'Create notebook source choice', '2159_13626_create_notebook.png', 844, 'Create notebook source choice'),
     ('2159:13180', 'Add link',      '2159_13180_add_link.png', 856, 'Thêm liên kết mới'),
     ('2159:12980', 'Link detail',   '2159_12980_link_detail.png', 844, 'Link detail'),
     ('2159:13036', 'Category list', '2159_13036_category.png', 856, 'Phim ảnh'),
@@ -65,8 +67,7 @@ SCREENS = [
     ('2172:5256', 'Notebook reading (AI Tips)', '2172_5256_notebook_reading_aitips.png', 844, 'Notebook reading (AI Tips)'),
     ('2172:5167', 'Notebook TOC (Travel)', '2172_5167_notebook_toc_travel.png', 844, 'Notebook TOC (Travel)'),
     ('2172:5296', 'Notebook reading (Travel)', '2172_5296_notebook_reading_travel.png', 844, 'Notebook reading (Travel)'),
-    # Nodes 2159:13626 and 2159:13570 are no longer reachable in the active
-    # storyboard. "Tạo sổ tay" now opens showcase node 2172:4631 directly.
+    # Node 2159:13570 is superseded by the showcase source-selection content.
     ('2172:4631', 'Select sources (showcase)', '2172_4631_select_sources.png', 844, 'Select sources'),
     ('2172:4536', 'Notebook list (showcase)', '2172_4536_notebook_list.png', 844, 'Sổ tay'),
     ('2172:7956', 'Notebook AI banner', '2172_7956_notebook_ai_banner.png', 844, 'Sổ tay'),
@@ -75,11 +76,14 @@ SCREENS = [
     ('2172:5409', 'AI Suggestion (Food)', '2172_5409_ai_suggestion_food.png', 844, 'AI Suggestion Food'),
     ('2172:5614', 'AI Suggestion (AI Tips)', '2172_5614_ai_suggestion_ai_tips.png', 844, 'AI Suggestion AI Tips'),
     ('2172:5717', 'AI Suggestion (Figma)', '2172_5717_ai_suggestion_figma.png', 844, 'AI Suggestion Figma'),
+    ('2221:8269', 'Profile', '2221_8269_profile.png', 844, 'Cá nhân'),
     ('2172:5877', 'Folder detail (Phim Hàn, showcase)', '2172_5877_folder_detail_phimhan.png', 843, 'Folder Phim Hàn'),
     ('2172:5991', 'Folder detail (Phim kinh dị, showcase)', '2172_5991_folder_detail_phimkinhdi.png', 843, 'Folder Phim kinh dị'),
     ('2172:6105', 'Folder detail (Phim ngắn, showcase)', '2172_6105_folder_detail_phimngan.png', 843, 'Folder Phim ngắn'),
     ('2172:6221', 'Folder detail (Anime, showcase)', '2172_6221_folder_detail_anime.png', 843, 'Folder Anime'),
     ('2172:7015', 'Folder detail (Nhật Bản, showcase)', '2172_7015_folder_detail_nhatban.png', 843, 'Folder Nhật Bản'),
+    ('2217:7777', 'Add link from Nhật Bản', '2217_7777_add_link_folder.png', 856, 'Add link from Nhật Bản'),
+    ('2217:7825', 'Folder add-link success', '2217_7825_folder_add_toast.png', 843, 'Folder Nhật Bản add toast'),
     ('2172:7130', 'Folder detail (Đông Nam Á, showcase)', '2172_7130_folder_detail_dongnama.png', 843, 'Folder Đông Nam Á'),
     ('2172:7244', 'Folder detail (Mẹo du lịch, showcase)', '2172_7244_folder_detail_meodulich.png', 843, 'Folder Mẹo du lịch tiết kiệm'),
     ('2172:7414', 'Folder detail (Bánh Âu, showcase)', '2172_7414_folder_detail_banhau.png', 843, 'Folder Bánh Âu'),
@@ -130,6 +134,10 @@ def capture(page, tab, height, dest):
             page.get_by_role('button', name='Tối ưu prompt AI', exact=True).click()
         elif tab == 'Recent movie':
             page.get_by_role('button', name='Phim hay mùa hè 2026', exact=True).click()
+        elif tab == 'Home add-link success':
+            page.get_by_text('Du lịch', exact=True).click()
+            page.get_by_role('button', name='Thêm link').click()
+            page.get_by_role('button', name='Lưu liên kết').click()
         elif tab == 'Category Study':
             page.get_by_role('button', name='Học tập & Công việc 24 mục').click()
         elif tab == 'Category Movie':
@@ -156,6 +164,12 @@ def capture(page, tab, height, dest):
                 'Mẹo du lịch tiết kiệm': 11,
             }
             page.get_by_role('button', name=f'{folder_name} {folder_counts[folder_name]} links').click()
+        elif tab in ('Add link from Nhật Bản', 'Folder Nhật Bản add toast'):
+            page.get_by_text('Du lịch', exact=True).click()
+            page.get_by_role('button').filter(has_text='Nhật Bản').first.click()
+            page.get_by_role('button', name='Thêm link').click()
+            if tab == 'Folder Nhật Bản add toast':
+                page.get_by_role('button', name='Lưu liên kết').click()
         elif tab == 'Category Cake':
             page.get_by_role('button', name='Công thức bánh 10 mục').click()
         elif tab == 'Link detail':
@@ -206,6 +220,10 @@ def capture(page, tab, height, dest):
             page.get_by_role('button', name='Đánh giá địa điểm du lịch').click()
             page.get_by_role('button', name='Xem sổ tay').click()
         elif tab == 'Select sources':
+            page.get_by_role('button', name='Sổ tay').click()
+            page.get_by_role('button', name='Tạo sổ tay').click()
+            page.get_by_role('button', name='Tạo từ các nội dung đã chọn').click()
+        elif tab == 'Create notebook source choice':
             page.get_by_role('button', name='Sổ tay').click()
             page.get_by_role('button', name='Tạo sổ tay').click()
         elif tab.startswith('AI Suggestion'):
