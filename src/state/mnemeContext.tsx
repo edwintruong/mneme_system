@@ -1,6 +1,18 @@
 import React, { createContext, useContext, useState, useEffect } from 'react';
 import { MnemeCategory, SavedLink, Notebook, AiExecutionResult } from '../types';
-import { INITIAL_CATEGORIES, INITIAL_FOLDERS, INITIAL_LINKS, INITIAL_NOTEBOOKS } from '../data/seed';
+import {
+  CAKE_SHOWCASE_LINK_IDS,
+  HOME_CATEGORY_IDS,
+  HOME_CREPE_IMAGE,
+  HOME_RECENT_LINK_IDS,
+  INITIAL_CATEGORIES,
+  INITIAL_FOLDERS,
+  INITIAL_LINKS,
+  INITIAL_NOTEBOOKS,
+  MOVIE_SHOWCASE_LINK_IDS,
+  STUDY_SHOWCASE_LINK_IDS,
+  TRAVEL_SHOWCASE_LINK_IDS,
+} from '../data/seed';
 
 interface MnemeContextType {
   categories: MnemeCategory[];
@@ -28,10 +40,78 @@ const STORAGE_KEYS = {
 
 const MnemeContext = createContext<MnemeContextType | undefined>(undefined);
 
+const LEGACY_HOME_CREPE_IMAGE = '/assets/images/figma_2159/2159_12771_recent_crepe.jpg';
+
+const HOME_CATEGORY_ID_SET = new Set<number>(HOME_CATEGORY_IDS);
+const HOME_RECENT_LINK_ID_SET = new Set<number>(HOME_RECENT_LINK_IDS);
+const MOVIE_SHOWCASE_LINK_ID_SET = new Set<number>(MOVIE_SHOWCASE_LINK_IDS);
+const STUDY_SHOWCASE_LINK_ID_SET = new Set<number>(STUDY_SHOWCASE_LINK_IDS);
+const TRAVEL_SHOWCASE_LINK_ID_SET = new Set<number>(TRAVEL_SHOWCASE_LINK_IDS);
+const CAKE_SHOWCASE_LINK_ID_SET = new Set<number>(CAKE_SHOWCASE_LINK_IDS);
+
+/**
+ * Restore Figma's Home fixtures while preserving every unrelated local-first record.
+ * Older deployments persisted whole seed arrays, so changing seed.ts alone cannot
+ * correct their visible Home copy, order, counts, or images.
+ */
+const migrateSavedCategories = (categories: MnemeCategory[]): MnemeCategory[] => {
+  const canonical = new Map(
+    INITIAL_CATEGORIES
+      .filter((category) => HOME_CATEGORY_ID_SET.has(category.id))
+      .map((category) => [category.id, category])
+  );
+  const present = new Set(categories.map((category) => category.id));
+  const normalized = categories.map((category) => {
+    const fixture = canonical.get(category.id);
+    return fixture ? { ...category, ...fixture } : category;
+  });
+  const missing = HOME_CATEGORY_IDS
+    .filter((id) => !present.has(id))
+    .map((id) => canonical.get(id))
+    .filter((category): category is MnemeCategory => Boolean(category));
+  return [...normalized, ...missing];
+};
+
+const migrateSavedLinks = (links: SavedLink[]): SavedLink[] => {
+  const canonical = new Map(
+    INITIAL_LINKS
+      .filter((link) =>
+        HOME_RECENT_LINK_ID_SET.has(link.id)
+        || MOVIE_SHOWCASE_LINK_ID_SET.has(link.id)
+        || STUDY_SHOWCASE_LINK_ID_SET.has(link.id)
+        || TRAVEL_SHOWCASE_LINK_ID_SET.has(link.id)
+        || CAKE_SHOWCASE_LINK_ID_SET.has(link.id)
+      )
+      .map((link) => [link.id, link])
+  );
+  const present = new Set(links.map((link) => link.id));
+  const normalized = links.map((link) => {
+    const fixture = canonical.get(link.id);
+    if (!fixture) return link;
+
+    // HOME_CREPE_IMAGE supersedes the old 2159 asset for id:5. Keeping this
+    // explicit makes the persisted-data migration traceable to node 2172:4416.
+    const image = link.image === LEGACY_HOME_CREPE_IMAGE ? HOME_CREPE_IMAGE : fixture.image;
+    return { ...link, ...fixture, image };
+  });
+  const canonicalIds = [
+    ...HOME_RECENT_LINK_IDS,
+    ...MOVIE_SHOWCASE_LINK_IDS,
+    ...STUDY_SHOWCASE_LINK_IDS,
+    ...TRAVEL_SHOWCASE_LINK_IDS,
+    ...CAKE_SHOWCASE_LINK_IDS,
+  ];
+  const missing = canonicalIds
+    .filter((id) => !present.has(id))
+    .map((id) => canonical.get(id))
+    .filter((link): link is SavedLink => Boolean(link));
+  return [...normalized, ...missing];
+};
+
 export const MnemeProvider: React.FC<{ children: React.ReactNode }> = ({ children }) => {
   const [categories, setCategories] = useState<MnemeCategory[]>(() => {
     const saved = localStorage.getItem(STORAGE_KEYS.CATEGORIES);
-    return saved ? JSON.parse(saved) : INITIAL_CATEGORIES;
+    return saved ? migrateSavedCategories(JSON.parse(saved)) : INITIAL_CATEGORIES;
   });
 
   const [folders, setFolders] = useState<string[]>(() => {
@@ -41,7 +121,7 @@ export const MnemeProvider: React.FC<{ children: React.ReactNode }> = ({ childre
 
   const [links, setLinks] = useState<SavedLink[]>(() => {
     const saved = localStorage.getItem(STORAGE_KEYS.LINKS);
-    return saved ? JSON.parse(saved) : INITIAL_LINKS;
+    return saved ? migrateSavedLinks(JSON.parse(saved)) : INITIAL_LINKS;
   });
 
   const [notebooks, setNotebooks] = useState<Notebook[]>(() => {

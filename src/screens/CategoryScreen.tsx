@@ -2,6 +2,12 @@ import React, { useState } from 'react';
 import { MnemeCategory, SavedLink } from '../types';
 import { useMneme } from '../state/mnemeContext';
 import { FigmaIcon } from '../components/common/FigmaIcon';
+import {
+  CAKE_CATEGORY_LINK_IDS,
+  MOVIE_CATEGORY_LINK_IDS,
+  STUDY_CATEGORY_LINK_IDS,
+  TRAVEL_CATEGORY_LINK_IDS,
+} from '../data/seed';
 
 interface CategoryScreenProps {
   category: MnemeCategory;
@@ -13,56 +19,91 @@ interface CategoryScreenProps {
 const FILTERS = ['Tất cả', 'Bài viết', 'Video', 'Ảnh'] as const;
 
 /**
- * Folder tiles shown per category. `Phim ảnh`'s order/count comes straight from node
- * 2159:13036 and is pixel-verified — do not reorder it. `Du lịch` and `Công thức bánh`
- * have no dedicated category-list Figma frame in this file, so their tiles are
- * functional (reachable, no broken layout) rather than pixel-targeted; see Section 9
- * in kit/docs/FIGMA_MAP.md for the folders' own verified Folder Detail nodes.
+ * Folder tiles shown per category. `Phim ảnh`'s order/count comes straight from nodes
+ * 2159:13036 / 2172:5822 and is pixel-verified — do not reorder it. `Học tập & Công việc` and
+ * `Du lịch` and `Công thức bánh` are matched to their Section 9 category frames.
  */
 const CATEGORY_FOLDERS: Record<string, readonly string[]> = {
+  'Học tập & Công việc': ['Ngoại ngữ', 'Kỹ năng làm việc', 'Tài liệu học tập', 'Công cụ AI'],
   'Phim ảnh': ['Phim Hàn', 'Phim kinh dị', 'Phim ngắn', 'Anime'],
-  'Du lịch': ['Nhật Bản', 'Đông Nam Á', 'Mẹo du lịch tiết kiệm'],
+  'Du lịch': ['Việt Nam', 'Nhật Bản', 'Đông Nam Á', 'Mẹo du lịch tiết kiệm'],
   'Công thức bánh': ['Bánh Âu', 'Bánh Á', 'Bánh không cần lò nướng', 'Trang trí bánh'],
 };
-/** The node's "Folders (6)" header text is exact copy, not a live count; only Phim ảnh is verified. */
-const CATEGORY_FOLDER_LABEL: Record<string, string> = { 'Phim ảnh': 'Folders (6)' };
-/** Only Phim ảnh's "Xem tất cả folder" link is node-verified (goes to its 5th folder). */
-const CATEGORY_VIEW_ALL_FOLDER: Record<string, string> = { 'Phim ảnh': 'Phim tài liệu' };
+const CATEGORY_FOLDER_COUNTS: Record<string, Record<string, number>> = {
+  'Học tập & Công việc': {
+    'Ngoại ngữ': 18,
+    'Kỹ năng làm việc': 15,
+    'Tài liệu học tập': 20,
+    'Công cụ AI': 12,
+  },
+  'Du lịch': {
+    'Việt Nam': 22,
+    'Nhật Bản': 14,
+    'Đông Nam Á': 16,
+    'Mẹo du lịch tiết kiệm': 11,
+  },
+  'Công thức bánh': {
+    'Bánh Âu': 16,
+    'Bánh Á': 13,
+    'Bánh không cần lò nướng': 19,
+    'Trang trí bánh': 9,
+  },
+};
+/** "Folders (6)" is exact storyboard copy rather than the number of visible tiles. */
+const CATEGORY_FOLDER_LABEL: Record<string, string> = {
+  'Học tập & Công việc': 'Folders (6)',
+  'Du lịch': 'Folders (6)',
+  'Phim ảnh': 'Folders (6)',
+  'Công thức bánh': 'Folders (6)',
+};
+/** The view-all affordance stays live by opening the first available showcased folder. */
+const CATEGORY_VIEW_ALL_FOLDER: Record<string, string> = {
+  'Học tập & Công việc': 'Ngoại ngữ',
+  'Du lịch': 'Việt Nam',
+  'Phim ảnh': 'Phim tài liệu',
+  'Công thức bánh': 'Bánh Âu',
+};
 
-const FolderThumbnail: React.FC = () => (
+const FolderThumbnail: React.FC<{ source: string }> = ({ source }) => (
   <span className="relative h-[32px] w-[36px] shrink-0 overflow-hidden">
-    {/* Crop transform comes directly from node 2159:13060. */}
+    {/* Both category nodes use the same 36x32 crop geometry. */}
     <img
-      src="/assets/images/figma_2159/2159_13036_folder.png"
+      src={source}
       alt=""
       className="pointer-events-none absolute top-[-81.25%] left-[-29.27%] h-[259.46%] w-[156.1%] max-w-none"
     />
   </span>
 );
 
-const CategoryLinkRow: React.FC<{ link: SavedLink; onClick: () => void }> = ({ link, onClick }) => (
+const CategoryLinkRow: React.FC<{ link: SavedLink; onClick: () => void; exactMetadata?: boolean }> = ({
+  link,
+  onClick,
+  exactMetadata = false,
+}) => (
   <button type="button" onClick={onClick} className="flex h-[112px] w-[316px] items-center gap-[10px] text-left">
     <span className="flex h-[112px] min-w-0 flex-1 items-center gap-[10px] rounded-[16px] bg-white p-[8px]">
       <span className="relative size-[80px] shrink-0 overflow-hidden rounded-[15px]">
         <img src={link.image} alt="" className="pointer-events-none absolute inset-0 size-full rounded-[15px] object-cover" />
-        <span className="absolute top-[58px] left-[40px] flex items-center justify-center rounded-[15px] bg-[#0e0727] px-[8px] py-[2px] text-[10px] leading-[13px] font-normal tracking-[0.06px] whitespace-nowrap text-white">
-          2:12
-        </span>
+        {(exactMetadata ? link.duration : '2:12') && (
+          <span className="absolute top-[58px] left-[40px] flex items-center justify-center rounded-[15px] bg-[#0e0727] px-[8px] py-[2px] text-[10px] leading-[13px] font-normal tracking-[0.06px] whitespace-nowrap text-white">
+            {exactMetadata ? link.duration : '2:12'}
+          </span>
+        )}
       </span>
       <span className="flex h-[96px] min-w-0 flex-1 flex-col items-start justify-center gap-[8px]">
         <span className="line-clamp-2 min-h-[40px] w-full min-w-0 flex-1 text-[14px] leading-[20px] font-normal text-black underline [text-underline-position:from-font]">
           {link.title}
         </span>
         <span className="flex w-full shrink-0 items-center gap-[4px] text-[12px] leading-[16px] font-normal tracking-[0.4px] whitespace-nowrap text-[#9490a2]">
-          <span>TikTok</span>
+          <span>{exactMetadata ? link.source : 'TikTok'}</span>
           <FigmaIcon name="category-dot" />
-          <span>@abcdef</span>
+          <span>{exactMetadata ? link.author : '@abcdef'}</span>
         </span>
         <span className="flex shrink-0 items-start gap-[8px]">
-          <span className="flex items-center justify-center rounded-[24px] bg-[#f2f2f3] px-[12px] py-[4px] text-[12px] leading-[16px] font-normal text-[#0e0727]">
+          <span className="flex shrink-0 items-center justify-center rounded-[24px] bg-[#f2f2f3] px-[12px] py-[4px] text-[12px] leading-[16px] font-normal whitespace-nowrap text-[#0e0727]">
             {link.tags[0]}
           </span>
-          <span className="flex items-center justify-center rounded-[24px] bg-[#f1eefc] px-[12px] py-[4px] text-[12px] leading-[16px] font-normal text-[#7758e2]">
+          <span className="flex shrink-0 items-center justify-center rounded-[24px] bg-[#f1eefc] px-[12px] py-[4px] text-[12px] leading-[16px] font-normal whitespace-nowrap text-[#7758e2]">
             {link.tags[1]}
           </span>
         </span>
@@ -74,7 +115,7 @@ const CategoryLinkRow: React.FC<{ link: SavedLink; onClick: () => void }> = ({ l
   </button>
 );
 
-/** Category list, Figma node 2159:13036 (390x856). */
+/** Shared category list, including Figma nodes 2159:13036 and 2172:5822. */
 export const CategoryScreen: React.FC<CategoryScreenProps> = ({
   category,
   onBack,
@@ -86,10 +127,31 @@ export const CategoryScreen: React.FC<CategoryScreenProps> = ({
   const [showAddModal, setShowAddModal] = useState(false);
   const [newFolderName, setNewFolderName] = useState('');
 
-  const categoryLinks = links.filter((link) => link.category === category.name).slice(0, 4);
+  const isStudyShowcase = category.name === 'Học tập & Công việc';
+  const isTravelShowcase = category.name === 'Du lịch';
+  const isCakeShowcase = category.name === 'Công thức bánh';
+  const usesExactMetadata = isStudyShowcase || isTravelShowcase || isCakeShowcase;
+  const truncatesFolderNames = isStudyShowcase || isTravelShowcase || isCakeShowcase;
+  const exactCategoryLinkIds = isStudyShowcase
+    ? STUDY_CATEGORY_LINK_IDS
+    : isTravelShowcase
+      ? TRAVEL_CATEGORY_LINK_IDS
+      : isCakeShowcase
+        ? CAKE_CATEGORY_LINK_IDS
+        : category.name === 'Phim ảnh'
+          ? MOVIE_CATEGORY_LINK_IDS
+          : null;
+  const categoryLinks = exactCategoryLinkIds
+    ? exactCategoryLinkIds
+        .map((id) => links.find((link) => link.id === id))
+        .filter((link): link is SavedLink => Boolean(link))
+    : links.filter((link) => link.category === category.name).slice(0, 4);
   const categoryFolders = CATEGORY_FOLDERS[category.name] ?? [];
   const folderLabel = CATEGORY_FOLDER_LABEL[category.name] ?? `Folders (${categoryFolders.length})`;
   const viewAllFolder = CATEGORY_VIEW_ALL_FOLDER[category.name];
+  const folderThumbnail = isStudyShowcase
+    ? '/assets/images/figma_2172/2172_6335_folder.png'
+    : '/assets/images/figma_2159/2159_13036_folder.png';
 
   const handleCreateFolder = (event: React.FormEvent) => {
     event.preventDefault();
@@ -164,10 +226,10 @@ export const CategoryScreen: React.FC<CategoryScreenProps> = ({
               <div className="flex h-[72px] w-full items-center gap-[10px]">
                 {categoryFolders.slice(0, 2).map((folder) => (
                   <button key={folder} type="button" onClick={() => onSelectFolder(folder)} className="flex h-[72px] min-w-0 flex-1 items-center justify-center gap-[10px] rounded-[12px] bg-[#f7f7f8] px-[8px] py-[12px] text-left">
-                    <FolderThumbnail />
+                    <FolderThumbnail source={folderThumbnail} />
                     <span className="flex min-w-0 flex-1 flex-col items-start justify-center gap-[4px] whitespace-nowrap">
-                      <span className="text-[16px] leading-[24px] font-medium text-[#0e0727]">{folder}</span>
-                      <span className="text-[14px] leading-[20px] font-normal tracking-[0.4px] text-[#9490a2]">24 links</span>
+                      <span className={`${truncatesFolderNames ? 'w-full truncate' : ''} text-[16px] leading-[24px] font-medium text-[#0e0727]`}>{folder}</span>
+                      <span className="text-[14px] leading-[20px] font-normal tracking-[0.4px] text-[#9490a2]">{CATEGORY_FOLDER_COUNTS[category.name]?.[folder] ?? 24} links</span>
                     </span>
                   </button>
                 ))}
@@ -178,10 +240,10 @@ export const CategoryScreen: React.FC<CategoryScreenProps> = ({
               <div className="flex h-[72px] w-full items-center gap-[10px]">
                 {categoryFolders.slice(2, 4).map((folder) => (
                   <button key={folder} type="button" onClick={() => onSelectFolder(folder)} className="flex h-[72px] min-w-0 flex-1 items-center justify-center gap-[10px] rounded-[12px] bg-[#f7f7f8] px-[8px] py-[12px] text-left">
-                    <FolderThumbnail />
+                    <FolderThumbnail source={folderThumbnail} />
                     <span className="flex min-w-0 flex-1 flex-col items-start justify-center gap-[4px] whitespace-nowrap">
-                      <span className="text-[16px] leading-[24px] font-medium text-[#0e0727]">{folder}</span>
-                      <span className="text-[14px] leading-[20px] font-normal tracking-[0.4px] text-[#9490a2]">24 links</span>
+                      <span className={`${truncatesFolderNames ? 'w-full truncate' : ''} text-[16px] leading-[24px] font-medium text-[#0e0727]`}>{folder}</span>
+                      <span className="text-[14px] leading-[20px] font-normal tracking-[0.4px] text-[#9490a2]">{CATEGORY_FOLDER_COUNTS[category.name]?.[folder] ?? 24} links</span>
                     </span>
                   </button>
                 ))}
@@ -201,7 +263,7 @@ export const CategoryScreen: React.FC<CategoryScreenProps> = ({
               </button>
             </div>
             {categoryLinks.map((link) => (
-              <CategoryLinkRow key={link.id} link={link} onClick={() => onSelectLink(link)} />
+              <CategoryLinkRow key={link.id} link={link} exactMetadata={usesExactMetadata} onClick={() => onSelectLink(link)} />
             ))}
           </section>
         </div>

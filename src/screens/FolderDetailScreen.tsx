@@ -65,7 +65,7 @@ export const FolderDetailScreen: React.FC<FolderDetailScreenProps> = ({
           <FigmaIcon name={isEmpty ? 'folder-empty-back' : 'folder-back'} style={{ transform: 'rotate(180deg)' }} />
         </button>
         <div className="flex h-full min-w-0 flex-1 items-center justify-center">
-          <h1 className="flex h-full w-[166px] items-center justify-center text-center text-[18px] leading-[28px] font-medium text-[#0e0727]">{folderName}</h1>
+          <h1 className="flex h-full min-w-0 flex-1 items-center justify-center text-center text-[18px] leading-[28px] font-medium whitespace-nowrap text-[#0e0727]">{folderName}</h1>
         </div>
         <span className="h-[30px] w-[24px] shrink-0" />
         <button type="button" aria-label="Thêm tùy chọn" className="flex size-[24px] shrink-0 items-center justify-center">

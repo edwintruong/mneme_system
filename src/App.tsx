@@ -35,10 +35,39 @@ type ScreenView =
   | { type: 'ai_suggestions'; notebook: Notebook }
   | { type: 'search' };
 
+/** Ho Chi Minh City clock (Asia/Ho_Chi_Minh, UTC+7) for the status bar. */
+function formatStatusBarTime(): string {
+  const parts = new Intl.DateTimeFormat('en-US', {
+    timeZone: 'Asia/Ho_Chi_Minh',
+    hourCycle: 'h23',
+    hour: 'numeric',
+    minute: 'numeric',
+  }).formatToParts(new Date());
+  const hour = parts.find((p) => p.type === 'hour')?.value ?? '00';
+  const minute = parts.find((p) => p.type === 'minute')?.value ?? '00';
+  return `${hour.padStart(2, '0')}:${minute.padStart(2, '0')}`;
+}
+
+function useStatusBarClock(): string {
+  const [time, setTime] = useState(formatStatusBarTime);
+
+  useEffect(() => {
+    const tick = () => setTime((prev) => {
+      const next = formatStatusBarTime();
+      return prev === next ? prev : next;
+    });
+    const interval = setInterval(tick, 1000);
+    return () => clearInterval(interval);
+  }, []);
+
+  return time;
+}
+
 const MnemeApp: React.FC = () => {
   const [currentTab, setCurrentTab] = useState<TabType>('home');
   const [viewStack, setViewStack] = useState<ScreenView[]>([{ type: 'tabs' }]);
   const [showToast, setShowToast] = useState(false);
+  const statusBarTime = useStatusBarClock();
 
   const currentView = viewStack[viewStack.length - 1];
   const mainRef = useRef<HTMLElement>(null);
@@ -49,7 +78,6 @@ const MnemeApp: React.FC = () => {
     mainRef.current?.scrollTo(0, 0);
   }, [currentView, currentTab]);
 
-  const usesReversedStatusBar = currentView.type === 'link_detail';
   const usesWhiteCanvas = currentView.type === 'notebook_detail' || currentView.type === 'select_sources';
   const usesPurpleStatusBar = currentView.type === 'create_notebook';
 
@@ -217,12 +245,7 @@ const MnemeApp: React.FC = () => {
               />
             );
           case 'activity':
-            return (
-              <ActivityScreen
-                onSelectLink={(link) => pushView({ type: 'link_detail', link })}
-                onViewSuggestions={(nb) => pushView({ type: 'ai_suggestions', notebook: nb })}
-              />
-            );
+            return <ActivityScreen />;
           case 'profile':
             return <ProfileScreen />;
         }
@@ -237,27 +260,18 @@ const MnemeApp: React.FC = () => {
         starts at x=20 while Content is a full 390 and overflows that padding.
       */}
       <div className={`relative flex h-screen w-full flex-col items-center overflow-hidden px-[20px] sm:h-[856px] sm:w-[390px] sm:rounded-[40px] sm:shadow-[0_30px_70px_-20px_rgba(0,0,0,0.55)] ${usesWhiteCanvas ? 'bg-white' : usesPurpleStatusBar ? 'bg-[#7758e2]' : 'bg-[#f8f6fd]'}`}>
-        {/* iOS UI/Status Bar. Link detail's node reverses the two sides. */}
+        {/* iOS UI/Status Bar. Same layout on every screen: live Ho Chi Minh City clock, left. */}
         <div className={`relative h-[44px] shrink-0 overflow-hidden select-none ${usesWhiteCanvas || usesPurpleStatusBar ? 'w-[390px]' : 'w-full'}`}>
           <p
-            className={`absolute h-[20px] w-[54px] text-center font-['Inter',sans-serif] text-[15px] leading-[20px] font-semibold tracking-[-0.5px] ${
-              usesReversedStatusBar ? 'top-[17px] right-0 text-[#0e0727]' : `top-[13px] left-[24px] ${usesPurpleStatusBar ? 'text-[#fefefe]' : 'text-[#161718]'}`
+            className={`absolute top-[13px] left-[24px] h-[20px] w-[54px] text-center font-['Inter',sans-serif] text-[15px] leading-[20px] font-semibold tracking-[-0.5px] ${
+              usesPurpleStatusBar ? 'text-[#fefefe]' : 'text-[#161718]'
             }`}
           >
-            9:41
+            {statusBarTime}
           </p>
-          {/* flex, so the 11.336-tall vector is not pushed down by a text baseline */}
-          {usesReversedStatusBar ? (
-            <div className="absolute top-[20.83px] left-0 flex h-[11.34px] items-center gap-[5px]">
-              <FigmaIcon name="detail-mobile-signal" />
-              <FigmaIcon name="detail-wifi" />
-              <FigmaIcon name="detail-battery" />
-            </div>
-          ) : (
-            <div className="absolute top-[17.33px] right-[18.67px] flex">
-              <FigmaIcon name={usesPurpleStatusBar ? 'create-notebook-status' : 'status-right'} color={usesPurpleStatusBar ? '#fefefe' : undefined} />
-            </div>
-          )}
+          <div className="absolute top-[17.33px] right-[18.67px] flex">
+            <FigmaIcon name={usesPurpleStatusBar ? 'create-notebook-status' : 'status-right'} color={usesPurpleStatusBar ? '#fefefe' : undefined} />
+          </div>
         </div>
 
         {/*

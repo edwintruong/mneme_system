@@ -9,7 +9,14 @@ interface LinkDetailScreenProps {
   onEdit: (link: SavedLink) => void;
 }
 
-/** Link detail, Figma node 2159:12980 (390x844). */
+const getSourceIcon = (source: string): string => {
+  const normalized = source.toLowerCase().replace(/\s+/g, '');
+  if (normalized.includes('youtube')) return 'showcase-youtube';
+  if (normalized.includes('facebook')) return 'showcase-facebook';
+  return 'tiktok';
+};
+
+/** Link detail, shared by nodes 2159:12980 and showcase nodes 2172:4258/4313/4365. */
 export const LinkDetailScreen: React.FC<LinkDetailScreenProps> = ({
   link,
   onBack,
@@ -19,6 +26,9 @@ export const LinkDetailScreen: React.FC<LinkDetailScreenProps> = ({
   const [copied, setCopied] = useState(false);
 
   const details = link.details?.length ? link.details : [link.summary];
+  const visibleTags = link.tags.slice(0, 3);
+  const sourceIcon = getSourceIcon(link.source);
+  const usesCompactTagGap = link.id === 4;
 
   const handleCopy = async () => {
     try {
@@ -66,8 +76,8 @@ export const LinkDetailScreen: React.FC<LinkDetailScreenProps> = ({
       </div>
 
       {/* Detail card, node 2159:12999. */}
-      <section className="mx-[20px] mt-[16px] flex h-[368px] w-[350px] flex-col gap-[24px] rounded-[16px] bg-white py-[16px]">
-        <div className="flex h-[196px] w-full flex-col gap-[12px]">
+      <section className="mx-[20px] mt-[16px] flex w-[350px] flex-col gap-[24px] rounded-[16px] bg-white py-[16px]">
+        <div className="flex w-full flex-col gap-[12px]">
           <div className="flex h-[28px] w-full items-center gap-[10px] px-[20px]">
             <h1 className="shrink-0 whitespace-nowrap text-[18px] leading-[28px] font-medium tracking-[0px] text-[#0e0727]">
               {link.title}
@@ -98,8 +108,8 @@ export const LinkDetailScreen: React.FC<LinkDetailScreenProps> = ({
             </button>
           </div>
 
-          <div className="h-[96px] w-full px-[20px]">
-            <ul className="h-[96px] w-[310px] list-disc pl-[24px] text-[16px] leading-[24px] font-normal tracking-[0px] text-[#0e0727]">
+          <div className="w-full px-[20px]">
+            <ul className="w-[310px] list-disc pl-[24px] text-[16px] leading-[24px] font-normal tracking-[0px] text-[#0e0727]">
               {details.map((detail) => (
                 <li key={detail} className="whitespace-pre-line">{detail}</li>
               ))}
@@ -107,12 +117,12 @@ export const LinkDetailScreen: React.FC<LinkDetailScreenProps> = ({
           </div>
         </div>
 
-        <div className="flex h-[32px] w-full items-center gap-[10px] px-[20px]">
-          {link.tags.slice(0, 3).map((tag, index) => (
+        <div className={`flex h-[32px] w-full items-center px-[20px] ${usesCompactTagGap ? 'gap-[4px]' : 'gap-[10px]'}`}>
+          {visibleTags.map((tag, index) => (
             <span
               key={tag}
               className={`flex h-[32px] shrink-0 items-center justify-center rounded-[24px] px-[12px] text-[16px] leading-[24px] font-normal tracking-[0px] ${
-                index === 2 ? 'bg-[#f1eefc] text-[#7758e2]' : 'bg-[#f2f2f3] text-[#0e0727]'
+                index === visibleTags.length - 1 ? 'bg-[#f1eefc] text-[#7758e2]' : 'bg-[#f2f2f3] text-[#0e0727]'
               }`}
             >
               {tag}
@@ -134,7 +144,7 @@ export const LinkDetailScreen: React.FC<LinkDetailScreenProps> = ({
               <FigmaIcon name="layers-figma" />
             </span>
             <span className="min-w-0 flex-1">Nguồn</span>
-            <FigmaIcon name="tiktok" />
+            <FigmaIcon name={sourceIcon} />
             <span className="shrink-0 whitespace-nowrap">{link.source}</span>
           </div>
           <div className="flex h-[24px] w-full items-center gap-[10px] px-[20px] text-[16px] leading-[24px] font-normal tracking-[0px] text-[#0e0727]">

@@ -18,6 +18,7 @@ interface IconAsset {
 
 const FIGMA = '/assets/icons/figma';
 const N2159 = '/assets/icons/figma_2159';
+const N2172 = '/assets/icons/figma_2172';
 
 export const FIGMA_ICONS: Record<string, IconAsset> = {
   // Navigation chrome
@@ -86,6 +87,8 @@ export const FIGMA_ICONS: Record<string, IconAsset> = {
   'copy-figma': { src: `${N2159}/2159_12980_copy.svg`, w: 21.3333, h: 21.3333 },
   'layers-figma': { src: `${N2159}/2159_12980_layers.svg`, w: 16.2497, h: 16.7294 },
   tiktok: { src: `${N2159}/2159_12980_tiktok.svg`, w: 24, h: 24 },
+  'showcase-youtube': { src: `${N2172}/2172_4313_youtube.svg`, w: 24, h: 24 },
+  'showcase-facebook': { src: `${N2172}/2172_4365_facebook.svg`, w: 24, h: 24 },
   'saved-clock': { src: `${N2159}/2159_12980_saved.svg`, w: 20, h: 20 },
   'more-horizontal-detail': { src: `${N2159}/2159_12980_more_horizontal.svg`, w: 24, h: 24 },
   'detail-mobile-signal': { src: `${N2159}/2159_12980_mobile_signal.svg`, w: 17, h: 10.6667 },

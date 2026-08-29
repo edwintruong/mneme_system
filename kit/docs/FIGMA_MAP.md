@@ -52,11 +52,11 @@ All 11 nodes are now seeded and pixel-compared. Scores (mean abs diff / 255, R/G
 | `2172:6221` | Anime | Phim ảnh | 6.33 / 6.29 / 6.20 (see crop-fix note in `docs/PROGRESS.md`) |
 | `2172:7015` | Nhật Bản | Du lịch | 5.21 / 5.04 / 4.94 |
 | `2172:7130` | Đông Nam Á | Du lịch | 5.39 / 5.32 / 5.26 |
-| `2172:7244` | Mẹo du lịch tiết kiệm | Du lịch | 5.79 / 5.93 / 6.04 |
-| `2172:7414` | Bánh Âu | Công thức bánh | 4.68 / 4.72 / 4.72 |
-| `2172:7512` | Bánh Á | Công thức bánh | 5.05 / 5.08 / 5.04 |
-| `2172:7610` | Bánh không cần lò nướng | Công thức bánh | 7.31 / 7.21 / 6.93 (long folder name wraps to 2 lines in the 166px header vs Figma's 1 line — cosmetic, no structural block) |
-| `2172:7704` | Trang trí bánh | Công thức bánh | 5.03 / 5.03 / 5.18 |
+| `2172:7244` | Mẹo du lịch tiết kiệm | Du lịch | 4.83 / 4.99 / 5.32 (also benefits from the flexible one-line header geometry) |
+| `2172:7414` | Bánh Âu | Công thức bánh | 4.73 / 4.77 / 4.79 |
+| `2172:7512` | Bánh Á | Công thức bánh | 5.10 / 5.14 / 5.11 |
+| `2172:7610` | Bánh không cần lò nướng | Công thức bánh | 6.48 / 6.35 / 6.17 (flexible title geometry now keeps the node's one-line header) |
+| `2172:7704` | Trang trí bánh | Công thức bánh | 5.08 / 5.09 / 5.25 |
 
 `2172:7610` and `2172:7704` are the only two Folder Detail nodes whose link rows carry a
 single tag chip instead of two — `FolderLinkRow` in `FolderDetailScreen.tsx` now renders
@@ -70,9 +70,8 @@ distinct scrolled-down state. No separate implementation was needed for them.
 regardless of which category was open (a pre-existing bug: opening "Du lịch" showed movie
 folder tiles). Fixed by keying the tile list off `category.name`, with the `Phim ảnh` entry
 kept byte-identical to the old `MOVIE_FOLDERS` order so its pixel-verified state
-(4.87/4.98/4.82) is untouched. `Du lịch` and `Công thức bánh` have no Figma category-list
-frame of their own in this file, so their tile layout is functional (reachable, no broken
-image/layout) rather than pixel-targeted.
+(4.87/4.98/4.82) is untouched. `Du lịch` and `Công thức bánh` are now fully audited against
+`2172:6846` and `2172:7359` respectively.
 
 All 11 Folder Detail frames in Section 9 are now complete — see `docs/PROGRESS.md`'s
 "Standing goal" checklist for the full history of this pass, including two real bugs
@@ -87,7 +86,21 @@ now stay matched to `2159:13036` only (`folder: 'Phim ảnh'`, unreachable from 
 Detail); `id:152/153/154` are the Folder Detail-only item-1 records. See
 `docs/PROGRESS.md`'s "Content-accuracy audit" section for the full root cause.
 
-| Activity, Home, Notebook-detail, and category-specific (HỌC TẬP/CV) demo variants | many (see `Section 9` root) | existing screens | Not audited — out of scope of this pass, which focuses on Folder Detail ("details") screens per the user's goal |
+| Activity | `2172:4208` | `src/screens/ActivityScreen.tsx` | Complete — 10.49 / 10.19 / 8.84 (see "Activity tab rebuilt from its own node" in `docs/PROGRESS.md`; residual is text-density antialiasing, not a structural mismatch) |
+| Home | `2172:4416` | `src/screens/HomeScreen.tsx` | Complete — 3.15 / 3.20 / 3.16; exact fixed showcase fixtures, corrected crepe thumbnail, persisted-data normalization, and live clock preserved |
+| Recent detail — Công thức bánh crepe | `2172:4258` | `src/screens/LinkDetailScreen.tsx` | Complete — 4.35 / 4.62 / 4.48; exact Tik Tok content |
+| Recent detail — Tối ưu prompt AI | `2172:4313` | `src/screens/LinkDetailScreen.tsx` | Complete — 4.60 / 4.76 / 4.27; exact YouTube content and node SVG |
+| Recent detail — Phim hay mùa hè 2026 | `2172:4365` | `src/screens/LinkDetailScreen.tsx` | Complete — 5.17 / 4.68 / 3.94; exact Facebook content and node SVG |
+| Phim ảnh category | `2172:5822` | `src/screens/CategoryScreen.tsx` | Complete — 4.92 / 5.04 / 4.89; exact four visible folders/counts and deterministic overview links |
+| Học tập & Công việc category | `2172:6335` | `src/screens/CategoryScreen.tsx` | Complete — 5.18 / 4.99 / 4.66; exact four visible folders/counts and four overview links |
+| Folder detail — Ngoại ngữ | `2172:6390` | `src/screens/FolderDetailScreen.tsx` | Complete — 5.59 / 5.42 / 5.23; five exact links |
+| Folder detail — Kỹ năng làm việc | `2172:6504` | `src/screens/FolderDetailScreen.tsx` | Complete — 6.04 / 6.05 / 5.74; five exact links |
+| Folder detail — Tài liệu học tập | `2172:6618` | `src/screens/FolderDetailScreen.tsx` | Complete — 6.07 / 5.94 / 5.81; five exact links |
+| Folder detail — Công cụ AI | `2172:6732` | `src/screens/FolderDetailScreen.tsx` | Complete — 5.47 / 5.24 / 4.86; five exact links |
+| Du lịch category | `2172:6846` | `src/screens/CategoryScreen.tsx` | Complete — 4.76 / 4.50 / 4.31; exact folders/counts and four overview links |
+| Folder detail — Việt Nam | `2172:6901` | `src/screens/FolderDetailScreen.tsx` | Complete — 4.94 / 4.68 / 4.61; five exact links |
+| Công thức bánh category | `2172:7359` | `src/screens/CategoryScreen.tsx` | Complete — 4.68 / 4.54 / 4.41; exact counts, overview metadata, tags, and category-specific image crop |
+| Notebook-detail demo variants | many (see `Section 9` root) | existing screens | Not audited |
 
 ## Legacy implementation reference
 
@@ -136,10 +149,10 @@ still using them must be re-exported from their own `2159:*` nodes when rebuilt.
 
 ### Link detail, node 2159:12980 — complete
 
-The cover JPEG and twelve vectors were exported from the exact node. The link-specific status bar
-reverses the Home order (signals on the left, time on the right), so `App.tsx` switches the shared
-chrome only for this view. The 30px down-chevron export is rotated 90 degrees by the frame to become
-the visible back arrow.
+The cover JPEG and twelve vectors were exported from the exact node. The 30px down-chevron export
+is rotated 90 degrees by the frame to become the visible back arrow. Although this legacy node
+draws time/status in the opposite order, the app intentionally keeps the same live Ho Chi Minh
+City clock/status placement across every view per the user's explicit override.
 
 Production comparison measures 6.79 / 6.54 / 5.55 with 6.53% of pixels over 28. The difference
 mask contains image re-encoding detail and glyph rasterization, but no solid displaced regions;
@@ -174,8 +187,11 @@ Render the app at 390x856 with `device_scale_factor: 1`, screenshot it, and diff
 `get_screenshot` of the node. Exclude pixels equal to `#444444`: that is the Figma canvas backdrop
 showing through the frame's 40px corner radius, not part of the design.
 
-Current production measurements are Home 3.10 / 3.13 / 3.06, Notebook list 4.40 / 4.57 / 3.23,
-Add link 4.71 / 4.86 / 3.94, Link detail 6.79 / 6.54 / 5.55, Category list
+Current production measurements are active Showcase Home (`2172:4416`) 3.15 / 3.20 / 3.16,
+legacy Home (`2159:12771`) 4.02 / 4.37 / 4.44, Notebook list 4.42 / 4.59 / 3.25,
+Add link 4.71 / 4.86 / 3.94, legacy Link detail 7.12 / 6.88 / 5.87,
+recent details (`2172:4258`, `2172:4313`, `2172:4365`) 4.35 / 4.62 / 4.48,
+4.60 / 4.76 / 4.27, and 5.17 / 4.68 / 3.94 respectively, Category list
 4.87 / 4.98 / 4.82, Create folder 2.12 / 2.20 / 1.67, Empty folder 0.73 / 0.78 / 0.79, and
 Folder detail 6.29 / 6.26 / 6.04. Text-heavy states retain glyph/JPEG residuals without structural
 blocks. Notebook detail measures 5.43 / 5.14 / 4.47 with the same thin glyph-only residual, and

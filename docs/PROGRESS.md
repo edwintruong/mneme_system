@@ -1,6 +1,6 @@
 # Mneme implementation progress
 
-Last updated: 2026-08-27
+Last updated: 2026-08-29
 
 ## Current milestone
 
@@ -176,12 +176,13 @@ There are 11 Folder Detail frames total in Section 9; see the table in
 - [x] `2172:7015` Nhật Bản (Du lịch) — new folder, 5 links, pixel-compared 5.21/5.04/4.94
 - [x] `2172:7130` Đông Nam Á (Du lịch) — new folder, 5 links, pixel-compared 5.39/5.32/5.26
 - [x] `2172:7244` Mẹo du lịch tiết kiệm (Du lịch) — new folder, 5 links, pixel-compared 5.79/5.93/6.04
-- [x] `2172:7414` Bánh Âu (Công thức bánh) — new folder, 5 links, pixel-compared 4.68/4.72/4.72
-- [x] `2172:7512` Bánh Á (Công thức bánh) — new folder, 5 links, pixel-compared 5.05/5.08/5.04
+- [x] `2172:7414` Bánh Âu (Công thức bánh) — new folder, 5 links, pixel-compared 4.73/4.77/4.79
+- [x] `2172:7512` Bánh Á (Công thức bánh) — new folder, 5 links, pixel-compared 5.10/5.14/5.11
 - [x] `2172:7610` Bánh không cần lò nướng (Công thức bánh) — new folder, 5 links,
-      pixel-compared 7.31/7.21/6.93 (single-tag row layout; see note below)
+      pixel-compared 6.48/6.35/6.17. Its header now uses the node's flexible title geometry,
+      keeping the long name on one line instead of wrapping inside a fixed 166px box.
 - [x] `2172:7704` Trang trí bánh (Công thức bánh) — new folder, 5 links, pixel-compared
-      5.03/5.03/5.18. First pass scored 25.32/27.67/27.68 (structurally off): this node's
+      5.08/5.09/5.25. First pass scored 25.32/27.67/27.68 (structurally off): this node's
       item 1 also carries an image override (`imgImagePlaceholder` background +
       `imgImage` real photo on top), which I initially assumed only items 2–5 had. That
       shifted every item's real-photo variable by one (item1 got the placeholder,
@@ -198,9 +199,8 @@ There are 11 Folder Detail frames total in Section 9; see the table in
       map keyed by `category.name` (was hardcoded to the movie folders for every
       category — a real pre-existing bug: opening "Du lịch" or "Công thức bánh" showed
       movie folder tiles). `Phim ảnh`'s entry is byte-identical to the old hardcoded
-      array so its pixel-verified state (4.87/4.98/4.82) is untouched; `Du lịch` and
-      `Công thức bánh` have no dedicated category-list Figma frame in this file, so
-      their tiles are functional rather than pixel-targeted.
+      array so its pixel-verified state (4.87/4.98/4.82) is untouched. `Du lịch` and
+      `Công thức bánh` were subsequently audited against `2172:6846` and `2172:7359`.
 - [x] Full `figma_compare.py` re-run: all 22 rows (11 original + 11 Section 9 Folder
       Detail nodes) pass under the 8.0 worst-score bar, zero regressions on any
       previously-verified screen.
@@ -279,13 +279,286 @@ still having one visibly wrong title. When auditing, read the actual rendered te
 `kit/figma-refs/out/compare_*.png` (Figma | app | diff columns) side by side rather than
 trusting the aggregate number alone — that's how these three were caught.
 
+## Activity tab rebuilt from its own node (2026-08-29)
+
+The user pointed at `node-id=2172-4208` and asked for the "Hoạt động" (Activity) tab to be
+made to look like it. The screen previously at `src/screens/ActivityScreen.tsx` was an
+unrelated placeholder (an "AI recommendation" banner + a "Đã lưu gần đây" links rail reusing
+`links.slice(0, 4)`) — it never matched this node at all, in content or layout.
+
+Rebuilt `ActivityScreen.tsx` to match `2172:4208` exactly: a white title bar with the
+node's multi-layer purple drop-shadow ("Hoạt động"), then two grouped notification feeds —
+"Hôm nay" (3 rows) and "Hôm qua" (3 rows) — each row a 40×40 rounded thumbnail plus two-line
+text (a regular-weight prefix sentence + a colored notebook/notebook-category mention,
+purple `#7758e2` for "sổ tay" mentions and blue `#6095ff` for category mentions) and a
+timestamp. All six rows' copy and the 5 unique thumbnails are literal, fixed content per the
+node (not derived from `MnemeProvider` state) — this frame is Figma's own demo/mock feed and
+its notebook names ("Movies to Watch", "Cake Receipts", "Travel Inspiration") don't all
+correspond to real `INITIAL_NOTEBOOKS` entries, so rows are static, non-interactive `<div>`s
+matching the source markup (no `button`/`onClick`, same as the design). Downloaded the 5
+unique thumbnail assets to `public/assets/images/figma_2172/2172_4208_notif{1..5}.jpg`
+(image 1 is reused for both its "Hôm nay" and "Hôm qua" appearances, matching the node).
+`App.tsx`'s `activity` case now renders `<ActivityScreen />` with no props — the old
+`onSelectLink`/`onViewSuggestions` wiring was only for the removed placeholder content.
+
+Added a `figma_compare.py` row (`2172:4208`, frame height 824 per the node's own
+`absoluteBoundingBox`, reached by clicking the "Hoạt động" bottom-nav button). This broke
+the pre-existing `'Link detail'` capture step, which used to open the Activity tab and click
+a link title there to reach `2159:12980` — that link (`id:6`, deliberately excluded from
+Home's 3-item rail per its own seed.ts comment) had no other route once Activity's link rail
+was replaced. Re-routed that step through the search flow instead (open search from Home,
+type the title, click the result) — same target screen, no longer coupled to Activity's
+content.
+
+Score: 10.49 / 10.19 / 8.84 — the only row currently over the ~8 bar, all other 22 rows
+unaffected (zero regressions). Root-caused with a zoomed crop diff (see
+`kit/figma-refs/2172_4208_activity.png` vs `kit/figma-refs/out/app_2172_4208_activity.png`):
+image position, row layout, spacing, and colors all match closely; the residual is
+character-by-character text drift consistent with Roboto-metric differences between Figma's
+renderer and Chromium (the raw Figma export even tags text with
+`fontVariationSettings: '"wdth" 100'`, a Roboto Flex axis the app's actual Google-Fonts
+Roboto doesn't have — grepped and confirmed no other screen's real code applies this either,
+so it's a pre-existing, un-fixed-elsewhere artifact of the pipeline, not new). This screen
+just has more total text lines (up to 16) than any other row in the suite, which the
+whole-frame MAE amplifies even with no structural error. Fixed one genuine bug found along
+the way: the two notification cards were missing the 4px gap between rows (`gap-[4px]`,
+present in the node's own auto-layout) — adding it dropped the score from ~12/~12/~10 to the
+current ~10/~10/~9. Not chasing this further with content-blind CSS tweaks aimed at the
+score rather than the design.
+
+## Status bar: live Ho Chi Minh City clock, consistent layout everywhere (2026-08-29)
+
+User feedback: the status bar's time/status display was "hiển thị sai" (wrong) and needed to
+be pixel-consistent across every screen, with the clock driven by real Ho Chi Minh City time
+instead of a static mock value.
+
+Root cause: `src/App.tsx`'s single shared status bar (rendered once, above every screen) hard-
+coded the literal text `9:41` — Apple's standard design-mockup placeholder, copied verbatim
+from the Figma export — and had a `usesReversedStatusBar` branch (`currentView.type ===
+'link_detail'`) that flipped the layout for that one screen only: time moved to the top-right
+and the signal/wifi/battery icons moved to the top-left, using three separate icon assets
+(`detail-mobile-signal`/`detail-wifi`/`detail-battery`) instead of the single combined
+`status-right` glyph every other screen uses. That flip came from literally matching
+`2159:12980`'s own Figma frame, but it made the status bar visibly inconsistent between
+screens in the running app, which is what the user flagged.
+
+Fix, in `src/App.tsx`:
+- Added `formatStatusBarTime()` / `useStatusBarClock()`: reads the real current time via
+  `Intl.DateTimeFormat(..., { timeZone: 'Asia/Ho_Chi_Minh', hourCycle: 'h23' })`, formatted as
+  zero-padded `HH:MM` (e.g. `00:40`), refreshed every second (cheap no-op re-render unless the
+  formatted string actually changed, via a `prev === next` check in the state updater).
+- Removed the `usesReversedStatusBar` branch entirely. Every screen — including Link detail —
+  now renders the same layout: clock top-left (`top-[13px] left-[24px]`, the position already
+  verified against the other 22 nodes), status icons top-right via the single `status-right`
+  glyph (or `create-notebook-status` for the purple variant). This is a deliberate, explicit
+  user override of `2159:12980`'s literal mockup in favor of a real, consistent OS-style status
+  bar; the `detail-mobile-signal`/`detail-wifi`/`detail-battery` icon registry entries in
+  `FigmaIcon.tsx` are left in place (harmless, still-valid asset catalog entries) but are no
+  longer referenced anywhere.
+
+Verified: `npx tsc --noEmit` and `npm run build` clean; full 23-row `kit/scripts/
+figma_compare.py` suite re-run with zero regressions — Link detail actually improved slightly
+(7.13/6.89/5.88, previously used the reversed layout matching that one frame) and every other
+row is byte-for-byte unaffected, since the status bar is centralized in `App.tsx` and no other
+file references `9:41`, `status-right`, or the removed reversed-layout icons (confirmed via
+`grep -rl` across `src/` before making the change).
+
+## Showcase Home audited against node 2172:4416 (2026-08-29)
+
+The user selected Section 9 Home node `2172:4416` as the current target and explicitly asked
+that the live time display remain unchanged. Direct `get_design_context`, asset hashing, and a
+production screenshot comparison confirmed that the existing Home geometry, avatar, seven
+other raster assets, and every visible SVG already match this showcase node. The first
+"Đã lưu gần đây" thumbnail differed: `2159:12771` used an older overhead food photo, while
+`2172:4416` uses a different crepe-and-berries photo.
+
+- Exported the current crepe source to
+  `public/assets/images/figma_2172/2172_4416_recent_crepe.jpg` and pointed the `id:5` seed item
+  at it.
+- Made the visible Home storyboard deterministic: `HomeScreen` selects the three recent links
+  (`id:5`, `id:4`, `id:3`) and four categories by their Figma fixture ids instead of depending
+  on mutable array order. `MnemeProvider` normalizes only those fixture records when loading
+  older localStorage data and restores a missing fixture, while preserving all unrelated
+  user-created links/categories and the rest of the local-first state.
+- Updated `HomeScreen`'s trace comments to the `2172:4416` node ids and added the exact Figma
+  export plus a dedicated comparison row to `kit/scripts/figma_compare.py`.
+- Production comparison: 3.15 / 3.20 / 3.16, with 3.84% of pixels over 28 and no broken images.
+  The remaining status-bar time difference is intentional per the user's instruction; no clock
+  code or placement was changed. The full 24-row suite showed no regressions. Its process still
+  exits non-zero because Activity's already-documented 10.50 / 10.21 / 8.87 text-antialiasing
+  residual remains above the script's global 8.0 threshold, unrelated to this Home change.
+- Verified the below-fold Home state in the production build: the scroll container has 88px of
+  travel, and after scrolling to its end the final 80px "Công thức bánh" row ends at y=705,
+  safely above the bottom-navigation menu beginning at y=781. The live clock continued running
+  unchanged during this check.
+
+## Recent-card link details matched to Section 9 nodes (2026-08-29)
+
+Each of the three cards under Home's "Đã lưu gần đây" rail now opens its own exact content
+variant in the shared `LinkDetailScreen`:
+
+- `Công thức bánh crepe` -> `2172:4258`: Tik Tok URL/source, two recipe notes,
+  `Công thức bánh` / `Bánh ngọt` tags, and `1 phút trước`.
+- `Tối ưu prompt AI` -> `2172:4313`: YouTube URL/source, two prompt-workflow notes,
+  `Học tập & Công việc` / `AI Workflow` tags, and `8 phút trước`.
+- `Phim hay mùa hè 2026` -> `2172:4365`: Facebook URL/source, two film notes,
+  `Phim ảnh` / `Giải trí` tags, and `2 giờ trước`.
+
+The shared detail card now grows from its content, matching the 368px recipe/prompt cards and
+the 392px movie card without creating separate screens or a second state layer. The two new
+source glyphs are exact node exports registered as `showcase-youtube` and
+`showcase-facebook` in `FigmaIcon`; all other glyphs and covers reuse byte-identical existing
+Figma exports. Existing persisted fixture ids are upgraded by the Home normalization above, so
+the three details are correct in both new and previously used browser sessions.
+
+Focused production comparison (Figma / app, no broken images or structural blocks):
+
+- `2172:4258`: 4.35 / 4.62 / 4.48, 4.51% of pixels over 28.
+- `2172:4313`: 4.60 / 4.76 / 4.27, 5.03% of pixels over 28.
+- `2172:4365`: 5.17 / 4.68 / 3.94, 4.97% of pixels over 28.
+- Legacy detail `2159:12980`: 7.12 / 6.88 / 5.87, confirming no regression from the
+  content-sized card.
+
+Playwright also clicked all three Home cards, asserted each title, URL, notes, tags, source,
+saved time, and source icon, then used the back control to return Home. The live Ho Chi Minh
+City clock/status placement remains the deliberate user override and was not changed.
+
+## Phim ảnh showcase flow matched (2026-08-29)
+
+Home's `Phim ảnh` category now opens the exact five-node Section 9 flow selected by the user:
+
+- Category `2172:5822`: exact `Folders (6)` copy; four visible 24-link tiles in storyboard
+  order (`Phim Hàn`, `Phim kinh dị`, `Phim ngắn`, `Anime`); the four deterministic overview
+  fixtures; and the node's search, filter, add-folder, overflow, and folder glyphs.
+- Folder detail `2172:5877` `Phim Hàn`, `2172:5991` `Phim kinh dị`, `2172:6105`
+  `Phim ngắn`, and `2172:6221` `Anime`: five exact links each, with node-specific titles,
+  images/crops, sources, authors, durations, and tags.
+
+The shared `CategoryScreen` selects overview records by `MOVIE_CATEGORY_LINK_IDS`, so Home's
+recent-card movie fixture and older persisted ordering cannot displace the storyboard copy.
+`MnemeProvider` normalizes and restores the canonical movie fixtures without replacing unrelated
+or user-created local-first data. Folder tiles remain backed by the existing view stack and open
+the same reusable `FolderDetailScreen`; no duplicate screen or second state layer was introduced.
+
+Fresh production comparison (Figma / app, no broken images or structural blocks):
+
+- `2172:5822`: 4.92 / 5.04 / 4.89, 5.97% of pixels over 28.
+- `2172:5877`: 6.64 / 6.98 / 6.93, 7.69%.
+- `2172:5991`: 6.47 / 6.28 / 6.01, 7.71%.
+- `2172:6105`: 5.91 / 5.80 / 5.49, 7.20%.
+- `2172:6221`: 6.37 / 6.35 / 6.27, 7.24%.
+
+`figma_compare.py` reached the category and every folder through the real Home click path. The
+full 35-row production suite showed no regression in the requested flow; it still exits non-zero
+only because Activity's previously documented text-antialiasing residual exceeds the global 8.0
+threshold. `npm run build` is clean.
+
+## Học tập & Công việc showcase flow matched (2026-08-29)
+
+Home's `Học tập & Công việc` category now opens the exact Section 9 category state and four
+distinct populated folder states requested by the user:
+
+- Category `2172:6335`: exact four visible folder tiles/counts (`Ngoại ngữ` 18,
+  `Kỹ năng làm việc` 15, `Tài liệu học tập` 20, `Công cụ AI` 12), the four overview links in
+  storyboard order, their real source/author/duration metadata, tags, and the node's folder crop.
+- `2172:6390` `Ngoại ngữ`, `2172:6504` `Kỹ năng làm việc`, `2172:6618`
+  `Tài liệu học tập`, and `2172:6732` `Công cụ AI`: five exact links each, including the current
+  Figma images, titles, authors, durations, sources, and both tags.
+
+The implementation reuses `CategoryScreen`, `FolderDetailScreen`, and `MnemeProvider`; no second
+state layer or duplicate screen was added. The 20 canonical study fixture ids are normalized and
+restored when older localStorage data loads, while unrelated/user-created records remain intact.
+`CategoryScreen` selects the four overview fixtures by explicit ids rather than mutable seed order.
+The same audit caught an older ordering regression where recent-card id `3` (now categorized as
+`Phim ảnh`) displaced the first movie overview row; the movie overview is now deterministic via
+ids `10–13`, restoring its prior pixel match.
+
+Focused production comparison (Figma / app, no broken images or structural blocks):
+
+- `2172:6335`: 5.18 / 4.99 / 4.66, 6.10% of pixels over 28.
+- `2172:6390`: 5.59 / 5.42 / 5.23, 6.89%.
+- `2172:6504`: 6.04 / 6.05 / 5.74, 7.25%.
+- `2172:6618`: 6.07 / 5.94 / 5.81, 6.97%.
+- `2172:6732`: 5.47 / 5.24 / 4.86, 6.32%.
+- Legacy movie Category `2159:13036`: 4.93 / 5.05 / 4.91, confirming the shared-screen change
+  did not regress its content/layout.
+
+`figma_compare.py` now reaches every state through the real Home → category → folder click path.
+The live status-bar clock remains intentionally unchanged.
+
+## Du lịch showcase flow matched (2026-08-29)
+
+Home's `Du lịch` category now opens the complete five-node flow selected by the user:
+
+- Category `2172:6846`: exact visible folders/counts (`Việt Nam` 22, `Nhật Bản` 14,
+  `Đông Nam Á` 16, `Mẹo du lịch tiết kiệm` 11), four deterministic overview links, real
+  duration/source/author metadata, tags, and the byte-identical shared Figma folder crop.
+- New folder `2172:6901` `Việt Nam`: five exact links with current Figma JPEGs, titles,
+  sources, authors, durations, and tags.
+- Existing exact folder fixtures are reused for `2172:7015` `Nhật Bản`, `2172:7130`
+  `Đông Nam Á`, and `2172:7244` `Mẹo du lịch tiết kiệm`.
+
+Category node `2172:6846` and folder node `2172:7244` intentionally use different title copy for
+the same cheap-flight photo. A category-only fixture preserves the longer “chỉ với vài bước đơn
+giản” copy without corrupting the shorter folder-detail title. All 21 canonical travel fixture
+ids are migrated/restored for older localStorage sessions while unrelated and user-created data
+remain untouched.
+
+Focused production comparison (Figma / app, no broken images or structural blocks):
+
+- `2172:6846`: 4.76 / 4.50 / 4.31, 5.73% of pixels over 28.
+- `2172:6901`: 4.94 / 4.68 / 4.61, 5.93%.
+- `2172:7015`: 5.24 / 5.08 / 5.00, 6.29%.
+- `2172:7130`: 5.43 / 5.36 / 5.32, 6.55%.
+- `2172:7244`: 5.83 / 5.97 / 6.10, 6.89%.
+- Shared-screen regressions: Study category remains 5.17 / 4.98 / 4.64 and legacy movie
+  Category remains 4.92 / 5.04 / 4.90.
+
+Playwright also started from an intentionally empty persisted link array, confirmed migration of
+every required travel fixture id, clicked all four folder tiles through the real Home route,
+asserted each folder's first exact title, returned to the category between clicks, and found zero
+broken images. The live clock/status implementation was not changed.
+
+## Công thức bánh showcase flow matched (2026-08-29)
+
+Home's `Công thức bánh` category now opens the exact five-node Section 9 flow selected by the
+user:
+
+- Category `2172:7359`: exact `Folders (6)` copy; folder counts `Bánh Âu` 16, `Bánh Á` 13,
+  `Bánh không cần lò nướng` 19, and `Trang trí bánh` 9; exact truncation; and four
+  deterministic overview links with real source, author, duration, and both tags.
+- Folder details `2172:7414`, `2172:7512`, `2172:7610`, and `2172:7704` retain their five
+  node-specific links and route through the shared `FolderDetailScreen`.
+
+The first three category rasters and the shared folder crop hash byte-for-byte against the
+already committed Folder Detail assets. `2172:7359` uses a different original source crop for
+the fourth overview image, so it is preserved separately as `2172_7359_link4.jpg`. Category-only
+records `181` and `182` preserve the category's second tags and its distinct “đơn giản mà đẹp
+mắt” title without changing the single-tag/copy contract of folder nodes `2172:7610` and
+`2172:7704`. `CAKE_SHOWCASE_LINK_IDS` also upgrades and restores all canonical fixtures for
+older localStorage sessions while preserving unrelated and user-created data.
+
+Fresh production comparison (Figma / app, no broken images or structural blocks):
+
+- `2172:7359`: 4.68 / 4.54 / 4.41, 5.89% of pixels over 28.
+- `2172:7414`: 4.73 / 4.77 / 4.79, 6.02%.
+- `2172:7512`: 5.10 / 5.14 / 5.11, 6.21%.
+- `2172:7610`: 6.48 / 6.35 / 6.17, 7.19%; the one-line header fix improved the old
+  7.31 / 7.21 / 6.93 score.
+- `2172:7704`: 5.08 / 5.09 / 5.25, 6.12%.
+
+Playwright started from an empty persisted link array, verified all four exact category rows and
+category-only tags, opened every folder through the real Home route using its node count, checked
+each first title, returned to the category, and found zero broken images. `tsc --noEmit` and the
+production build are clean. The full 36-row comparison suite still exits non-zero only because
+Activity's previously documented text-antialiasing residual exceeds the global 8.0 threshold.
+
 ## Next work
 
 1. Continue the remaining Notebook analysis/content states against their own nodes, starting with
    `2159:13602`.
 2. Implement the Home toast state `2159:13227` against its node; it currently uses the exact
    success vector but its layout has not been node-verified.
-3. Implement the two remaining Home variants, `2159:13303` and `2159:13676`.
 
 ## Important context
 

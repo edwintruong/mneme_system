@@ -2,9 +2,10 @@ import React, { useState } from 'react';
 import { useMneme } from '../state/mnemeContext';
 import { FigmaIcon } from '../components/common/FigmaIcon';
 import { MnemeCategory, SavedLink } from '../types';
+import { HOME_CATEGORY_IDS, HOME_RECENT_LINK_IDS } from '../data/seed';
 
 /**
- * Home, Figma node 2159:12771. Every size, gap and colour below is read from
+ * Home, Figma node 2172:4416. Every size, gap and colour below is read from
  * that node; do not adjust them to taste.
  */
 
@@ -28,10 +29,18 @@ export const HomeScreen: React.FC<HomeScreenProps> = ({
   const { categories, links } = useMneme();
   const [filter, setFilter] = useState<string>(FILTERS[0]);
 
-  const recent = links.slice(0, 3);
+  // This screen is the fixed showcase storyboard from node 2172:4416. Select
+  // its fixtures by id so older localStorage order and user-created links do
+  // not silently replace the copy visible in the Figma frame.
+  const recent = HOME_RECENT_LINK_IDS
+    .map((id) => links.find((link) => link.id === id))
+    .filter((link): link is SavedLink => Boolean(link));
+  const homeCategories = HOME_CATEGORY_IDS
+    .map((id) => categories.find((category) => category.id === id))
+    .filter((category): category is MnemeCategory => Boolean(category));
 
   return (
-    // Content, node 2159:12773
+    // Content, node 2172:4418
     <div className="flex w-[390px] flex-1 flex-col items-start gap-[12px] px-[20px] py-[16px]">
       {showSuccessToast && (
         // Add-link toast, node 2159:13227
@@ -48,7 +57,7 @@ export const HomeScreen: React.FC<HomeScreenProps> = ({
         </div>
       )}
 
-      {/* Header, node 2159:12774 */}
+      {/* Header, node 2172:4419 */}
       <div className="flex w-[350px] items-start justify-end">
         <h1 className="min-w-px flex-1 self-stretch text-[24px] leading-[30px] font-medium tracking-[-0.15px] text-[#0e0727]">
           Xin chào, echs
@@ -62,7 +71,7 @@ export const HomeScreen: React.FC<HomeScreenProps> = ({
         </div>
       </div>
 
-      {/* Search Card, node 2159:12777 */}
+      {/* Search Card, node 2172:4422 */}
       <div className="flex w-[350px] flex-col items-start overflow-hidden rounded-[30px] bg-white p-[12px]">
         <div className="flex w-[326px] items-center justify-center gap-[18px]">
           <button
@@ -81,12 +90,12 @@ export const HomeScreen: React.FC<HomeScreenProps> = ({
         </div>
       </div>
 
-      {/* Card, node 2159:12779 */}
+      {/* Card, node 2172:4424 */}
       <div
         className="flex w-full flex-col items-start gap-[20px] rounded-[20px] bg-white px-[16px] py-[20px]"
         style={{ boxShadow: 'var(--shadow-card)' }}
       >
-        {/* Filter Chips, node 2159:12780 */}
+        {/* Filter Chips, node 2172:4425 */}
         <div className="flex items-start gap-[10px] overflow-hidden">
           {FILTERS.map((label) => {
             const selected = filter === label;
@@ -111,9 +120,9 @@ export const HomeScreen: React.FC<HomeScreenProps> = ({
           })}
         </div>
 
-        {/* node 2159:12785 */}
+        {/* node 2172:4430 */}
         <div className="flex w-full flex-col items-start gap-[20px]">
-          {/* Đã lưu gần đây, node 2159:12786 */}
+          {/* Đã lưu gần đây, node 2172:4431 */}
           <div className="flex w-full flex-col items-start gap-[10px]">
             <p className="w-full text-[14px] leading-[20px] font-medium tracking-[0.4px] text-[#0e0727]">
               Đã lưu gần đây
@@ -137,12 +146,12 @@ export const HomeScreen: React.FC<HomeScreenProps> = ({
             </div>
           </div>
 
-          {/* Categories, node 2159:12801 */}
+          {/* Categories, node 2172:4446 */}
           <div className="flex w-full flex-col items-start gap-[10px]">
             <p className="w-full text-[14px] leading-[20px] font-medium tracking-[0.4px] text-[#0e0727]">
               Categories
             </p>
-            {categories.map((category, index) => (
+            {homeCategories.map((category, index) => (
               <button
                 key={category.id}
                 type="button"
@@ -163,7 +172,7 @@ export const HomeScreen: React.FC<HomeScreenProps> = ({
                   </div>
                 </div>
                 {/* Only the last row carries the overflow control in the design. */}
-                {index === categories.length - 1 && (
+                {index === homeCategories.length - 1 && (
                   // 24px box holding a 2.5x12.5 glyph, node 2143:3538
                   <span className="relative size-[24px] shrink-0">
                     {/*

@@ -34,6 +34,19 @@ CORNER_RADIUS = 40
 # node id -> (reference file, frame height, nav tab to click first)
 SCREENS = [
     ('2159:12771', 'Home',          '2159_12771_home.png',     856, None),
+    ('2172:4416', 'Home (showcase)', '2172_4416_home.png',      856, None),
+    ('2172:4258', 'Link detail (crepe)', '2172_4258_link_detail_crepe.png', 845, 'Recent crepe'),
+    ('2172:4313', 'Link detail (prompt)', '2172_4313_link_detail_prompt.png', 845, 'Recent prompt'),
+    ('2172:4365', 'Link detail (movie)', '2172_4365_link_detail_movie.png', 845, 'Recent movie'),
+    ('2172:5822', 'Category (movie showcase)', '2172_5822_category_movie.png', 850, 'Category Movie'),
+    ('2172:6335', 'Category (study)', '2172_6335_category_study.png', 850, 'Category Study'),
+    ('2172:6390', 'Folder (languages)', '2172_6390_folder_languages.png', 843, 'Folder Ngoại ngữ'),
+    ('2172:6504', 'Folder (work skills)', '2172_6504_folder_work_skills.png', 843, 'Folder Kỹ năng làm việc'),
+    ('2172:6618', 'Folder (study materials)', '2172_6618_folder_study_materials.png', 843, 'Folder Tài liệu học tập'),
+    ('2172:6732', 'Folder (AI tools)', '2172_6732_folder_ai_tools.png', 843, 'Folder Công cụ AI'),
+    ('2172:6846', 'Category (travel)', '2172_6846_category_travel.png', 856, 'Category Travel'),
+    ('2172:6901', 'Folder (Vietnam)', '2172_6901_folder_vietnam.png', 843, 'Folder Việt Nam'),
+    ('2172:7359', 'Category (cake)', '2172_7359_category_cake.png', 856, 'Category Cake'),
     ('2159:12891', 'Notebook list', '2159_12891_notebook.png', 844, 'Sổ tay'),
     ('2159:13180', 'Add link',      '2159_13180_add_link.png', 856, 'Thêm liên kết mới'),
     ('2159:12980', 'Link detail',   '2159_12980_link_detail.png', 844, 'Link detail'),
@@ -55,6 +68,7 @@ SCREENS = [
     ('2172:7512', 'Folder detail (Bánh Á, showcase)', '2172_7512_folder_detail_banha.png', 843, 'Folder Bánh Á'),
     ('2172:7610', 'Folder detail (Bánh không lò, showcase)', '2172_7610_folder_detail_banhkhongcanlo.png', 843, 'Folder Bánh không cần lò nướng'),
     ('2172:7704', 'Folder detail (Trang trí bánh, showcase)', '2172_7704_folder_detail_trangtribanh.png', 837, 'Folder Trang trí bánh'),
+    ('2172:4208', 'Activity',      '2172_4208_activity.png',  824, 'Hoạt động'),
 ]
 
 
@@ -84,8 +98,43 @@ def capture(page, tab, height, dest):
     page.reload(wait_until='networkidle')
     page.wait_for_timeout(900)
     if tab:
-        if tab == 'Link detail':
-            page.get_by_role('button', name='Hoạt động').click()
+        if tab == 'Recent crepe':
+            page.get_by_role('button', name='Công thức bánh crepe', exact=True).click()
+        elif tab == 'Recent prompt':
+            page.get_by_role('button', name='Tối ưu prompt AI', exact=True).click()
+        elif tab == 'Recent movie':
+            page.get_by_role('button', name='Phim hay mùa hè 2026', exact=True).click()
+        elif tab == 'Category Study':
+            page.get_by_role('button', name='Học tập & Công việc 24 mục').click()
+        elif tab == 'Category Movie':
+            page.get_by_role('button', name='Phim ảnh 10 mục').click()
+        elif tab in ('Folder Ngoại ngữ', 'Folder Kỹ năng làm việc', 'Folder Tài liệu học tập', 'Folder Công cụ AI'):
+            page.get_by_role('button', name='Học tập & Công việc 24 mục').click()
+            folder_name = tab.removeprefix('Folder ')
+            folder_counts = {
+                'Ngoại ngữ': 18,
+                'Kỹ năng làm việc': 15,
+                'Tài liệu học tập': 20,
+                'Công cụ AI': 12,
+            }
+            page.get_by_role('button', name=f'{folder_name} {folder_counts[folder_name]} links').click()
+        elif tab == 'Category Travel':
+            page.get_by_role('button', name='Du lịch 10 mục').click()
+        elif tab in ('Folder Việt Nam', 'Folder Nhật Bản', 'Folder Đông Nam Á', 'Folder Mẹo du lịch tiết kiệm'):
+            page.get_by_role('button', name='Du lịch 10 mục').click()
+            folder_name = tab.removeprefix('Folder ')
+            folder_counts = {
+                'Việt Nam': 22,
+                'Nhật Bản': 14,
+                'Đông Nam Á': 16,
+                'Mẹo du lịch tiết kiệm': 11,
+            }
+            page.get_by_role('button', name=f'{folder_name} {folder_counts[folder_name]} links').click()
+        elif tab == 'Category Cake':
+            page.get_by_role('button', name='Công thức bánh 10 mục').click()
+        elif tab == 'Link detail':
+            page.get_by_role('button', name='Enter search terms...').click()
+            page.get_by_placeholder('Tìm link, folder hoặc category...').fill('Bún chả Hà Nội')
             page.get_by_text('Bún chả Hà Nội ngon ở phố cổ', exact=True).click()
         elif tab == 'Create folder':
             page.get_by_role('button', name='Phim ảnh').click()
@@ -124,27 +173,16 @@ def capture(page, tab, height, dest):
         elif tab == 'Folder Anime':
             page.get_by_role('button', name='Phim ảnh').click()
             page.get_by_role('button', name='Anime 24 links').click()
-        elif tab == 'Folder Nhật Bản':
-            page.get_by_role('button', name='Du lịch').click()
-            page.get_by_role('button', name='Nhật Bản 24 links').click()
-        elif tab == 'Folder Đông Nam Á':
-            page.get_by_role('button', name='Du lịch').click()
-            page.get_by_role('button', name='Đông Nam Á 24 links').click()
-        elif tab == 'Folder Mẹo du lịch tiết kiệm':
-            page.get_by_role('button', name='Du lịch').click()
-            page.get_by_role('button', name='Mẹo du lịch tiết kiệm 24 links').click()
-        elif tab == 'Folder Bánh Âu':
+        elif tab in ('Folder Bánh Âu', 'Folder Bánh Á', 'Folder Bánh không cần lò nướng', 'Folder Trang trí bánh'):
             page.get_by_role('button', name='Công thức bánh 10 mục').click()
-            page.get_by_role('button', name='Bánh Âu 24 links').click()
-        elif tab == 'Folder Bánh Á':
-            page.get_by_role('button', name='Công thức bánh 10 mục').click()
-            page.get_by_role('button', name='Bánh Á 24 links').click()
-        elif tab == 'Folder Bánh không cần lò nướng':
-            page.get_by_role('button', name='Công thức bánh 10 mục').click()
-            page.get_by_role('button', name='Bánh không cần lò nướng 24 links').click()
-        elif tab == 'Folder Trang trí bánh':
-            page.get_by_role('button', name='Công thức bánh 10 mục').click()
-            page.get_by_role('button', name='Trang trí bánh 24 links').click()
+            folder_name = tab.removeprefix('Folder ')
+            folder_counts = {
+                'Bánh Âu': 16,
+                'Bánh Á': 13,
+                'Bánh không cần lò nướng': 19,
+                'Trang trí bánh': 9,
+            }
+            page.get_by_role('button', name=f'{folder_name} {folder_counts[folder_name]} links').click()
         else:
             page.get_by_role('button', name=tab).click()
         page.wait_for_timeout(800)
