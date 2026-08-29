@@ -30,8 +30,7 @@ interface AddLinkScreenProps {
   initialFolder?: string;
   initialCategory?: string;
   onBack: () => void;
-  onStartAnalysis: (params: { url: string; folder: string; category: string }) => void;
-  onSaveToCategory?: (params: AddLinkParams) => Promise<void>;
+  onSaveToCategory: (params: AddLinkParams) => Promise<void>;
 }
 
 /** A native select laid invisibly over a styled row, so the row keeps Figma's look. */
@@ -59,7 +58,6 @@ export const AddLinkScreen: React.FC<AddLinkScreenProps> = ({
   initialFolder,
   initialCategory,
   onBack,
-  onStartAnalysis,
   onSaveToCategory,
 }) => {
   const { folders, categories } = useMneme();
@@ -83,25 +81,29 @@ export const AddLinkScreen: React.FC<AddLinkScreenProps> = ({
 
   const folderOptions = Array.from(new Set([designFolder, ...folders]));
   const categoryOptions = Array.from(new Set([designCategory, ...categories.map((c) => c.name)]));
+  const [isSaving, setIsSaving] = useState(false);
 
-  const handleSave = () => {
-    if (isTravelCategoryFlow && onSaveToCategory) {
-      void onSaveToCategory({
+  const handleSave = async () => {
+    if (isSaving) return;
+    setIsSaving(true);
+    try {
+      await onSaveToCategory({
         url,
         folder,
         category,
-        preset: {
-          title: TRAVEL_DESIGN.title,
-          summary: TRAVEL_DESIGN.summary,
-          image: TRAVEL_DESIGN.previewImage,
-          source: 'Website',
-          tags: ['Du lịch', 'Kyoto'],
-        },
+        preset: isTravelCategoryFlow
+          ? {
+              title: TRAVEL_DESIGN.title,
+              summary: TRAVEL_DESIGN.summary,
+              image: TRAVEL_DESIGN.previewImage,
+              source: 'Website',
+              tags: ['Du lịch', 'Kyoto'],
+            }
+          : undefined,
       });
-      return;
+    } finally {
+      setIsSaving(false);
     }
-
-    onStartAnalysis({ url, folder, category });
   };
 
   return (
@@ -264,10 +266,11 @@ export const AddLinkScreen: React.FC<AddLinkScreenProps> = ({
         <button
           type="button"
           onClick={handleSave}
-          className="flex w-[354px] items-center justify-center gap-[10px] overflow-hidden rounded-[16px] bg-[#7758e2] px-[16px] py-[12px]"
+          disabled={isSaving}
+          className="flex w-[354px] items-center justify-center gap-[10px] overflow-hidden rounded-[16px] bg-[#7758e2] px-[16px] py-[12px] disabled:opacity-60"
         >
           <span className="whitespace-nowrap text-center text-[16px] leading-[22px] font-medium tracking-[-0.18px] text-white">
-            Lưu liên kết
+            {isSaving ? 'Đang lưu...' : 'Lưu liên kết'}
           </span>
         </button>
       </div>

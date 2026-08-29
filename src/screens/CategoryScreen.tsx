@@ -275,8 +275,11 @@ export const CategoryScreen: React.FC<CategoryScreenProps> = ({
 
       {showAddModal && (
         // Create-folder sheet, Figma nodes 2159:13091 / 2172:7830.
-        <div className="fixed top-0 left-1/2 z-60 h-[858px] w-[390px] -translate-x-1/2 overflow-hidden bg-black/40">
-          <form onSubmit={handleCreateFolder} className="absolute top-[548px] left-0 flex h-[310px] w-[390px] flex-col items-start gap-[16px] rounded-[20px] bg-white px-[20px] pt-[20px] pb-[40px]">
+        // `inset-0` fills the phone frame's actual height (see the frame's
+        // transform-gpu in App.tsx) instead of a hardcoded 858px, so the dark
+        // backdrop never leaves a gap that lets underlying content show through.
+        <div className="fixed inset-0 z-60 flex flex-col justify-end overflow-hidden bg-black/40">
+          <form onSubmit={handleCreateFolder} className="flex h-[310px] w-full shrink-0 flex-col items-start gap-[16px] rounded-[20px] bg-white px-[20px] pt-[20px] pb-[40px]">
             <div className="flex h-[24px] w-full items-start justify-center gap-[16px]">
               <h2 className="min-w-0 flex-1 text-center text-[16px] leading-[24px] font-semibold tracking-[0.15px] text-black">Tạo folder mới</h2>
               <button type="button" onClick={() => setShowAddModal(false)} aria-label="Đóng" className="flex size-[24px] shrink-0 items-center justify-end">

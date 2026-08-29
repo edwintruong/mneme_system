@@ -78,20 +78,18 @@ export const LinkDetailScreen: React.FC<LinkDetailScreenProps> = ({
       {/* Detail card, node 2159:12999. */}
       <section className="mx-[20px] mt-[16px] flex w-[350px] flex-col gap-[24px] rounded-[16px] bg-white py-[16px]">
         <div className="flex w-full flex-col gap-[12px]">
-          <div className="flex h-[28px] w-full items-center gap-[10px] px-[20px]">
-            <h1 className="shrink-0 whitespace-nowrap text-[18px] leading-[28px] font-medium tracking-[0px] text-[#0e0727]">
+          <div className="flex w-full items-start gap-[10px] px-[20px]">
+            <h1 className="min-w-0 flex-1 break-words text-[18px] leading-[28px] font-medium tracking-[0px] text-[#0e0727]">
               {link.title}
             </h1>
-            <div className="flex min-w-0 flex-1 items-center">
-              <button
-                type="button"
-                onClick={() => toggleFavorite(link.id)}
-                aria-label={link.favorite ? 'Bỏ yêu thích' : 'Yêu thích'}
-                className="flex size-[20px] items-center justify-center"
-              >
-                <FigmaIcon name="star-filled" size={20} />
-              </button>
-            </div>
+            <button
+              type="button"
+              onClick={() => toggleFavorite(link.id)}
+              aria-label={link.favorite ? 'Bỏ yêu thích' : 'Yêu thích'}
+              className="flex size-[20px] shrink-0 items-center justify-center"
+            >
+              <FigmaIcon name="star-filled" size={20} />
+            </button>
           </div>
 
           <div className="mx-auto flex h-[48px] w-[316px] items-center gap-[10px] rounded-[16px] border-[1.8px] border-solid border-[#f2f2f3] px-[20px] py-[8px]">

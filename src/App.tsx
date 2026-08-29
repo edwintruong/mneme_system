@@ -7,7 +7,6 @@ import { FolderDetailScreen } from './screens/FolderDetailScreen';
 import { LinkDetailScreen } from './screens/LinkDetailScreen';
 import { EditLinkScreen } from './screens/EditLinkScreen';
 import { AddLinkScreen } from './screens/AddLinkScreen';
-import { LinkAnalysisScreen } from './screens/LinkAnalysisScreen';
 import { NotebookScreen } from './screens/NotebookScreen';
 import { SelectSourcesScreen } from './screens/SelectSourcesScreen';
 import { NotebookDetailScreen } from './screens/NotebookDetailScreen';
@@ -166,29 +165,6 @@ const MnemeApp: React.FC = () => {
             initialCategory={currentView.initialCategory}
             onBack={popView}
             onSaveToCategory={saveResolvedCategoryLink}
-            onStartAnalysis={(params) =>
-              pushView({
-                type: 'link_analysis',
-                url: params.url,
-                folder: params.folder,
-                category: params.category,
-              })
-            }
-          />
-        );
-
-      case 'link_analysis':
-        return (
-          <LinkAnalysisScreen
-            url={currentView.url}
-            folder={currentView.folder}
-            category={currentView.category}
-            onFinished={(createdLink) => {
-              setSuccessCategory(createdLink.category);
-              resetToTabs('home');
-              pushView({ type: 'link_detail', link: createdLink });
-            }}
-            onCancel={popView}
           />
         );
 
@@ -295,7 +271,13 @@ const MnemeApp: React.FC = () => {
         The Figma frame carries px-20, which is why the status bar is 350 wide and
         starts at x=20 while Content is a full 390 and overflows that padding.
       */}
-      <div className={`relative flex h-screen w-full flex-col items-center overflow-hidden px-[20px] sm:h-[856px] sm:w-[390px] sm:rounded-[40px] sm:shadow-[0_30px_70px_-20px_rgba(0,0,0,0.55)] ${usesDarkCanvas ? 'bg-[#2e1442]' : usesWhiteCanvas ? 'bg-white' : 'bg-[#f8f6fd]'}`}>
+      {/*
+        transform-gpu makes this frame the containing block for any `fixed`
+        descendant (full-screen modals, sticky action bars) so they size and
+        clip to the 390x856 mockup instead of the real browser viewport,
+        which on desktop is centered around this frame, not flush with it.
+      */}
+      <div className={`relative flex h-screen w-full transform-gpu flex-col items-center overflow-hidden px-[20px] sm:h-[856px] sm:w-[390px] sm:rounded-[40px] sm:shadow-[0_30px_70px_-20px_rgba(0,0,0,0.55)] ${usesDarkCanvas ? 'bg-[#2e1442]' : usesWhiteCanvas ? 'bg-white' : 'bg-[#f8f6fd]'}`}>
         {/* iOS UI/Status Bar. Same layout on every screen: live Ho Chi Minh City clock, left. */}
         <div className={`relative h-[44px] shrink-0 overflow-hidden select-none ${usesWhiteCanvas || usesDarkCanvas ? 'w-[390px]' : 'w-full'} ${usesDarkCanvas ? 'bg-[#2e1442]' : ''}`}>
           <p

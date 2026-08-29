@@ -26,7 +26,7 @@ export const SearchScreen: React.FC<SearchScreenProps> = ({ onBack, onSelectLink
   return (
     <div className="min-h-screen bg-[#F8F6FD] pb-28">
       {/* Top Search Bar */}
-      <div className="sticky top-0 bg-[#F8F6FD]/90 backdrop-blur-md px-4 py-3 z-30 flex items-center gap-2">
+      <div className="sticky top-0 bg-[#F8F6FD] px-4 py-3 z-30 flex items-center gap-2">
         <FigmaBackButton onClick={onBack} />
         <div className="flex-1 relative">
           <input
@@ -50,6 +50,9 @@ export const SearchScreen: React.FC<SearchScreenProps> = ({ onBack, onSelectLink
             </button>
           )}
         </div>
+        <button type="button" aria-label="Bộ lọc" className="shrink-0">
+          <FigmaIcon name="filter" size={36} />
+        </button>
       </div>
 
       <div className="px-4 space-y-4 pt-1">
